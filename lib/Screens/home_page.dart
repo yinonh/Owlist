@@ -13,15 +13,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Stream<List<ToDoList>> existingItemsStream; // Change the type to Stream
+  late Future<List<ToDoList>> existingItems;
   ListsProvider provider = ListsProvider();
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    existingItemsStream =
-        provider.existingItemsStream; // Use the stream from the provider
+    _onItemTapped(0);
   }
 
   void deleteItem(ToDoList item) {
@@ -34,12 +33,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
       if (index == 0)
-        existingItemsStream =
-            provider.existingItemsStream; // Use the stream for active items
+        existingItems = provider.getActiveItems();
       else
-        existingItemsStream = provider
-            .getAchievedItems()
-            .asStream(); // Convert future to stream for achieved items
+        existingItems = provider.getAchievedItems();
     });
   }
 
@@ -147,18 +143,31 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(height: 16.0),
               Expanded(
-                child: StreamBuilder<List<ToDoList>>(
-                  stream:
-                      existingItemsStream, // Use the stream instead of future
+                child: FutureBuilder<List<ToDoList>>(
+                  future: existingItems,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                           child: CircularProgressIndicator(
                         color: Colors.white,
-                      )); // Replace with your preferred loading widget
+                      ));
                     } else if (snapshot.hasError) {
-                      print("Error: ${snapshot.error}");
-                      return Text('Error: ${snapshot.error}');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          duration: Duration(seconds: 2),
+                          content: Text(
+                            'Error',
+                            style: TextStyle(
+                              color: Colors.deepOrange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                      return Text(
+                        'Error: ${snapshot.error}',
+                        style: TextStyle(color: Colors.white),
+                      );
                     } else {
                       return ListView.builder(
                         itemCount: snapshot.data!.length,
