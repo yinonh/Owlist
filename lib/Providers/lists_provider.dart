@@ -9,16 +9,23 @@ class ListsProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<List<ToDoList>> getActiveItems() async {
-    DateTime currentDate = DateTime.now();
-    String userId = FirebaseAuth.instance.currentUser!.uid;
+  List<ToDoList>? _activeItemsCache;
+  List<ToDoList>? _achievedItemsCache;
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+  Future<List<ToDoList>> getActiveItems() async {
+    if (_activeItemsCache != null) {
+      return _activeItemsCache!;
+    }
+
+    DateTime currentDate = DateTime.now();
+    String userId = _auth.currentUser!.uid;
+
+    QuerySnapshot snapshot = await _firestore
         .collection('todo_lists')
         .where('userID', isEqualTo: userId)
         .get();
 
-    List<ToDoList> activeItems = snapshot.docs
+    _activeItemsCache = snapshot.docs
         .where((doc) {
           var deadline = DateTime.parse(doc['deadline']);
           return doc['accomplishedItems'] < doc['totalItems'] &&
@@ -27,19 +34,23 @@ class ListsProvider with ChangeNotifier {
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
 
-    return activeItems;
+    return _activeItemsCache!;
   }
 
   Future<List<ToDoList>> getAchievedItems() async {
-    DateTime currentDate = DateTime.now();
-    String userId = FirebaseAuth.instance.currentUser!.uid;
+    if (_achievedItemsCache != null) {
+      return _achievedItemsCache!;
+    }
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    DateTime currentDate = DateTime.now();
+    String userId = _auth.currentUser!.uid;
+
+    QuerySnapshot snapshot = await _firestore
         .collection('todo_lists')
         .where('userID', isEqualTo: userId)
         .get();
 
-    List<ToDoList> achievedItems = snapshot.docs
+    _achievedItemsCache = snapshot.docs
         .where((doc) {
           var deadline = DateTime.parse(doc['deadline']);
           return doc['accomplishedItems'] == doc['totalItems'] ||
@@ -48,7 +59,7 @@ class ListsProvider with ChangeNotifier {
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
 
-    return achievedItems;
+    return _achievedItemsCache!;
   }
 
   // Method to add a new list to Firebase Cloud Firestore
@@ -58,6 +69,12 @@ class ListsProvider with ChangeNotifier {
     } catch (e) {
       print('Error adding new list: $e');
     }
+  }
+
+  // Method to invalidate the cache and clear the stored data
+  void invalidateCache() {
+    _activeItemsCache = null;
+    _achievedItemsCache = null;
   }
 
   // Modify existingItems to a stream that listens to changes in Firestore

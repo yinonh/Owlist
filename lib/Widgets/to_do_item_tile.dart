@@ -8,7 +8,7 @@ class ToDoItemTile extends StatelessWidget {
   final ToDoList item;
   final Function(ToDoList) onDelete;
 
-  ToDoItemTile({required this.item, required this.onDelete});
+  const ToDoItemTile({required this.item, required this.onDelete});
 
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(

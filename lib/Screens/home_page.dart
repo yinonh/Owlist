@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../Providers/lists_provider.dart';
 import '../Models/to_do_list.dart';
+import '../Widgets/items_screen.dart';
 import '../Widgets/to_do_item_tile.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,14 +14,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<ToDoList>> existingItems;
+  // late Future<List<ToDoList>> existingItems;
   ListsProvider provider = ListsProvider();
-  int _selectedIndex = 0;
+  int currentIndex = 0;
+  PageController selectedIndex = PageController(initialPage: 0);
 
   @override
   void initState() {
     super.initState();
-    _onItemTapped(0);
   }
 
   void deleteItem(ToDoList item) {
@@ -31,11 +32,9 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
-      if (index == 0)
-        existingItems = provider.getActiveItems();
-      else
-        existingItems = provider.getAchievedItems();
+      selectedIndex!.animateToPage(index,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+      currentIndex = index;
     });
   }
 
@@ -45,7 +44,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        currentIndex: _selectedIndex,
+        currentIndex: currentIndex,
         onTap: _onItemTapped,
         selectedIconTheme: IconThemeData(
           size: 30,
@@ -88,6 +87,17 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.logout, color: Colors.white)),
+                    const Text(
+                      'To-Do',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
                       icon: Icon(Icons.add, color: Colors.white),
                       onPressed: () {
                         TextEditingController? new_title;
@@ -118,22 +128,13 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
-                    const Text(
-                      'To-Do',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(),
                   ],
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  _selectedIndex == 0 ? 'Active Items' : 'Archived Items',
+                  currentIndex == 0 ? 'Active Items' : 'Archived Items',
                   style: const TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.bold,
@@ -143,46 +144,83 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(height: 16.0),
               Expanded(
-                child: FutureBuilder<List<ToDoList>>(
-                  future: existingItems,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ));
-                    } else if (snapshot.hasError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          duration: Duration(seconds: 2),
-                          content: Text(
-                            'Error',
-                            style: TextStyle(
-                              color: Colors.deepOrange,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                      return Text(
-                        'Error: ${snapshot.error}',
-                        style: TextStyle(color: Colors.white),
-                      );
-                    } else {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ToDoItemTile(
-                              item: snapshot.data![index],
-                              onDelete: deleteItem,
+                child: PageView(
+                  onPageChanged: _onItemTapped,
+                  controller: selectedIndex,
+                  children: [
+                    FutureBuilder<List<ToDoList>>(
+                      future: provider.getActiveItems(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
                             ),
                           );
-                        },
-                      );
-                    }
-                  },
+                        } else if (snapshot.hasError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: Duration(seconds: 2),
+                              content: Text(
+                                'Error',
+                                style: TextStyle(
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                          return Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return ItemsScreen(
+                            selectedIndex: 0,
+                            existingItems: snapshot.data!,
+                            deleteItem: deleteItem,
+                          );
+                        }
+                      },
+                    ),
+                    FutureBuilder<List<ToDoList>>(
+                      future: provider.getAchievedItems(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: Duration(seconds: 2),
+                              content: Text(
+                                'Error',
+                                style: TextStyle(
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                          return Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return ItemsScreen(
+                            selectedIndex: 1,
+                            existingItems: snapshot.data!,
+                            deleteItem: deleteItem,
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
