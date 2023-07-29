@@ -30,6 +30,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
     }
   }
 
+  void _moveToItemPage(BuildContext context, String itemID) {
+    print("Moving to item page: $itemID");
+  }
+
   @override
   Widget build(BuildContext context) {
     todoItems.sort((a, b) {
@@ -160,11 +164,5 @@ class _SingleListScreenState extends State<SingleListScreen> {
         ),
       ),
     );
-  }
-
-  void _moveToItemPage(BuildContext context, String itemID) {
-    // Implement the navigation to the item page here if needed.
-    // For simplicity, you can just print the item ID for now.
-    print("Moving to item page: $itemID");
   }
 }

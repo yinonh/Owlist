@@ -2,7 +2,7 @@ class ToDoItem {
   final String id;
   final String listId;
   final String title;
-  final String description;
+  final String content;
   bool done;
   int index;
 
@@ -10,7 +10,7 @@ class ToDoItem {
     required this.id,
     required this.listId,
     required this.title,
-    required this.description,
+    required this.content,
     required this.done,
     required this.index,
   });

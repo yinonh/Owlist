@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
-import '../Providers/lists_provider.dart';
 import '../Models/to_do_list.dart';
+import '../Providers/lists_provider.dart';
 import '../Widgets/items_screen.dart';
-import '../Widgets/to_do_item_tile.dart';
+import '../Widgets/add_list.dart';
+import '../Screens/sign_in_sign_up_screen.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -14,19 +17,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // late Future<List<ToDoList>> existingItems;
-  ListsProvider provider = ListsProvider();
+  late ListsProvider provider;
+
   int currentIndex = 0;
   PageController selectedIndex = PageController(initialPage: 0);
 
   @override
   void initState() {
     super.initState();
+    //provider = Provider.of<ListsProvider>(context);
   }
 
   void deleteItem(ToDoList item) {
     setState(() {
-      print("remove ${item}");
+      provider.deleteList(item.id);
+    });
+  }
+
+  void addItem(String title, DateTime deadline) {
+    setState(() {
+      provider.createNewList(title, deadline);
     });
   }
 
@@ -40,6 +50,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    provider = Provider.of<ListsProvider>(context);
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
@@ -87,7 +98,11 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.pushReplacementNamed(
+                              context, LoginScreen.routeName);
+                        },
                         icon: Icon(Icons.logout, color: Colors.white)),
                     const Text(
                       'To-Do',
@@ -97,37 +112,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.add, color: Colors.white),
-                      onPressed: () {
-                        TextEditingController? new_title;
-                        showDialog<void>(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Enter list title'),
-                              content: TextFormField(
-                                  controller: new_title,
-                                  maxLength: 30,
-                                  decoration:
-                                      InputDecoration(hintText: "Title")),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(color: Color(0xFF636995)),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    AddList(add_item: addItem),
                   ],
                 ),
               ),

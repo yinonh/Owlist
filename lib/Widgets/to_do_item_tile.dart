@@ -7,8 +7,9 @@ import '../Screens/single_list_screen.dart';
 class ToDoItemTile extends StatelessWidget {
   final ToDoList item;
   final Function(ToDoList) onDelete;
+  // bool is_done = false;
 
-  const ToDoItemTile({required this.item, required this.onDelete});
+  ToDoItemTile({required this.item, required this.onDelete});
 
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
@@ -48,7 +49,6 @@ class ToDoItemTile extends StatelessWidget {
       },
     ).then((value) {
       if (value == true) {
-        // Call the onDelete callback with the current item to delete it from the list.
         onDelete(item);
       }
     });
@@ -60,6 +60,8 @@ class ToDoItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // is_done = item.deadline.isBefore(DateTime.now()) ||
+    //     item.totalItems == item.accomplishedItems;
     final DateTime currentDate = DateTime.now();
 
     final int totalDays = item.deadline.difference(item.creationDate).inDays;
@@ -78,6 +80,8 @@ class ToDoItemTile extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
+          // border:
+          //     is_done ? Border.all(color: Color(0xFF936995), width: 5) : null,
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -89,6 +93,11 @@ class ToDoItemTile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Checkbox(
+                  //   value: is_done,
+                  //   onChanged: (value) {},
+                  //   activeColor: Color(0xFF945985),
+                  // ),
                   Text(
                     item.title,
                     style: const TextStyle(
@@ -127,7 +136,7 @@ class ToDoItemTile extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               LinearProgressIndicator(
-                value: remainingDays < 0
+                value: remainingDays <= 0
                     ? 1
                     : (totalDays - remainingDays) / totalDays,
                 backgroundColor: Colors.grey[300],

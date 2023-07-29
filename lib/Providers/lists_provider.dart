@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 import '../Models/to_do_list.dart';
 
@@ -28,7 +29,8 @@ class ListsProvider with ChangeNotifier {
     _activeItemsCache = snapshot.docs
         .where((doc) {
           var deadline = DateTime.parse(doc['deadline']);
-          return doc['accomplishedItems'] < doc['totalItems'] &&
+          return (doc['accomplishedItems'] < doc['totalItems'] ||
+                  doc['totalItems'] == 0) &&
               deadline.isAfter(currentDate);
         })
         .map((doc) => ToDoList.fromSnapshot(doc))
@@ -53,7 +55,8 @@ class ListsProvider with ChangeNotifier {
     _achievedItemsCache = snapshot.docs
         .where((doc) {
           var deadline = DateTime.parse(doc['deadline']);
-          return doc['accomplishedItems'] == doc['totalItems'] ||
+          return (doc['accomplishedItems'] == doc['totalItems'] &&
+                  doc['totalItems'] > 0) ||
               deadline.isBefore(currentDate);
         })
         .map((doc) => ToDoList.fromSnapshot(doc))
@@ -77,13 +80,38 @@ class ListsProvider with ChangeNotifier {
     _achievedItemsCache = null;
   }
 
-  // Modify existingItems to a stream that listens to changes in Firestore
-  Stream<List<ToDoList>> get existingItemsStream {
-    return _firestore
-        .collection('todo_lists')
-        .where('userID', isEqualTo: _auth.currentUser!.uid)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ToDoList.fromSnapshot(doc)).toList());
+  // Function to create and add a new list item to Firestore
+  Future<void> createNewList(String title, DateTime deadline) async {
+    String userId = _auth.currentUser!.uid;
+
+    // Create a new ToDoList object
+    ToDoList newList = ToDoList(
+      id: '', // Empty ID, as Firestore will generate a new ID when adding the document
+      userID: userId,
+      title: title,
+      creationDate: DateTime.now(), // Use the current date as the creation date
+      deadline: deadline,
+      totalItems: 0, // Initialize total items to 0
+      accomplishedItems: 0, // Initialize accomplished items to 0
+    );
+
+    // Add the new list to Firestore
+    await add_new_list(newList).then((_) {
+      invalidateCache();
+      notifyListeners();
+    });
+
+    // Invalidate the cache to reflect the updated data
+  }
+
+  // Function to delete a list item from Firestore by its ID
+  Future<void> deleteList(String listId) async {
+    try {
+      await _firestore.collection('todo_lists').doc(listId).delete();
+      invalidateCache();
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting list: $e');
+    }
   }
 }
