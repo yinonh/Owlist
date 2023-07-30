@@ -11,7 +11,7 @@ class AddList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.add, color: Colors.white),
+      icon: Icon(Icons.add),
       onPressed: () {
         TextEditingController new_title = TextEditingController();
         DateTime new_deadline = DateTime.now().add(Duration(days: 7));

@@ -59,14 +59,10 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         selectedIconTheme: IconThemeData(
           size: 30,
-          color: Colors.white,
         ),
         unselectedIconTheme: IconThemeData(
           size: 20,
-          color: Color(0xFF636995),
         ),
-        backgroundColor: Color(0xFF18122B),
-        //Color(0xFF635985),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(
@@ -103,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.pushReplacementNamed(
                               context, LoginScreen.routeName);
                         },
-                        icon: Icon(Icons.logout, color: Colors.white)),
+                        icon: Icon(Icons.logout)),
                     const Text(
                       'To-Do',
                       style: TextStyle(
@@ -139,9 +135,7 @@ class _HomePageState extends State<HomePage> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
+                            child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasError) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -175,9 +169,7 @@ class _HomePageState extends State<HomePage> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
+                            child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasError) {
                           ScaffoldMessenger.of(context).showSnackBar(

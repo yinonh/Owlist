@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
 import '../Providers/lists_provider.dart';
@@ -21,8 +22,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
   void initState() {
     super.initState();
     title = "Hello";
-    // title = ListsProvider().title_by_id(widget.id);
-    List<ToDoItem>? itemList = ItemProvider().items_by_listId(widget.id);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    List<ToDoItem>? itemList =
+        Provider.of<ItemProvider>(context).items_by_listId(widget.id);
     if (itemList == null) {
       todoItems = [];
     } else {
@@ -142,7 +148,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
                           title: Text(
                             item.title,
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
                           ),
                           trailing: Checkbox(
                             activeColor: Color(0xFF945985),

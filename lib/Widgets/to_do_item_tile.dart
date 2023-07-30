@@ -171,7 +171,7 @@ class ToDoItemTile extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               Text(
-                'Progress: ${(progressPercentage * 100).toStringAsFixed(1)}%',
+                'Progress: ${(progressPercentage * 100).toStringAsFixed(0)}%',
                 // style: const TextStyle(fontSize: 16.0),
               ),
             ],

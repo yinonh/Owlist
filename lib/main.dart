@@ -50,6 +50,30 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor:
+            Colors.white, // Color for app bar and other primary elements
+        scaffoldBackgroundColor: Colors.transparent,
+
+        textTheme: TextTheme(
+          headline6: TextStyle(color: Colors.white), // Titles will be white
+          subtitle1: TextStyle(
+              color: Color(0xFF945985)), // Subtitles will be Color(0xFF945985)
+          bodyText1: TextStyle(
+              color: Colors
+                  .black), // Text color in containers and lists will be black
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        progressIndicatorTheme: ProgressIndicatorThemeData(color: Colors.white),
+
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Color(0xFF636995),
+          backgroundColor: Color(0xFF18122B),
+        ),
+      ),
       routes: {
         HomePage.routeName: (context) => HomePage(),
         LoginScreen.routeName: (context) => LoginScreen(),
@@ -64,6 +88,12 @@ class _MyAppState extends State<MyApp> {
         }
       },
       home: initialScreen,
+      // colorScheme: ColorScheme(
+      //     background: LinearGradient(
+      //   begin: Alignment.topCenter,
+      //   end: Alignment.bottomCenter,
+      //   colors: [Color(0xFF635985), Color(0xFF18122B)],
+      // )),
     );
   }
 }
