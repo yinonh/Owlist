@@ -1,43 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Models/to_do_item.dart';
 
 class ItemProvider with ChangeNotifier {
-  final List<ToDoItem> todoItems = [
-    ToDoItem(
-      id: "1",
-      listId: "kg70kjdy8Wy7Z9nvngXY",
-      title: "Work",
-      content: "Work Work",
-      done: true,
-      index: 0,
-    ),
-    ToDoItem(
-      id: "2",
-      listId: "kg70kjdy8Wy7Z9nvngXY",
-      title: "StandStandStandStandStandStandStandStandStandS",
-      content: "Hello",
-      done: false,
-      index: 1,
-    ),
-    ToDoItem(
-      id: "3",
-      listId: "pruGdEGwoSTSkASkCfN0",
-      title: "Hey",
-      content: "What's up?",
-      done: true,
-      index: 2,
-    ),
-    ToDoItem(
-      id: "4",
-      listId: "pruGdEGwoSTSkASkCfN0",
-      title: "Last",
-      content: "Last one",
-      done: false,
-      index: 3,
-    )
-  ];
+  Future<List<ToDoItem>> itemsByListId(String listId) async {
+    try {
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('todoItems')
+          .where('listId', isEqualTo: listId)
+          .get();
 
-  List<ToDoItem>? items_by_listId(listId) =>
-      todoItems.where((element) => element.listId == listId).toList();
+      return snapshot.docs.map((doc) {
+        return ToDoItem(
+          id: doc.id,
+          listId: doc['listId'],
+          title: doc['title'],
+          content: doc['content'],
+          done: doc['done'],
+          index: doc['index'],
+        );
+      }).toList();
+    } catch (error) {
+      print("Error fetching data: $error");
+      return [];
+    }
+  }
+
+  Future<void> addNewItem(String listId, String title) async {
+    try {
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('todoItems')
+          .where('listId', isEqualTo: listId)
+          .orderBy('index',
+              descending: true) // Order by index in descending order
+          .limit(1) // Limit to the first item (which has the highest index)
+          .get();
+
+      int newIndex = 0; // Default index if no items are found
+
+      if (snapshot.docs.isNotEmpty) {
+        final highestIndexItem = snapshot.docs.first;
+        final highestIndex = highestIndexItem['index'] as int;
+        newIndex = highestIndex + 1;
+      }
+
+      final newItemData = {
+        'listId': listId,
+        'title': title,
+        'content': '',
+        'done': false,
+        'index': newIndex,
+      };
+
+      await FirebaseFirestore.instance.collection('todoItems').add(newItemData);
+      notifyListeners();
+    } catch (error) {
+      print("Error adding new item: $error");
+    }
+  }
 }

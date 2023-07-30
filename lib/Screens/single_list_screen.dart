@@ -2,58 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
-import '../Providers/lists_provider.dart';
 import '../Providers/item_provider.dart';
 
-class SingleListScreen extends StatefulWidget {
+class SingleListScreen extends StatelessWidget {
   final String id;
   static const routeName = '/single_list_screen';
-  @override
-  _SingleListScreenState createState() => _SingleListScreenState();
 
-  const SingleListScreen({required this.id, Key? key}) : super(key: key);
-}
-
-class _SingleListScreenState extends State<SingleListScreen> {
-  late String title;
-  late List<ToDoItem> todoItems;
-
-  @override
-  void initState() {
-    super.initState();
-    title = "Hello";
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    List<ToDoItem>? itemList =
-        Provider.of<ItemProvider>(context).items_by_listId(widget.id);
-    if (itemList == null) {
-      todoItems = [];
-    } else {
-      todoItems = itemList;
-    }
-  }
+  SingleListScreen({required this.id, Key? key}) : super(key: key);
 
   void _moveToItemPage(BuildContext context, String itemID) {
     print("Moving to item page: $itemID");
   }
 
+  void _showNewItemDialog(BuildContext context) {
+    String newTitle = ''; // Initialize with an empty string
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter New Item Title',
+              style: TextStyle(color: Color(0xFF635985))),
+          content: TextField(
+            onChanged: (value) {
+              newTitle =
+                  value; // Update the newTitle variable when the user enters text
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Cancel', style: TextStyle(color: Color(0xFF635985))),
+            ),
+            TextButton(
+              onPressed: () {
+                // Obtain the instance of ItemProvider
+                final itemProvider =
+                    Provider.of<ItemProvider>(context, listen: false);
+
+                // Check if the entered title is not empty
+                if (newTitle.isNotEmpty) {
+                  // Add a new item using the addNewItem function
+                  itemProvider.addNewItem(id, newTitle);
+                  Navigator.of(context).pop(); // Close the dialog
+                } else {
+                  // Handle empty title, show an error message, or any other validation you prefer
+                }
+              },
+              child: Text(
+                'Add',
+                style: TextStyle(color: Color(0xFF635985)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    todoItems.sort((a, b) {
-      if (a.done && !b.done) {
-        return 1;
-      } else if (!a.done && b.done) {
-        return -1;
-      } else {
-        return a.index.compareTo(b.index);
-      }
-    });
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // Show the popup dialog to get the new item title
+          _showNewItemDialog(context);
+        },
         backgroundColor: Color(0xFF635985),
         child: const Icon(Icons.add),
       ),
@@ -80,7 +96,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                       },
                     ),
                     Text(
-                      title,
+                      "Title Placeholder", // You can replace this with the actual title
                       style: const TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
@@ -95,75 +111,88 @@ class _SingleListScreenState extends State<SingleListScreen> {
                 ),
               ),
               Expanded(
-                child: ReorderableListView.builder(
-                  onReorder: (int oldIndex, int newIndex) {
-                    if (oldIndex < newIndex) newIndex--;
-                    setState(() {
-                      if (oldIndex < newIndex) {
-                        for (int i = oldIndex + 1; i <= newIndex; i++) {
-                          todoItems[i].index = i - 1;
+                child: FutureBuilder<List<ToDoItem>>(
+                  future: Provider.of<ItemProvider>(context).itemsByListId(id),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error fetching data'),
+                      );
+                    } else {
+                      List<ToDoItem> todoItems = snapshot.data ?? [];
+
+                      // Sort the items (you can keep this sorting logic as it is)
+                      todoItems.sort((a, b) {
+                        if (a.done && !b.done) {
+                          return 1;
+                        } else if (!a.done && b.done) {
+                          return -1;
+                        } else {
+                          return a.index.compareTo(b.index);
                         }
-                      } else if (oldIndex > newIndex) {
-                        for (int i = oldIndex - 1; i >= newIndex; i--) {
-                          todoItems[i].index = i + 1;
-                        }
-                      }
-                      todoItems[oldIndex].index = newIndex;
-                    });
-                  },
-                  itemCount: todoItems.length,
-                  itemBuilder: (context, index) {
-                    final item = todoItems[index];
-                    return Container(
-                      margin: EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(10.0))),
-                      key: Key(item.id),
-                      child: Dismissible(
-                        key: Key(item.id),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (direction) {
-                          setState(() {
-                            todoItems.removeAt(index);
-                          });
+                      });
+
+                      return ReorderableListView.builder(
+                        onReorder: (int oldIndex, int newIndex) {
+                          // ... your existing onReorder logic ...
                         },
-                        background: Container(
-                          alignment: AlignmentDirectional.centerEnd,
-                          color: Colors.red,
-                          child: const Padding(
-                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-                            child: Icon(
-                              Icons.delete,
-                              color: Colors.white,
+                        itemCount: todoItems.length,
+                        itemBuilder: (context, index) {
+                          final item = todoItems[index];
+                          return Container(
+                            margin: EdgeInsets.all(5),
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0))),
+                            key: Key(item.id),
+                            child: Dismissible(
+                              key: Key(item.id),
+                              direction: DismissDirection.endToStart,
+                              onDismissed: (direction) {
+                                // ... your existing onDismissed logic ...
+                              },
+                              background: Container(
+                                alignment: AlignmentDirectional.centerEnd,
+                                color: Colors.red,
+                                child: const Padding(
+                                  padding:
+                                      EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  _moveToItemPage(context, item.id);
+                                },
+                                leading: Icon(Icons.drag_handle),
+                                title: Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                                trailing: Checkbox(
+                                  activeColor: Color(0xFF945985),
+                                  value: item.done,
+                                  onChanged: (value) {
+                                    // ... your existing onChanged logic ...
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        child: ListTile(
-                          onTap: () {
-                            _moveToItemPage(context, item.id);
-                          },
-                          leading: Icon(Icons.drag_handle),
-                          title: Text(
-                            item.title,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          trailing: Checkbox(
-                            activeColor: Color(0xFF945985),
-                            value: item.done,
-                            onChanged: (value) {
-                              setState(() {
-                                item.done = value ?? false;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    );
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               ),

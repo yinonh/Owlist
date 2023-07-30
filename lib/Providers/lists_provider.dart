@@ -107,11 +107,24 @@ class ListsProvider with ChangeNotifier {
   // Function to delete a list item from Firestore by its ID
   Future<void> deleteList(String listId) async {
     try {
+      // Fetch the items with the matching listId
+      final QuerySnapshot itemSnapshot = await _firestore
+          .collection('todoItems')
+          .where('listId', isEqualTo: listId)
+          .get();
+
+      // Delete each item that matches the listId
+      for (final doc in itemSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete the list itself
       await _firestore.collection('todo_lists').doc(listId).delete();
+
       invalidateCache();
       notifyListeners();
     } catch (e) {
-      print('Error deleting list: $e');
+      print('Error deleting list and its items: $e');
     }
   }
 }

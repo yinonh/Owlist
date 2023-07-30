@@ -55,13 +55,8 @@ class _MyAppState extends State<MyApp> {
             Colors.white, // Color for app bar and other primary elements
         scaffoldBackgroundColor: Colors.transparent,
 
-        textTheme: TextTheme(
-          headline6: TextStyle(color: Colors.white), // Titles will be white
-          subtitle1: TextStyle(
-              color: Color(0xFF945985)), // Subtitles will be Color(0xFF945985)
-          bodyText1: TextStyle(
-              color: Colors
-                  .black), // Text color in containers and lists will be black
+        datePickerTheme: DatePickerThemeData(
+          headerBackgroundColor: Color(0xFF636995),
         ),
         iconTheme: IconThemeData(color: Colors.white),
         progressIndicatorTheme: ProgressIndicatorThemeData(color: Colors.white),
