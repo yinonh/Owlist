@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // _refreshLists();
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -69,12 +70,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _refreshLists() async {
+  Future<void> refreshLists() async {
+    print("TO DO: refresh the screen after add element to the list");
     setState(() {
-      activeItemsFuture =
-          Provider.of<ListsProvider>(context, listen: false).getActiveItems();
-      achievedItemsFuture =
-          Provider.of<ListsProvider>(context, listen: false).getAchievedItems();
+      activeItemsFuture = provider.getActiveItems();
+      achievedItemsFuture = provider.getAchievedItems();
     });
   }
 
@@ -87,10 +87,10 @@ class _HomePageState extends State<HomePage> {
         showUnselectedLabels: false,
         currentIndex: currentIndex,
         onTap: _onItemTapped,
-        selectedIconTheme: IconThemeData(
+        selectedIconTheme: const IconThemeData(
           size: 30,
         ),
-        unselectedIconTheme: IconThemeData(
+        unselectedIconTheme: const IconThemeData(
           size: 20,
         ),
         items: const <BottomNavigationBarItem>[
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshLists,
+        onRefresh: refreshLists,
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -161,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 Expanded(
                   child: PageView(
                     onPageChanged: _onItemTapped,
@@ -172,12 +172,12 @@ class _HomePageState extends State<HomePage> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                 duration: Duration(seconds: 2),
                                 content: Text(
                                   'Error',
@@ -197,6 +197,7 @@ class _HomePageState extends State<HomePage> {
                               selectedIndex: 0,
                               existingItems: snapshot.data!,
                               deleteItem: deleteItem,
+                              refresh: refreshLists,
                             );
                           }
                         },
@@ -231,6 +232,7 @@ class _HomePageState extends State<HomePage> {
                               selectedIndex: 1,
                               existingItems: snapshot.data!,
                               deleteItem: deleteItem,
+                              refresh: refreshLists,
                             );
                           }
                         },

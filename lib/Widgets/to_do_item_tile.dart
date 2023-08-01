@@ -7,9 +7,11 @@ import '../Screens/single_list_screen.dart';
 class ToDoItemTile extends StatelessWidget {
   final ToDoList item;
   final Function(ToDoList) onDelete;
+  final Function refresh;
   // bool is_done = false;
 
-  ToDoItemTile({required this.item, required this.onDelete});
+  ToDoItemTile(
+      {required this.item, required this.refresh, required this.onDelete});
 
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
@@ -76,7 +78,10 @@ class ToDoItemTile extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, SingleListScreen.routeName,
-            arguments: item.id);
+                arguments: item.id)
+            .then((value) {
+          refresh();
+        });
       },
       child: Container(
         decoration: BoxDecoration(

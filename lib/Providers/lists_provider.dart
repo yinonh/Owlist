@@ -65,7 +65,6 @@ class ListsProvider with ChangeNotifier {
     return _achievedItemsCache!;
   }
 
-  // Method to add a new list to Firebase Cloud Firestore
   Future<void> add_new_list(ToDoList newList) async {
     try {
       await _firestore.collection('todo_lists').add(newList.toMap());
@@ -74,40 +73,32 @@ class ListsProvider with ChangeNotifier {
     }
   }
 
-  // Method to invalidate the cache and clear the stored data
   void invalidateCache() {
     _activeItemsCache = null;
     _achievedItemsCache = null;
   }
 
-  // Function to create and add a new list item to Firestore
   Future<void> createNewList(String title, DateTime deadline) async {
     String userId = _auth.currentUser!.uid;
 
-    // Create a new ToDoList object
     ToDoList newList = ToDoList(
       id: '', // Empty ID, as Firestore will generate a new ID when adding the document
       userID: userId,
       title: title,
-      creationDate: DateTime.now(), // Use the current date as the creation date
+      creationDate: DateTime.now(),
       deadline: deadline,
-      totalItems: 0, // Initialize total items to 0
-      accomplishedItems: 0, // Initialize accomplished items to 0
+      totalItems: 0,
+      accomplishedItems: 0,
     );
 
-    // Add the new list to Firestore
     await add_new_list(newList).then((_) {
       invalidateCache();
       notifyListeners();
     });
-
-    // Invalidate the cache to reflect the updated data
   }
 
-  // Function to delete a list item from Firestore by its ID
   Future<void> deleteList(String listId) async {
     try {
-      // Fetch the items with the matching listId
       final QuerySnapshot itemSnapshot = await _firestore
           .collection('todoItems')
           .where('listId', isEqualTo: listId)
@@ -125,6 +116,28 @@ class ListsProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error deleting list and its items: $e');
+    }
+  }
+
+  Future<String?> getItemTitleById(String id) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('todo_lists')
+              .doc(id)
+              .get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data()!;
+        String title = data['title'];
+        return title;
+      } else {
+        print('Item with ID $id not found!');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching item: $e');
+      return null;
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
+import '../Providers/lists_provider.dart';
 
 class SingleListScreen extends StatelessWidget {
   final String id;
@@ -62,6 +63,11 @@ class SingleListScreen extends StatelessWidget {
     );
   }
 
+  void deleteItem(String id, bool done, context) {
+    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
+    itemProvider.deleteItemById(id, done);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,13 +101,30 @@ class SingleListScreen extends StatelessWidget {
                         Navigator.of(context).pop();
                       },
                     ),
-                    Text(
-                      "Title Placeholder", // You can replace this with the actual title
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    FutureBuilder<String?>(
+                      future: ListsProvider().getItemTitleById(id),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError || snapshot.data == null) {
+                          return Text(
+                            'Error fetching title',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return Text(
+                            snapshot.data!,
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        }
+                      },
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.white),
@@ -125,7 +148,6 @@ class SingleListScreen extends StatelessWidget {
                     } else {
                       List<ToDoItem> todoItems = snapshot.data ?? [];
 
-                      // Sort the items (you can keep this sorting logic as it is)
                       todoItems.sort((a, b) {
                         if (a.done && !b.done) {
                           return 1;
@@ -138,7 +160,14 @@ class SingleListScreen extends StatelessWidget {
 
                       return ReorderableListView.builder(
                         onReorder: (int oldIndex, int newIndex) {
-                          // ... your existing onReorder logic ...
+                          if (oldIndex < newIndex) newIndex -= 1;
+                          final ToDoItem movedItem =
+                              todoItems.removeAt(oldIndex);
+                          todoItems.insert(newIndex, movedItem);
+
+                          for (int i = 0; i < todoItems.length; i++) {
+                            todoItems[i].index = i;
+                          }
                         },
                         itemCount: todoItems.length,
                         itemBuilder: (context, index) {
@@ -154,6 +183,7 @@ class SingleListScreen extends StatelessWidget {
                               key: Key(item.id),
                               direction: DismissDirection.endToStart,
                               onDismissed: (direction) {
+                                deleteItem(item.id, item.done, context);
                                 // ... your existing onDismissed logic ...
                               },
                               background: Container(
@@ -183,9 +213,7 @@ class SingleListScreen extends StatelessWidget {
                                 trailing: Checkbox(
                                   activeColor: Color(0xFF945985),
                                   value: item.done,
-                                  onChanged: (value) {
-                                    // ... your existing onChanged logic ...
-                                  },
+                                  onChanged: (value) {},
                                 ),
                               ),
                             ),

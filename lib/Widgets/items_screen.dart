@@ -7,11 +7,13 @@ class ItemsScreen extends StatelessWidget {
   final int selectedIndex;
   final List<ToDoList> existingItems;
   final Function deleteItem;
+  final Function refresh;
 
   const ItemsScreen({
     required this.selectedIndex,
     required this.existingItems,
     required this.deleteItem,
+    required this.refresh,
     Key? key,
   }) : super(key: key);
 
@@ -27,6 +29,7 @@ class ItemsScreen extends StatelessWidget {
             onDelete: (item) {
               deleteItem(item);
             },
+            refresh: refresh,
           ),
         );
       },
