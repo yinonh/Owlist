@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // _refreshLists();
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -71,8 +70,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> refreshLists() async {
-    print("TO DO: refresh the screen after add element to the list");
     setState(() {
+      provider.invalidateCache();
       activeItemsFuture = provider.getActiveItems();
       achievedItemsFuture = provider.getAchievedItems();
     });

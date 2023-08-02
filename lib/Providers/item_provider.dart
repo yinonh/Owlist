@@ -94,4 +94,38 @@ class ItemProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> toggleItemDone(String itemId, String listId, bool isDone) async {
+    try {
+      final itemRef =
+          FirebaseFirestore.instance.collection('todoItems').doc(itemId);
+
+      // Fetch the current item data
+      final DocumentSnapshot<Map<String, dynamic>> itemSnapshot =
+          await itemRef.get();
+      final bool currentDoneValue = itemSnapshot.data()!['done'] as bool;
+
+      // Toggle the 'done' field value
+      await itemRef.update({'done': !currentDoneValue});
+
+      // Fetch the list data to update 'accomplishedItems'
+      final listRef =
+          FirebaseFirestore.instance.collection('todo_lists').doc(listId);
+      final DocumentSnapshot<Map<String, dynamic>> listSnapshot =
+          await listRef.get();
+      int accomplishedItems = listSnapshot.data()!['accomplishedItems'] as int;
+
+      if (currentDoneValue) {
+        accomplishedItems--;
+      } else {
+        accomplishedItems++;
+      }
+
+      await listRef.update({'accomplishedItems': accomplishedItems});
+
+      notifyListeners();
+    } catch (error) {
+      print("Error toggling item's done state: $error");
+    }
+  }
 }

@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
+import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
 
-class SingleListScreen extends StatelessWidget {
-  final String id;
+class SingleListScreen extends StatefulWidget {
+  final ToDoList list;
   static const routeName = '/single_list_screen';
 
-  SingleListScreen({required this.id, Key? key}) : super(key: key);
+  SingleListScreen({required this.list, Key? key}) : super(key: key);
+
+  @override
+  State<SingleListScreen> createState() => _SingleListScreenState();
+}
+
+class _SingleListScreenState extends State<SingleListScreen> {
+  bool editMode = false;
+  bool _isLoading = false;
 
   void _moveToItemPage(BuildContext context, String itemID) {
     print("Moving to item page: $itemID");
@@ -46,7 +55,7 @@ class SingleListScreen extends StatelessWidget {
                 // Check if the entered title is not empty
                 if (newTitle.isNotEmpty) {
                   // Add a new item using the addNewItem function
-                  itemProvider.addNewItem(id, newTitle);
+                  itemProvider.addNewItem(widget.list.id, newTitle);
                   Navigator.of(context).pop(); // Close the dialog
                 } else {
                   // Handle empty title, show an error message, or any other validation you prefer
@@ -68,17 +77,45 @@ class SingleListScreen extends StatelessWidget {
     itemProvider.deleteItemById(id, done);
   }
 
+  Future<void> _toggleItemDone(bool? value, ToDoItem item) async {
+    if (_isLoading)
+      return; // Avoid multiple requests while the function is still processing
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Provider.of<ItemProvider>(context, listen: false)
+          .toggleItemDone(item.id, item.listId, item.done);
+    } catch (error) {
+      print("Error toggling item's done state: $error");
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show the popup dialog to get the new item title
-          _showNewItemDialog(context);
-        },
-        backgroundColor: Color(0xFF635985),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: editMode
+          ? FloatingActionButton(
+              onPressed: () {
+                // Show the popup dialog to get the new item title
+                _showNewItemDialog(context);
+              },
+              backgroundColor: Color(0xFF635985),
+              child: const Icon(Icons.calendar_month),
+            )
+          : FloatingActionButton(
+              onPressed: () {
+                // Show the popup dialog to get the new item title
+                _showNewItemDialog(context);
+              },
+              backgroundColor: Color(0xFF635985),
+              child: const Icon(Icons.add),
+            ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -95,49 +132,50 @@ class SingleListScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    editMode
+                        ? IconButton(
+                            icon: const Icon(Icons.cancel, color: Colors.white),
+                            onPressed: () {
+                              setState(() {
+                                editMode = false;
+                              });
+                            },
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.arrow_back,
+                                color: Colors.white),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                    Text(
+                      widget.list.title,
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: editMode
+                          ? Icon(Icons.save, color: Colors.white)
+                          : Icon(Icons.edit, color: Colors.white),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        setState(() {
+                          editMode = !editMode;
+                        });
                       },
-                    ),
-                    FutureBuilder<String?>(
-                      future: ListsProvider().getItemTitleById(id),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError || snapshot.data == null) {
-                          return Text(
-                            'Error fetching title',
-                            style: TextStyle(color: Colors.white),
-                          );
-                        } else {
-                          return Text(
-                            snapshot.data!,
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.white),
-                      onPressed: () {},
                     ),
                   ],
                 ),
               ),
               Expanded(
                 child: FutureBuilder<List<ToDoItem>>(
-                  future: Provider.of<ItemProvider>(context).itemsByListId(id),
+                  future: Provider.of<ItemProvider>(context)
+                      .itemsByListId(widget.list.id),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting ||
+                        _isLoading) {
                       return Center(
                         child: CircularProgressIndicator(),
                       );
@@ -159,16 +197,19 @@ class SingleListScreen extends StatelessWidget {
                       });
 
                       return ReorderableListView.builder(
-                        onReorder: (int oldIndex, int newIndex) {
-                          if (oldIndex < newIndex) newIndex -= 1;
-                          final ToDoItem movedItem =
-                              todoItems.removeAt(oldIndex);
-                          todoItems.insert(newIndex, movedItem);
+                        onReorder: (editMode
+                            ? (int oldIndex, int newIndex) {
+                                if (oldIndex < newIndex) newIndex -= 1;
+                                final ToDoItem movedItem =
+                                    todoItems.removeAt(oldIndex);
+                                todoItems.insert(newIndex, movedItem);
 
-                          for (int i = 0; i < todoItems.length; i++) {
-                            todoItems[i].index = i;
-                          }
-                        },
+                                for (int i = 0; i < todoItems.length; i++) {
+                                  todoItems[i].index = i;
+                                }
+                              }
+                            : (_, __) {}),
+                        buildDefaultDragHandles: editMode,
                         itemCount: todoItems.length,
                         itemBuilder: (context, index) {
                           final item = todoItems[index];
@@ -184,7 +225,6 @@ class SingleListScreen extends StatelessWidget {
                               direction: DismissDirection.endToStart,
                               onDismissed: (direction) {
                                 deleteItem(item.id, item.done, context);
-                                // ... your existing onDismissed logic ...
                               },
                               background: Container(
                                 alignment: AlignmentDirectional.centerEnd,
@@ -202,7 +242,15 @@ class SingleListScreen extends StatelessWidget {
                                 onTap: () {
                                   _moveToItemPage(context, item.id);
                                 },
-                                leading: Icon(Icons.drag_handle),
+                                leading: editMode
+                                    ? Icon(Icons.drag_handle)
+                                    : Text(
+                                        (index + 1).toString(),
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Color(0xFF945985),
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                 title: Text(
                                   item.title,
                                   style: const TextStyle(
@@ -210,11 +258,19 @@ class SingleListScreen extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20),
                                 ),
-                                trailing: Checkbox(
-                                  activeColor: Color(0xFF945985),
-                                  value: item.done,
-                                  onChanged: (value) {},
-                                ),
+                                trailing: _isLoading
+                                    ? Checkbox(
+                                        activeColor: Color(0xFF945985),
+                                        value: item.done,
+                                        onChanged: (value) {},
+                                      )
+                                    : Checkbox(
+                                        activeColor: Color(0xFF945985),
+                                        value: item.done,
+                                        onChanged: (value) {
+                                          _toggleItemDone(value, item);
+                                        },
+                                      ),
                               ),
                             ),
                           );

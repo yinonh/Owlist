@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../Models/to_do_list.dart';
 import '../Screens/single_list_screen.dart';
 
-class ToDoItemTile extends StatelessWidget {
+class ToDoItemTile extends StatefulWidget {
   final ToDoList item;
   final Function(ToDoList) onDelete;
   final Function refresh;
@@ -13,6 +13,11 @@ class ToDoItemTile extends StatelessWidget {
   ToDoItemTile(
       {required this.item, required this.refresh, required this.onDelete});
 
+  @override
+  State<ToDoItemTile> createState() => _ToDoItemTileState();
+}
+
+class _ToDoItemTileState extends State<ToDoItemTile> {
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -51,7 +56,7 @@ class ToDoItemTile extends StatelessWidget {
       },
     ).then((value) {
       if (value == true) {
-        onDelete(item);
+        widget.onDelete(widget.item);
       }
     });
   }
@@ -66,11 +71,14 @@ class ToDoItemTile extends StatelessWidget {
     //     item.totalItems == item.accomplishedItems;
     final DateTime currentDate = DateTime.now();
 
-    final int totalDays = item.deadline.difference(item.creationDate).inDays;
-    final int remainingDays = item.deadline.difference(currentDate).inDays;
+    final int totalDays =
+        widget.item.deadline.difference(widget.item.creationDate).inDays;
+    final int remainingDays =
+        widget.item.deadline.difference(currentDate).inDays;
     double progressPercentage;
-    if (item.totalItems != 0) {
-      progressPercentage = (item.accomplishedItems / item.totalItems);
+    if (widget.item.totalItems != 0) {
+      progressPercentage =
+          (widget.item.accomplishedItems / widget.item.totalItems);
     } else {
       progressPercentage = 1;
     }
@@ -78,9 +86,11 @@ class ToDoItemTile extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, SingleListScreen.routeName,
-                arguments: item.id)
+                arguments: widget.item)
             .then((value) {
-          refresh();
+          setState(() {
+            widget.refresh();
+          });
         });
       },
       child: Container(
@@ -104,7 +114,7 @@ class ToDoItemTile extends StatelessWidget {
                   //   activeColor: Color(0xFF945985),
                   // ),
                   Text(
-                    item.title,
+                    widget.item.title,
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -124,14 +134,14 @@ class ToDoItemTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    formatDate(item.creationDate), // Format creationDate
+                    formatDate(widget.item.creationDate), // Format creationDate
                     style: const TextStyle(
                       // fontSize: 16.0,
                       color: Colors.black,
                     ),
                   ),
                   Text(
-                    formatDate(item.deadline), // Format deadline
+                    formatDate(widget.item.deadline), // Format deadline
                     style: const TextStyle(
                       // fontSize: 16.0,
                       color: Colors.black,
@@ -157,12 +167,12 @@ class ToDoItemTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total Items: ${item.totalItems}',
+                    'Total Items: ${widget.item.totalItems}',
                     // style: TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'Accomplished Items: ${item.accomplishedItems}',
+                    'Accomplished Items: ${widget.item.accomplishedItems}',
                     // style: const TextStyle(fontSize: 16.0),
                   ),
                 ],

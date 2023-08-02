@@ -140,4 +140,33 @@ class ListsProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<bool> isListDone(String listId) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('todo_lists')
+              .doc(listId)
+              .get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data()!;
+        int totalItems = data['totalItems'];
+        int accomplishedItems = data['accomplishedItems'];
+        DateTime deadline = DateTime.parse(data['deadline']);
+
+        bool allItemsAccomplished =
+            totalItems > 0 && accomplishedItems == totalItems;
+        bool deadlinePassed = deadline.isBefore(DateTime.now());
+
+        return allItemsAccomplished || deadlinePassed;
+      } else {
+        print('Item with ID $listId not found!');
+        return false;
+      }
+    } catch (e) {
+      print('Error fetching item: $e');
+      return false;
+    }
+  }
 }

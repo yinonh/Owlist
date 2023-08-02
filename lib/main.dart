@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
 import './Screens/sign_in_sign_up_screen.dart';
@@ -75,9 +76,10 @@ class _MyAppState extends State<MyApp> {
       },
       onGenerateRoute: (settings) {
         if (settings.name == SingleListScreen.routeName) {
+          ToDoList arg = settings.arguments as ToDoList;
           return MaterialPageRoute(builder: (context) {
             return SingleListScreen(
-              id: settings.arguments as String,
+              list: arg,
             );
           });
         }
