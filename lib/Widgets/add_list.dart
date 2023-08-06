@@ -35,7 +35,7 @@ class AddList extends StatelessWidget {
                   DatePickerWidget(
                     initialDate: DateTime.now().add(Duration(days: 7)),
                     firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
+                    lastDate: DateTime.now().add(Duration(days: 3650)),
                     onDateSelected: (selectedDate) {
                       if (selectedDate != null) new_deadline = selectedDate;
                     },

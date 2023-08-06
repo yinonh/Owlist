@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -126,6 +128,19 @@ class ItemProvider with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       print("Error toggling item's done state: $error");
+    }
+  }
+
+  Future<void> editIndex(String itemId, int newIndex) async {
+    try {
+      final itemRef =
+          FirebaseFirestore.instance.collection('todoItems').doc(itemId);
+
+      await itemRef.update({'index': newIndex});
+
+      notifyListeners();
+    } catch (error) {
+      print("Error editing item's index: $error");
     }
   }
 }

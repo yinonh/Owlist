@@ -42,17 +42,20 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
           fontSize: 20,
         ),
       ),
-      trailing: Checkbox(
-        activeColor: Color(0xFF945985),
-        value: widget.item.done,
-        onChanged: (value) {
-          setState(() {
-            widget.item.done = !widget.item.done;
-          });
-          Provider.of<ItemProvider>(context, listen: false).toggleItemDone(
-              widget.item.id, widget.item.listId, widget.item.done);
-        },
-      ),
+      trailing: widget.editMode
+          ? null
+          : Checkbox(
+              activeColor: Color(0xFF945985),
+              value: widget.item.done,
+              onChanged: (value) {
+                setState(() {
+                  widget.item.done = !widget.item.done;
+                });
+                Provider.of<ItemProvider>(context, listen: false)
+                    .toggleItemDone(
+                        widget.item.id, widget.item.listId, widget.item.done);
+              },
+            ),
     );
   }
 }

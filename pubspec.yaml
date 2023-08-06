@@ -42,6 +42,7 @@ dependencies:
   firebase_core: ^2.15.0
   firebase_auth: ^4.7.2
   cloud_firestore: ^4.8.4
+  animated_list_item: ^1.0.0
 
 dev_dependencies:
   flutter_test:

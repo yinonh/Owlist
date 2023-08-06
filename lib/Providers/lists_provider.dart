@@ -169,4 +169,72 @@ class ListsProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<void> editDeadline(String listId, DateTime? newDeadline) async {
+    if (newDeadline == null) {
+      return;
+    }
+
+    try {
+      // Fetch the document snapshot of the specified to-do list
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('todo_lists')
+              .doc(listId)
+              .get();
+
+      if (snapshot.exists) {
+        // Convert the snapshot data to a map
+        Map<String, dynamic> data = snapshot.data()!;
+
+        // Update the 'deadline' field with the new deadline
+        data['deadline'] = DateFormat('yyyy-MM-dd').format(newDeadline);
+
+        // Update the document in Firestore
+        await _firestore.collection('todo_lists').doc(listId).update(data);
+
+        // Invalidate cache and notify listeners to reflect the changes
+        invalidateCache();
+        notifyListeners();
+      } else {
+        print('Item with ID $listId not found!');
+      }
+    } catch (e) {
+      print('Error updating the deadline: $e');
+    }
+  }
+
+  Future<void> editTitle(String listId, String? newTitle) async {
+    if (newTitle == null) {
+      return;
+    }
+
+    try {
+      // Fetch the document snapshot of the specified to-do list
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('todo_lists')
+              .doc(listId)
+              .get();
+
+      if (snapshot.exists) {
+        // Convert the snapshot data to a map
+        Map<String, dynamic> data = snapshot.data()!;
+
+        // Update the 'title' field with the new newTitle
+        data['title'] = newTitle;
+
+        // Update the document in Firestore
+        await _firestore.collection('todo_lists').doc(listId).update(data);
+
+        // Invalidate cache and notify listeners to reflect the changes
+        invalidateCache();
+        notifyListeners();
+      } else {
+        print('Item with ID $listId not found!');
+      }
+    } catch (e) {
+      print('Error updating the deadline: $e');
+    }
+  }
 }
