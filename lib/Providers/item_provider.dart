@@ -30,7 +30,7 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addNewItem(String listId, String title) async {
+  Future<ToDoItem?> addNewItem(String listId, String title) async {
     try {
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('todoItems')
@@ -55,16 +55,30 @@ class ItemProvider with ChangeNotifier {
         'index': newIndex,
       };
 
-      await FirebaseFirestore.instance.collection('todoItems').add(newItemData);
+      final newItemRef = await FirebaseFirestore.instance
+          .collection('todoItems')
+          .add(newItemData);
 
       // Update totalItems in todo_lists collection
       final listRef =
           FirebaseFirestore.instance.collection('todo_lists').doc(listId);
       await listRef.update({'totalItems': FieldValue.increment(1)});
 
+      final newItem = ToDoItem(
+        id: newItemRef.id,
+        listId: listId,
+        title: title,
+        content: '',
+        done: false,
+        index: newIndex,
+      );
+
       notifyListeners();
+
+      return newItem;
     } catch (error) {
       print("Error adding new item: $error");
+      return null;
     }
   }
 

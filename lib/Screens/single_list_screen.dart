@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:great_list_view/great_list_view.dart';
 
 import '../Widgets/to_do_item_widget.dart';
 import '../Widgets/date_picker.dart';
@@ -19,16 +20,44 @@ class SingleListScreen extends StatefulWidget {
 }
 
 class _SingleListScreenState extends State<SingleListScreen> {
-  bool editMode = false;
   late DateTime newDeadline;
   TextEditingController _titleController = TextEditingController();
   bool isLoading = false;
+  bool editMode = false;
+  late List<ToDoItem> currentList;
 
   @override
   void initState() {
     super.initState();
     newDeadline = widget.list.deadline;
     _titleController.text = widget.list.title;
+    getList();
+  }
+
+  void _toggleEditMode() {
+    setState(() {
+      editMode = !editMode;
+    });
+  }
+
+  void getList() async {
+    setState(() {
+      isLoading = true;
+    });
+    currentList = await Provider.of<ItemProvider>(context, listen: false)
+        .itemsByListId(widget.list.id);
+    currentList.sort((a, b) {
+      if (a.done && !b.done) {
+        return 1;
+      } else if (!a.done && b.done) {
+        return -1;
+      } else {
+        return a.index.compareTo(b.index);
+      }
+    });
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -70,15 +99,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             ),
             TextButton(
               onPressed: () {
-                final itemProvider =
-                    Provider.of<ItemProvider>(context, listen: false);
-
-                if (newTitle.isNotEmpty) {
-                  itemProvider.addNewItem(widget.list.id, newTitle);
-                  Navigator.of(context).pop();
-                } else {
-                  // Handle empty title
-                }
+                addNewItem(newTitle);
               },
               child: Text(
                 'Add',
@@ -113,6 +134,30 @@ class _SingleListScreenState extends State<SingleListScreen> {
   void deleteItem(String id, bool done, context) {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
     itemProvider.deleteItemById(id, done);
+
+    List<ToDoItem> temp = List.from(currentList);
+    temp.removeWhere((element) => element.id == id);
+    setState(() {
+      currentList = temp;
+    });
+  }
+
+  void addNewItem(String newTitle) async {
+    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
+
+    if (newTitle.isNotEmpty) {
+      ToDoItem? newItem =
+          await itemProvider.addNewItem(widget.list.id, newTitle);
+      Navigator.of(context).pop();
+
+      if (newItem != null) {
+        List<ToDoItem> temp = List.from(currentList);
+        temp.add(newItem);
+        setState(() {
+          currentList = temp;
+        });
+      }
+    }
   }
 
   void _save() async {
@@ -128,9 +173,27 @@ class _SingleListScreenState extends State<SingleListScreen> {
       await Provider.of<ListsProvider>(context, listen: false)
           .editTitle(widget.list.id, _titleController.text);
     }
+    _toggleEditMode();
     setState(() {
       isLoading = false;
-      editMode = !editMode;
+    });
+  }
+
+  void checkItem(String id) {
+    List<ToDoItem> temp = List.from(currentList);
+    ToDoItem x = temp.firstWhere((element) => element.id == id);
+    x.done = !x.done;
+    temp.sort((a, b) {
+      if (a.done && !b.done) {
+        return 1;
+      } else if (!a.done && b.done) {
+        return -1;
+      } else {
+        return a.index.compareTo(b.index);
+      }
+    });
+    setState(() {
+      currentList = temp;
     });
   }
 
@@ -161,169 +224,134 @@ class _SingleListScreenState extends State<SingleListScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    editMode
-                        ? IconButton(
-                            icon: const Icon(Icons.cancel, color: Colors.white),
-                            onPressed: () {
-                              setState(() {
-                                newDeadline = widget.list.deadline;
-                                _titleController.text = widget.list.title;
-                                editMode = false;
-                              });
-                            },
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.arrow_back,
-                                color: Colors.white),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                    editMode
-                        ? Expanded(
-                            child: TextField(
-                              controller: _titleController,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+          child: Container(
+            height: MediaQuery.of(context).size.height -
+                MediaQuery.of(context).padding.top -
+                MediaQuery.of(context).padding.bottom,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        editMode
+                            ? IconButton(
+                                icon: const Icon(Icons.cancel,
+                                    color: Colors.white),
+                                onPressed: () {
+                                  setState(() {
+                                    newDeadline = widget.list.deadline;
+                                    _titleController.text = widget.list.title;
+                                    editMode = false;
+                                  });
+                                },
+                              )
+                            : IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                              maxLength: 35, // Set the maximum length
-                              decoration: InputDecoration(
-                                counterText: "", // Hide the character counter
-                                // border: InputBorder.none,
+                        editMode
+                            ? Expanded(
+                                child: TextField(
+                                  controller: _titleController,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLength: 35,
+                                  // Set the maximum length
+                                  decoration: InputDecoration(
+                                    counterText:
+                                        "", // Hide the character counter
+                                    // border: InputBorder.none,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _titleController.text,
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          )
-                        : Text(
-                            _titleController.text,
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                    editMode
-                        ? IconButton(
-                            icon: Icon(Icons.save, color: Colors.white),
-                            onPressed: () {
-                              _save();
-                            },
-                          )
-                        : IconButton(
-                            icon: Icon(Icons.edit, color: Colors.white),
-                            onPressed: () {
-                              setState(() {
-                                editMode = !editMode;
-                              });
-                            },
-                          ),
-                  ],
-                ),
-              ),
-              isLoading
-                  ? CircularProgressIndicator()
-                  : Expanded(
-                      child: Consumer<ItemProvider>(
-                        builder: (context, itemProvider, _) {
-                          return FutureBuilder<List<ToDoItem>>(
-                            future: itemProvider.itemsByListId(widget.list.id),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('Error fetching data'),
-                                );
-                              } else {
-                                List<ToDoItem> todoItems = snapshot.data ?? [];
-
-                                todoItems.sort((a, b) {
-                                  if (a.done && !b.done) {
-                                    return 1;
-                                  } else if (!a.done && b.done) {
-                                    return -1;
-                                  } else {
-                                    return a.index.compareTo(b.index);
-                                  }
-                                });
-
-                                return ReorderableListView.builder(
-                                  onReorder: (editMode
-                                      ? (int oldIndex, int newIndex) {
-                                          if (oldIndex < newIndex)
-                                            newIndex -= 1;
-                                          final ToDoItem movedItem =
-                                              todoItems.removeAt(oldIndex);
-                                          todoItems.insert(newIndex, movedItem);
-
-                                          for (int i = 0;
-                                              i < todoItems.length;
-                                              i++) {
-                                            todoItems[i].index = i;
-                                          }
-                                        }
-                                      : (_, __) {}),
-                                  buildDefaultDragHandles: editMode,
-                                  itemCount: todoItems.length,
-                                  itemBuilder: (context, index) {
-                                    final item = todoItems[index];
-                                    return Container(
-                                      margin: EdgeInsets.all(5),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0)),
-                                      ),
-                                      key: Key(item.id),
-                                      child: Dismissible(
-                                        key: Key(item.id),
-                                        direction: DismissDirection.endToStart,
-                                        onDismissed: (direction) {
-                                          deleteItem(
-                                              item.id, item.done, context);
-                                        },
-                                        background: Container(
-                                          alignment:
-                                              AlignmentDirectional.centerEnd,
-                                          color: Colors.red,
-                                          child: const Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.0, 0.0, 10.0, 0.0),
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        child: ToDoItemWidget(
-                                            item, editMode, index),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
+                        editMode
+                            ? IconButton(
+                                icon: Icon(Icons.save, color: Colors.white),
+                                onPressed: () {
+                                  _save();
+                                },
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.edit, color: Colors.white),
+                                onPressed: () {
+                                  _toggleEditMode();
+                                },
+                              ),
+                      ],
                     ),
-            ],
+                  ),
+                  isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : Container(
+                          height: MediaQuery.of(context).size.height * 0.85,
+                          child: AutomaticAnimatedListView<ToDoItem>(
+                            list: currentList,
+                            comparator:
+                                AnimatedListDiffListComparator<ToDoItem>(
+                              sameItem: (a, b) => a.id == b.id,
+                              sameContent: (a, b) => a.title == b.title,
+                            ),
+                            itemBuilder: (context, item, data) => data.measuring
+                                ? Container(
+                                    margin: EdgeInsets.all(5), height: 50)
+                                : Container(
+                                    margin: EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ToDoItemWidget(
+                                      item,
+                                      editMode,
+                                      item.index,
+                                      checkItem,
+                                      deleteItem,
+                                    ),
+                                  ),
+                            listController: controller,
+                            addLongPressReorderable: editMode,
+                            reorderModel: editMode
+                                ? AutomaticAnimatedListReorderModel(currentList)
+                                : null,
+                            detectMoves: editMode,
+                          ),
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+final controller = AnimatedListController();
