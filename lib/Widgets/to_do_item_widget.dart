@@ -46,6 +46,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         ),
         child: ListTile(
           onTap: () {
+            print(widget.editMode);
             print("move to" + widget.item.id + "page");
           },
           leading: widget.editMode

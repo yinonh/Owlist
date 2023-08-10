@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
 
+import '../Widgets/item_list.dart';
 import '../Widgets/to_do_item_widget.dart';
 import '../Widgets/date_picker.dart';
 import '../Models/to_do_item.dart';
@@ -23,7 +24,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   late DateTime newDeadline;
   TextEditingController _titleController = TextEditingController();
   bool isLoading = false;
-  bool editMode = false;
+  late bool editMode;
   late List<ToDoItem> currentList;
 
   @override
@@ -31,12 +32,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
     super.initState();
     newDeadline = widget.list.deadline;
     _titleController.text = widget.list.title;
+    editMode = false;
     getList();
   }
 
   void _toggleEditMode() {
     setState(() {
       editMode = !editMode;
+      print(editMode);
     });
   }
 
@@ -161,7 +164,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void _save() async {
-    if (isLoading) return;
     setState(() {
       isLoading = true;
     });
@@ -173,10 +175,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
       await Provider.of<ListsProvider>(context, listen: false)
           .editTitle(widget.list.id, _titleController.text);
     }
-    _toggleEditMode();
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
+    _toggleEditMode();
   }
 
   void checkItem(String id) {
@@ -245,7 +247,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   setState(() {
                                     newDeadline = widget.list.deadline;
                                     _titleController.text = widget.list.title;
-                                    editMode = false;
+                                    _toggleEditMode();
                                   });
                                 },
                               )
@@ -293,56 +295,19 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               )
                             : IconButton(
                                 icon: Icon(Icons.edit, color: Colors.white),
-                                onPressed: () {
-                                  _toggleEditMode();
-                                },
+                                onPressed: _toggleEditMode,
                               ),
                       ],
                     ),
                   ),
                   isLoading
                       ? Center(child: CircularProgressIndicator())
-                      : Container(
-                          height: MediaQuery.of(context).size.height * 0.85,
-                          child: AutomaticAnimatedListView<ToDoItem>(
-                            list: currentList,
-                            comparator:
-                                AnimatedListDiffListComparator<ToDoItem>(
-                              sameItem: (a, b) => a.id == b.id,
-                              sameContent: (a, b) => a.title == b.title,
-                            ),
-                            itemBuilder: (context, item, data) => data.measuring
-                                ? Container(
-                                    margin: EdgeInsets.all(5), height: 50)
-                                : Container(
-                                    margin: EdgeInsets.symmetric(vertical: 8),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ToDoItemWidget(
-                                      item,
-                                      editMode,
-                                      item.index,
-                                      checkItem,
-                                      deleteItem,
-                                    ),
-                                  ),
-                            listController: controller,
-                            addLongPressReorderable: editMode,
-                            reorderModel: editMode
-                                ? AutomaticAnimatedListReorderModel(currentList)
-                                : null,
-                            detectMoves: editMode,
-                          ),
+                      : ItemList(
+                          editMode: editMode,
+                          currentList: currentList,
+                          checkItem: checkItem,
+                          deleteItem: deleteItem,
+                          controller: controller,
                         ),
                 ],
               ),
