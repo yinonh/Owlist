@@ -154,6 +154,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void checkItem(String id, String listId, bool done) {
+    // To Do: fix bug with the check items
     Provider.of<ItemProvider>(context, listen: false)
         .toggleItemDone(id, listId, done);
     List<ToDoItem> temp = List.from(currentList);
