@@ -28,8 +28,9 @@ class AddList extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
+                    autofocus: true,
                     controller: new_title,
-                    maxLength: 30,
+                    maxLength: 35,
                     decoration: InputDecoration(hintText: "Title"),
                   ),
                   DatePickerWidget(
@@ -45,6 +46,16 @@ class AddList extends StatelessWidget {
               actions: <Widget>[
                 TextButton(
                   child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                        color: Color(0xFF635985), fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text(
                     'Save',
                     style: TextStyle(
                         color: Color(0xFF635985), fontWeight: FontWeight.bold),
@@ -53,7 +64,6 @@ class AddList extends StatelessWidget {
                     if (new_title.text != '') {
                       add_item(new_title.text, new_deadline);
                     }
-
                     Navigator.of(context).pop();
                   },
                 ),

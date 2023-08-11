@@ -125,11 +125,10 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                       onPressed: () {
                         _showDeleteConfirmation(context);
                       },
-                      icon: Icon(Icons.delete, color: Colors.black))
+                      icon: Icon(Icons.delete, color: Color(0xFF393053)))
                   // Icon(Icons.delete, color: Colors.black),
                 ],
               ),
-              SizedBox(height: 8.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

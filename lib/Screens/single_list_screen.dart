@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
 
+import '../Widgets/edit_title_popup.dart';
 import '../Widgets/item_list.dart';
 import '../Widgets/to_do_item_widget.dart';
 import '../Widgets/date_picker.dart';
@@ -80,37 +81,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void _showNewItemDialog(BuildContext context) {
-    String newTitle = '';
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter New Item Title',
-              style: TextStyle(color: Color(0xFF635985))),
-          content: TextField(
-            onChanged: (value) {
-              newTitle = value;
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Color(0xFF635985))),
-            ),
-            TextButton(
-              onPressed: () {
-                addNewItem(newTitle);
-              },
-              child: Text(
-                'Add',
-                style: TextStyle(color: Color(0xFF635985)),
-              ),
-            ),
-          ],
-        );
+        return EditItemDialog(
+            addNewItem: addNewItem); // Pass the function as a parameter
       },
     );
   }
@@ -151,7 +126,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
     if (newTitle.isNotEmpty) {
       ToDoItem? newItem =
           await itemProvider.addNewItem(widget.list.id, newTitle);
-      Navigator.of(context).pop();
 
       if (newItem != null) {
         List<ToDoItem> temp = List.from(currentList);
@@ -176,12 +150,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
           .editTitle(widget.list.id, _titleController.text);
     }
     setState(() {
-      isLoading = true;
+      isLoading = false;
     });
     _toggleEditMode();
   }
 
-  void checkItem(String id) {
+  void checkItem(String id, String listId, bool done) {
+    Provider.of<ItemProvider>(context, listen: false)
+        .toggleItemDone(id, listId, done);
     List<ToDoItem> temp = List.from(currentList);
     ToDoItem x = temp.firstWhere((element) => element.id == id);
     x.done = !x.done;
@@ -228,8 +204,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
         child: SafeArea(
           child: Container(
             height: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top -
-                MediaQuery.of(context).padding.bottom,
+                MediaQuery.of(context).padding.top,
             child: SingleChildScrollView(
               child: Column(
                 children: [

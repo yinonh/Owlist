@@ -8,11 +8,11 @@ class ToDoItemWidget extends StatefulWidget {
   final ToDoItem item;
   final bool editMode;
   final int index;
-  final Function swapList;
+  final Function checkItem;
   final Function deleteItem;
 
   ToDoItemWidget(
-      this.item, this.editMode, this.index, this.swapList, this.deleteItem,
+      this.item, this.editMode, this.index, this.checkItem, this.deleteItem,
       {Key? key})
       : super(key: key);
 
@@ -46,7 +46,6 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         ),
         child: ListTile(
           onTap: () {
-            print(widget.editMode);
             print("move to" + widget.item.id + "page");
           },
           leading: widget.editMode
@@ -73,16 +72,9 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   activeColor: Color(0xFF945985),
                   value: widget.item.done,
                   onChanged: (value) {
-                    widget.swapList(widget.item.id);
+                    widget.checkItem(
+                        widget.item.id, widget.item.listId, widget.item.done);
                   },
-                  // onChanged: (value) {
-                  //   setState(() {
-                  //     widget.item.done = !widget.item.done;
-                  //   });
-                  //   Provider.of<ItemProvider>(context, listen: false)
-                  //       .toggleItemDone(
-                  //           widget.item.id, widget.item.listId, widget.item.done);
-                  // },
                 ),
         ),
       ),
