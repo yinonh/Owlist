@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
+import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
-import '../Widgets/add_list.dart';
 import '../Screens/sign_in_sign_up_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -81,31 +81,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     provider = Provider.of<ListsProvider>(context);
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+      bottomNavigationBar: MyBottomNavigationBar(
         currentIndex: currentIndex,
         onTap: _onItemTapped,
-        selectedIconTheme: const IconThemeData(
-          size: 30,
-        ),
-        unselectedIconTheme: const IconThemeData(
-          size: 20,
-        ),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.fact_check,
-            ),
-            label: 'Active',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.archive,
-            ),
-            label: 'Archived',
-          ),
-        ],
+        add_item: addItem,
       ),
       body: RefreshIndicator(
         onRefresh: refreshLists,
@@ -145,7 +124,9 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                         ),
                       ),
-                      AddList(add_item: addItem),
+                      SizedBox(
+                        width: 40,
+                      )
                     ],
                   ),
                 ),

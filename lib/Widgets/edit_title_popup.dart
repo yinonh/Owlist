@@ -15,6 +15,11 @@ class _EditItemDialogState extends State<EditItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          10.0,
+        ),
+      ),
       title: Text('Enter New Item Title',
           style: TextStyle(color: Color(0xFF635985))),
       content: TextField(

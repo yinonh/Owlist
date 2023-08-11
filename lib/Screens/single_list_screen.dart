@@ -4,8 +4,6 @@ import 'package:great_list_view/great_list_view.dart';
 
 import '../Widgets/edit_title_popup.dart';
 import '../Widgets/item_list.dart';
-import '../Widgets/to_do_item_widget.dart';
-import '../Widgets/date_picker.dart';
 import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
@@ -178,21 +176,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: editMode
-          ? FloatingActionButton(
-              onPressed: () {
-                _showChangeDateDialog(context);
-              },
-              backgroundColor: Color(0xFF635985),
-              child: const Icon(Icons.calendar_month),
-            )
-          : FloatingActionButton(
-              onPressed: () {
-                _showNewItemDialog(context);
-              },
-              backgroundColor: Color(0xFF635985),
-              child: const Icon(Icons.add),
-            ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -277,12 +260,58 @@ class _SingleListScreenState extends State<SingleListScreen> {
                   ),
                   isLoading
                       ? Center(child: CircularProgressIndicator())
-                      : ItemList(
-                          editMode: editMode,
-                          currentList: currentList,
-                          checkItem: checkItem,
-                          deleteItem: deleteItem,
-                          controller: controller,
+                      //To DO: change the height to be calculated
+                      : Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.78,
+                                  child: ItemList(
+                                    editMode: editMode,
+                                    currentList: currentList,
+                                    checkItem: checkItem,
+                                    deleteItem: deleteItem,
+                                    controller: itemListController,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 40,
+                                )
+                              ],
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              child: editMode
+                                  ? ElevatedButton(
+                                      onPressed: () {
+                                        _showChangeDateDialog(context);
+                                      },
+                                      child:
+                                          Icon(Icons.calendar_month, size: 30),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder(),
+                                        backgroundColor: Color(0xFF635985),
+                                        padding: EdgeInsets.all(15),
+                                        elevation: 10,
+                                      ),
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        _showNewItemDialog(context);
+                                      },
+                                      child: Icon(Icons.add, size: 30),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder(),
+                                        backgroundColor: Color(0xFF635985),
+                                        padding: EdgeInsets.all(15),
+                                        elevation: 10,
+                                      ),
+                                    ),
+                            ),
+                          ],
                         ),
                 ],
               ),
@@ -294,4 +323,4 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 }
 
-final controller = AnimatedListController();
+AnimatedListController itemListController = AnimatedListController();

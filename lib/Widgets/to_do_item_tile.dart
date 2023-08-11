@@ -23,6 +23,11 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
           title: const Text(
             'Confirm Deletion',
             style: TextStyle(color: Color(0xFF864879)),
