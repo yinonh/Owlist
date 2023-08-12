@@ -66,7 +66,7 @@ class MyBottomNavigationBar extends StatelessWidget {
                           TextFormField(
                             autofocus: true,
                             controller: new_title,
-                            maxLength: 35,
+                            maxLength: 25,
                             decoration: InputDecoration(hintText: "Title"),
                           ),
                           DatePickerWidget(

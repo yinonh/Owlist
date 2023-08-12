@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
@@ -192,7 +194,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Padding(
+                  Container(
+                    height: 75,
                     padding:
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
                     child: Row(
@@ -223,11 +226,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 24.0,
+                                    fontSize: 15.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
-                                  maxLength: 35,
+                                  maxLength: 25,
                                   // Set the maximum length
                                   decoration: InputDecoration(
                                     counterText:
@@ -236,14 +239,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   ),
                                 ),
                               )
-                            : Text(
-                                _titleController.text,
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            : Flexible(
+                                child: Text(
+                                  _titleController.text,
+                                  style: TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                         editMode
                             ? IconButton(
@@ -268,8 +273,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
                             Column(
                               children: [
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.78,
+                                  height: MediaQuery.of(context).size.height -
+                                      MediaQuery.of(context).padding.top -
+                                      (75 + 40),
                                   child: ItemList(
                                     editMode: editMode,
                                     currentList: currentList,

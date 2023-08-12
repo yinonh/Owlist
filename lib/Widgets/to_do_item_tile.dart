@@ -118,12 +118,15 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                   //   onChanged: (value) {},
                   //   activeColor: Color(0xFF945985),
                   // ),
-                  Text(
-                    widget.item.title,
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF864879),
+                  FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      widget.item.title,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF864879),
+                      ),
                     ),
                   ),
                   IconButton(

@@ -23,6 +23,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
       title: Text('Enter New Item Title',
           style: TextStyle(color: Color(0xFF635985))),
       content: TextField(
+        maxLength: 35,
         autofocus: true,
         onChanged: (value) {
           setState(() {
