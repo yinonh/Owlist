@@ -40,7 +40,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
   void _toggleEditMode() {
     setState(() {
       editMode = !editMode;
-      print(editMode);
     });
   }
 
@@ -130,6 +129,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
       if (newItem != null) {
         List<ToDoItem> temp = List.from(currentList);
         temp.add(newItem);
+        temp.sort((a, b) {
+          if (a.done == b.done) {
+            return a.index.compareTo(b.index);
+          } else {
+            return a.done ? 1 : -1;
+          }
+        });
         setState(() {
           currentList = temp;
         });
@@ -160,15 +166,18 @@ class _SingleListScreenState extends State<SingleListScreen> {
     Provider.of<ItemProvider>(context, listen: false)
         .toggleItemDone(id, listId, done);
     List<ToDoItem> temp = List.from(currentList);
-    ToDoItem x = temp.firstWhere((element) => element.id == id);
-    x.done = !x.done;
+
+    for (int i = 0; i < temp.length; i++) {
+      if (temp[i].id == id) {
+        temp[i].done = !temp[i].done;
+        break;
+      }
+    }
     temp.sort((a, b) {
-      if (a.done && !b.done) {
-        return 1;
-      } else if (!a.done && b.done) {
-        return -1;
-      } else {
+      if (a.done == b.done) {
         return a.index.compareTo(b.index);
+      } else {
+        return a.done ? 1 : -1;
       }
     });
     setState(() {

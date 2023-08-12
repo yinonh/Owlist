@@ -72,8 +72,10 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   activeColor: Color(0xFF945985),
                   value: widget.item.done,
                   onChanged: (value) {
-                    widget.checkItem(
-                        widget.item.id, widget.item.listId, widget.item.done);
+                    setState(() {
+                      widget.checkItem(
+                          widget.item.id, widget.item.listId, widget.item.done);
+                    });
                   },
                 ),
         ),
