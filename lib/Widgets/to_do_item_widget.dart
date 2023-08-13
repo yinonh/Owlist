@@ -66,18 +66,18 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
               fontSize: 20,
             ),
           ),
-          trailing: widget.editMode
-              ? null
-              : Checkbox(
-                  activeColor: Color(0xFF945985),
-                  value: widget.item.done,
-                  onChanged: (value) {
+          trailing: Checkbox(
+            activeColor: Color(0xFF945985),
+            value: widget.item.done,
+            onChanged: widget.editMode
+                ? null
+                : (value) {
                     setState(() {
                       widget.checkItem(
                           widget.item.id, widget.item.listId, widget.item.done);
                     });
                   },
-                ),
+          ),
         ),
       ),
     );

@@ -146,15 +146,18 @@ class ItemProvider with ChangeNotifier {
   }
 
   Future<void> editIndex(String itemId, int newIndex) async {
+    print(itemId + " " + newIndex.toString());
     try {
       final itemRef =
           FirebaseFirestore.instance.collection('todoItems').doc(itemId);
 
+      // Update the 'index' field value
       await itemRef.update({'index': newIndex});
 
+      // Notify listeners or perform any other necessary actions
       notifyListeners();
     } catch (error) {
-      print("Error editing item's index: $error");
+      print("Error editing item index: $error");
     }
   }
 }

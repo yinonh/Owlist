@@ -27,6 +27,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   bool isLoading = false;
   late bool editMode;
   late List<ToDoItem> currentList;
+  late List<ToDoItem> editList;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void _toggleEditMode() {
+    if (!editMode) editList = List.from(currentList);
     setState(() {
       editMode = !editMode;
     });
@@ -50,14 +52,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
     currentList = await Provider.of<ItemProvider>(context, listen: false)
         .itemsByListId(widget.list.id);
     currentList.sort((a, b) {
-      if (a.done && !b.done) {
-        return 1;
-      } else if (!a.done && b.done) {
-        return -1;
-      } else {
+      if (a.done == b.done) {
         return a.index.compareTo(b.index);
+      } else {
+        return a.done ? 1 : -1;
       }
     });
+    editList = List.from(currentList);
     setState(() {
       isLoading = false;
     });
@@ -143,6 +144,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
     }
   }
 
+  void reorderItems(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final ToDoItem item = editList.removeAt(oldIndex);
+      editList.insert(newIndex, item);
+    });
+  }
+
   void _save() async {
     setState(() {
       isLoading = true;
@@ -155,14 +164,17 @@ class _SingleListScreenState extends State<SingleListScreen> {
       await Provider.of<ListsProvider>(context, listen: false)
           .editTitle(widget.list.id, _titleController.text);
     }
-    setState(() {
-      isLoading = false;
-    });
+    for (int i = 0; i < editList.length; i++) {
+      if (editList[i].index != i) {
+        await Provider.of<ItemProvider>(context, listen: false)
+            .editIndex(editList[i].id, i);
+      }
+    }
+    getList();
     _toggleEditMode();
   }
 
   void checkItem(String id, String listId, bool done) {
-    // To Do: fix bug with the check items
     Provider.of<ItemProvider>(context, listen: false)
         .toggleItemDone(id, listId, done);
     List<ToDoItem> temp = List.from(currentList);
@@ -235,7 +247,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 15.0,
+                                    fontSize: 19.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -288,6 +300,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   child: ItemList(
                                     editMode: editMode,
                                     currentList: currentList,
+                                    editList: editList,
+                                    reorderItems: reorderItems,
                                     checkItem: checkItem,
                                     deleteItem: deleteItem,
                                     controller: itemListController,

@@ -7,6 +7,8 @@ import '../Widgets/to_do_item_widget.dart';
 class ItemList extends StatefulWidget {
   final bool editMode;
   final List<ToDoItem> currentList;
+  final List<ToDoItem> editList;
+  final Function reorderItems;
   final Function deleteItem;
   final Function checkItem;
   final AnimatedListController controller;
@@ -14,6 +16,8 @@ class ItemList extends StatefulWidget {
   const ItemList(
       {required this.editMode,
       required this.currentList,
+      required this.editList,
+      required this.reorderItems,
       required this.checkItem,
       required this.deleteItem,
       required this.controller,
@@ -29,9 +33,9 @@ class _ItemListState extends State<ItemList> {
   Widget build(BuildContext context) {
     return widget.editMode
         ? ReorderableListView.builder(
-            itemCount: widget.currentList.length,
+            itemCount: widget.editList.length,
             itemBuilder: (context, index) {
-              final item = widget.currentList[index];
+              final item = widget.editList[index];
               return Container(
                 key: Key(item.id), // Key for reordering
                 margin: EdgeInsets.symmetric(vertical: 5),
@@ -57,12 +61,13 @@ class _ItemListState extends State<ItemList> {
               );
             },
             onReorder: (oldIndex, newIndex) {
-              // Reorder logic here
-              setState(() {
-                if (newIndex > oldIndex) newIndex -= 1;
-                final ToDoItem item = widget.currentList.removeAt(oldIndex);
-                widget.currentList.insert(newIndex, item);
-              });
+              widget.reorderItems(oldIndex, newIndex);
+              // // Reorder logic here
+              // setState(() {
+              //   if (newIndex > oldIndex) newIndex -= 1;
+              //   final ToDoItem item = widget.currentList.removeAt(oldIndex);
+              //   widget.currentList.insert(newIndex, item);
+              // });
             },
           )
         : AutomaticAnimatedListView<ToDoItem>(
