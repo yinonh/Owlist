@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class ToDoList {
   final String id;
   final String userID;
-  final int notification_index;
+  final int notificationIndex;
   bool hasDeadline;
   String title;
   DateTime creationDate;
@@ -15,7 +15,7 @@ class ToDoList {
   ToDoList({
     required this.id,
     required this.userID,
-    required this.notification_index,
+    required this.notificationIndex,
     required this.hasDeadline,
     required this.title,
     required this.creationDate,
@@ -30,7 +30,7 @@ class ToDoList {
     return ToDoList(
       id: snapshot.id,
       userID: data['userID'],
-      notification_index: data['notification_index'],
+      notificationIndex: data['notificationIndex'],
       hasDeadline: data['hasDeadline'],
       title: data['title'],
       creationDate: DateTime.parse(data['creationDate']),
@@ -45,7 +45,7 @@ class ToDoList {
     return {
       'userID': userID,
       'title': title,
-      'notification_index': notification_index,
+      'notificationIndex': notificationIndex,
       'hasDeadline': hasDeadline,
       'creationDate': DateFormat('yyyy-MM-dd').format(creationDate),
       'deadline': DateFormat('yyyy-MM-dd').format(deadline),

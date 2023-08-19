@@ -90,18 +90,18 @@ class ListsProvider with ChangeNotifier {
           .limit(1)
           .get();
 
-      int notification_index = 0;
+      int notificationIndex = 0;
 
       if (snapshot.docs.isNotEmpty) {
         final highestIndexItem = snapshot.docs.first;
         final highestIndex = highestIndexItem['notification_index'] as int;
-        notification_index = highestIndex + 1;
+        notificationIndex = highestIndex + 1;
       }
 
       ToDoList newList = ToDoList(
         id: '',
         userID: userId,
-        notification_index: notification_index,
+        notificationIndex: notificationIndex,
         hasDeadline: hasDeadline,
         title: title,
         creationDate: DateTime.now(),
