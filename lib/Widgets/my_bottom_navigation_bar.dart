@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../Widgets/date_picker.dart';
 import '../Providers/lists_provider.dart';
 
-class MyBottomNavigationBar extends StatelessWidget {
+class MyBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
   final Function add_item;
@@ -13,6 +13,13 @@ class MyBottomNavigationBar extends StatelessWidget {
       {required this.currentIndex,
       required this.onTap,
       required this.add_item});
+
+  @override
+  State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
+}
+
+class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
+  bool hasDeadline = true;
 
   @override
   Widget build(BuildContext context) {
@@ -50,43 +57,69 @@ class MyBottomNavigationBar extends StatelessWidget {
                   context: context,
                   barrierDismissible: true,
                   builder: (BuildContext context) {
+                    hasDeadline = true;
+
                     return AlertDialog(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          10.0,
-                        ),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       title: const Text(
                         'Enter list title',
                         style: TextStyle(color: Color(0xFF635985)),
                       ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            autofocus: true,
-                            controller: new_title,
-                            maxLength: 25,
-                            decoration: InputDecoration(hintText: "Title"),
-                          ),
-                          DatePickerWidget(
-                            initialDate: DateTime.now().add(Duration(days: 7)),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(Duration(days: 3650)),
-                            onDateSelected: (selectedDate) {
-                              if (selectedDate != null)
-                                new_deadline = selectedDate;
-                            },
-                          ),
-                        ],
+                      content: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                autofocus: true,
+                                controller: new_title,
+                                maxLength: 25,
+                                decoration: InputDecoration(hintText: "Title"),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Checkbox(
+                                    value: hasDeadline,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        hasDeadline = val ??
+                                            false; // Ensure a default value
+                                      });
+                                    },
+                                    activeColor: Color(0xFF945985),
+                                  ),
+                                  hasDeadline
+                                      ? DatePickerWidget(
+                                          initialDate: new_deadline ??
+                                              DateTime.now()
+                                                  .add(Duration(days: 7)),
+                                          firstDate: DateTime.now(),
+                                          lastDate: DateTime.now()
+                                              .add(Duration(days: 3650)),
+                                          onDateSelected: (selectedDate) {
+                                            if (selectedDate != null)
+                                              new_deadline = selectedDate;
+                                          },
+                                        )
+                                      : Text('Check for adding deadline'),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
                       ),
                       actions: <Widget>[
                         TextButton(
                           child: const Text(
                             'Cancel',
                             style: TextStyle(
-                                color: Color(0xFF635985),
-                                fontWeight: FontWeight.bold),
+                              color: Color(0xFF635985),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -96,12 +129,14 @@ class MyBottomNavigationBar extends StatelessWidget {
                           child: const Text(
                             'Save',
                             style: TextStyle(
-                                color: Color(0xFF635985),
-                                fontWeight: FontWeight.bold),
+                              color: Color(0xFF635985),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           onPressed: () {
                             if (new_title.text != '') {
-                              add_item(new_title.text, new_deadline);
+                              widget.add_item(
+                                  new_title.text, new_deadline, hasDeadline);
                             }
                             Navigator.of(context).pop();
                           },
@@ -128,7 +163,7 @@ class MyBottomNavigationBar extends StatelessWidget {
   Widget _buildBottomNavigationItem(
       IconData iconData, String label, int index) {
     return GestureDetector(
-      onTap: () => onTap(index),
+      onTap: () => widget.onTap(index),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: BoxDecoration(
@@ -140,11 +175,11 @@ class MyBottomNavigationBar extends StatelessWidget {
           children: [
             Icon(
               iconData,
-              size: currentIndex == index ? 30 : 20,
-              color: currentIndex == index ? Colors.white : Colors.grey,
+              size: widget.currentIndex == index ? 30 : 20,
+              color: widget.currentIndex == index ? Colors.white : Colors.grey,
             ),
-            if (currentIndex == index) SizedBox(height: 5),
-            if (currentIndex == index)
+            if (widget.currentIndex == index) SizedBox(height: 5),
+            if (widget.currentIndex == index)
               Text(
                 label,
                 style: TextStyle(

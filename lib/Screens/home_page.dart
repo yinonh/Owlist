@@ -48,10 +48,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void addItem(String title, DateTime deadline) {
+  void addItem(String title, DateTime deadline, hasDeadline) {
     setState(() {
       activeItemsFuture = activeItemsFuture.then((activeItems) {
-        return provider.createNewList(title, deadline).then((_) {
+        return provider.createNewList(title, deadline, hasDeadline).then((_) {
           return provider.getActiveItems();
         });
       });

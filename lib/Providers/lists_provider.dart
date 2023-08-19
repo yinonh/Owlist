@@ -78,23 +78,46 @@ class ListsProvider with ChangeNotifier {
     _achievedItemsCache = null;
   }
 
-  Future<void> createNewList(String title, DateTime deadline) async {
-    String userId = _auth.currentUser!.uid;
+  Future<void> createNewList(
+      String title, DateTime deadline, bool hasDeadline) async {
+    try {
+      String userId = _auth.currentUser!.uid;
 
-    ToDoList newList = ToDoList(
-      id: '', // Empty ID, as Firestore will generate a new ID when adding the document
-      userID: userId,
-      title: title,
-      creationDate: DateTime.now(),
-      deadline: deadline,
-      totalItems: 0,
-      accomplishedItems: 0,
-    );
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('todo_lists')
+          .where('userID', isEqualTo: userId)
+          .orderBy('notification_index', descending: true)
+          .limit(1)
+          .get();
 
-    await add_new_list(newList).then((_) {
-      invalidateCache();
-      notifyListeners();
-    });
+      int notification_index = 0;
+
+      if (snapshot.docs.isNotEmpty) {
+        final highestIndexItem = snapshot.docs.first;
+        final highestIndex = highestIndexItem['notification_index'] as int;
+        notification_index = highestIndex + 1;
+      }
+
+      ToDoList newList = ToDoList(
+        id: '',
+        userID: userId,
+        notification_index: notification_index,
+        hasDeadline: hasDeadline,
+        title: title,
+        creationDate: DateTime.now(),
+        deadline: deadline,
+        totalItems: 0,
+        accomplishedItems: 0,
+      );
+
+      await add_new_list(newList).then((_) {
+        invalidateCache();
+        notifyListeners();
+      });
+    } catch (error) {
+      print("Error adding new item: $error");
+      return null;
+    }
   }
 
   Future<void> deleteList(String listId) async {

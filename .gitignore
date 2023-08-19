@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub/
 /build/
 temp.dart
+Assets/
+android/app/src/main/res/drawable/res_app_icon.png
 
 # Symbolication related
 app.*.symbols

@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class ToDoList {
-  String id;
-  String userID;
+  final String id;
+  final String userID;
+  final int notification_index;
+  bool hasDeadline;
   String title;
   DateTime creationDate;
   DateTime deadline;
@@ -13,6 +15,8 @@ class ToDoList {
   ToDoList({
     required this.id,
     required this.userID,
+    required this.notification_index,
+    required this.hasDeadline,
     required this.title,
     required this.creationDate,
     required this.deadline,
@@ -26,6 +30,8 @@ class ToDoList {
     return ToDoList(
       id: snapshot.id,
       userID: data['userID'],
+      notification_index: data['notification_index'],
+      hasDeadline: data['hasDeadline'],
       title: data['title'],
       creationDate: DateTime.parse(data['creationDate']),
       deadline: DateTime.parse(data['deadline']),
@@ -39,6 +45,8 @@ class ToDoList {
     return {
       'userID': userID,
       'title': title,
+      'notification_index': notification_index,
+      'hasDeadline': hasDeadline,
       'creationDate': DateFormat('yyyy-MM-dd').format(creationDate),
       'deadline': DateFormat('yyyy-MM-dd').format(deadline),
       'totalItems': totalItems,

@@ -52,7 +52,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               child: const Text(
                 'Delete',
                 style: TextStyle(
-                  color: Color(0xFF864879),
+                  color: Colors.red,
                 ),
               ),
             ),
@@ -137,38 +137,58 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                   // Icon(Icons.delete, color: Colors.black),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    formatDate(widget.item.creationDate), // Format creationDate
-                    style: const TextStyle(
-                      // fontSize: 16.0,
-                      color: Colors.black,
+              widget.item.hasDeadline
+                  ? Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                formatDate(widget
+                                    .item.creationDate), // Format creationDate
+                                style: const TextStyle(
+                                  // fontSize: 16.0,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                formatDate(
+                                    widget.item.deadline), // Format deadline
+                                style: const TextStyle(
+                                  // fontSize: 16.0,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.0),
+                          LinearProgressIndicator(
+                            value: remainingDays <= 0
+                                ? 1
+                                : (totalDays - remainingDays) / totalDays,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFF393053)),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            'Remaining Days: ${remainingDays <= 0 ? "done" : remainingDays}',
+                            // style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Text(
+                      "Creation Date: " +
+                          formatDate(
+                              widget.item.creationDate), // Format creationDate
+                      style: const TextStyle(
+                        // fontSize: 16.0,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  Text(
-                    formatDate(widget.item.deadline), // Format deadline
-                    style: const TextStyle(
-                      // fontSize: 16.0,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              LinearProgressIndicator(
-                value: remainingDays <= 0
-                    ? 1
-                    : (totalDays - remainingDays) / totalDays,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF393053)),
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                'Remaining Days: ${remainingDays <= 0 ? "done" : remainingDays}',
-                // style: TextStyle(fontSize: 16.0),
-              ),
               const SizedBox(height: 8.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,17 +205,25 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 ],
               ),
               const SizedBox(height: 8.0),
-              LinearProgressIndicator(
-                value: progressPercentage,
-                backgroundColor: Colors.grey[300],
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(Color(0xFF635985)),
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                'Progress: ${(progressPercentage * 100).toStringAsFixed(0)}%',
-                // style: const TextStyle(fontSize: 16.0),
-              ),
+              widget.item.totalItems > 0
+                  ? Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          LinearProgressIndicator(
+                            value: progressPercentage,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xFF635985)),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            'Progress: ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox(height: 0),
             ],
           ),
         ),

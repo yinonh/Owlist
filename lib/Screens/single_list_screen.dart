@@ -316,9 +316,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               bottom: 0,
                               child: editMode
                                   ? ElevatedButton(
-                                      onPressed: () {
-                                        _showChangeDateDialog(context);
-                                      },
+                                      onPressed: widget.list.hasDeadline
+                                          ? () {
+                                              _showChangeDateDialog(context);
+                                            }
+                                          : null,
                                       child:
                                           Icon(Icons.calendar_month, size: 30),
                                       style: ElevatedButton.styleFrom(

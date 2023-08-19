@@ -44,6 +44,8 @@ dependencies:
   cloud_firestore: ^4.8.4
   animated_list_item: ^1.0.0
   great_list_view: ^0.2.3
+  awesome_notifications: ^0.6.19
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +68,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - Assets/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
