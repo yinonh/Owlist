@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Models/to_do_item.dart';
-import '../Providers/lists_provider.dart';
 
 class ItemProvider with ChangeNotifier {
   Future<List<ToDoItem>> itemsByListId(String listId) async {

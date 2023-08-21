@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
-import '../Screens/sign_in_sign_up_screen.dart';
+import '../Screens/auth_screen.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -27,6 +28,43 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then(
+      (isAllowed) {
+        if (!isAllowed) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Allow Notifications'),
+              content: Text('Our app would like to send you notifications'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Don\'t Allow',
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => AwesomeNotifications()
+                      .requestPermissionToSendNotifications()
+                      .then((_) => Navigator.pop(context)),
+                  child: Text(
+                    'Allow',
+                    style: TextStyle(
+                      color: Color(0xFF636995),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -109,9 +147,10 @@ class _HomePageState extends State<HomePage> {
                       IconButton(
                         onPressed: () async {
                           await FirebaseAuth.instance.signOut();
+                          provider.invalidateCache();
                           Navigator.pushReplacementNamed(
                             context,
-                            LoginScreen.routeName,
+                            AuthScreen.routeName,
                           );
                         },
                         icon: Icon(Icons.logout),
@@ -156,18 +195,6 @@ class _HomePageState extends State<HomePage> {
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                duration: Duration(seconds: 2),
-                                content: Text(
-                                  'Error',
-                                  style: TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            );
                             return Text(
                               'Error: ${snapshot.error}',
                               style: TextStyle(color: Colors.white),

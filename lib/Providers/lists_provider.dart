@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
+// import 'package:workmanager/workmanager.dart';
 
 import '../Models/to_do_list.dart';
 
@@ -35,6 +37,9 @@ class ListsProvider with ChangeNotifier {
         })
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
+    if (_activeItemsCache != null)
+      _activeItemsCache!
+          .sort((a, b) => a.notificationIndex.compareTo(b.notificationIndex));
 
     return _activeItemsCache!;
   }
@@ -62,12 +67,43 @@ class ListsProvider with ChangeNotifier {
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
 
+    if (_achievedItemsCache != null)
+      _achievedItemsCache!
+          .sort((a, b) => a.notificationIndex.compareTo(b.notificationIndex));
+
     return _achievedItemsCache!;
   }
 
   Future<void> add_new_list(ToDoList newList) async {
     try {
       await _firestore.collection('todo_lists').add(newList.toMap());
+      if (newList.hasDeadline) {
+        // && newList.deadline.isAfter(DateTime.now().add(Duration(days: 7)))) {
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: newList.notificationIndex,
+            channelKey: 'task_deadline_channel',
+            title: '${newList.title}',
+            body: 'Task deadline is about to end',
+            color: Color(0xFF635985),
+            // groupKey: "1",
+          ),
+          schedule: NotificationCalendar.fromDate(
+            date: DateTime.now().add(
+              Duration(seconds: 30),
+            ),
+          ),
+        );
+        // final selectedDate = DateTime.now().add(Duration(seconds: 30));
+        // final isoFormattedDate = selectedDate.toIso8601String();
+        // Workmanager().registerOneOffTask(
+        //   '12',
+        //   '23',
+        //   inputData: {
+        //     'notificationDate': isoFormattedDate,
+        //   },
+        // );
+      }
     } catch (e) {
       print('Error adding new list: $e');
     }
@@ -77,6 +113,23 @@ class ListsProvider with ChangeNotifier {
     _activeItemsCache = null;
     _achievedItemsCache = null;
   }
+
+  // int generateUniqueNumber() {
+  //   DateTime now = DateTime.now();
+  //   int year = now.year % 100; // Use only the last two digits
+  //   int month = now.month;
+  //   int day = now.day;
+  //   int minutes = now.minute;
+  //   int seconds = now.second;
+  //
+  //   int uniqueNumber = year * 100000000 +
+  //       month * 1000000 +
+  //       day * 10000 +
+  //       minutes * 100 +
+  //       seconds;
+  //
+  //   return uniqueNumber;
+  // }
 
   Future<void> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {

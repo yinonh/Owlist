@@ -1,5 +1,5 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../Widgets/date_picker.dart';
 import '../Providers/lists_provider.dart';
@@ -50,7 +50,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           Positioned(
             bottom: 0,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 TextEditingController new_title = TextEditingController();
                 DateTime new_deadline = DateTime.now().add(Duration(days: 7));
                 showDialog<void>(

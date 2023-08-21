@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
 
-import '../Widgets/edit_title_popup.dart';
+import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
 import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
