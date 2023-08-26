@@ -129,12 +129,6 @@ class _MyAppState extends State<MyApp> {
         }
       },
       home: initialScreen,
-      // colorScheme: ColorScheme(
-      //     background: LinearGradient(
-      //   begin: Alignment.topCenter,
-      //   end: Alignment.bottomCenter,
-      //   colors: [Color(0xFF635985), Color(0xFF18122B)],
-      // )),
     );
   }
 }

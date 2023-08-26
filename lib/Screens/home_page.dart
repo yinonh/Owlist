@@ -10,6 +10,15 @@ import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Screens/auth_screen.dart';
 
+enum FilterBy {
+  creationLTN,
+  creationNTL,
+  deadlineLTN,
+  deadlineNTL,
+  progressBTS,
+  progressSTB
+}
+
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
 
@@ -21,13 +30,15 @@ class _HomePageState extends State<HomePage> {
   late ListsProvider provider;
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
-
-  int currentIndex = 0;
-  PageController selectedIndex = PageController(initialPage: 0);
+  FilterBy selectedOption = FilterBy.creationNTL;
+  late int currentIndex;
+  late PageController selectedIndex;
 
   @override
   void initState() {
     super.initState();
+    currentIndex = 0;
+    selectedIndex = PageController(initialPage: 0);
     AwesomeNotifications().isNotificationAllowed().then(
       (isAllowed) {
         if (!isAllowed) {
@@ -71,6 +82,58 @@ class _HomePageState extends State<HomePage> {
         Provider.of<ListsProvider>(context, listen: false).getAchievedItems();
   }
 
+  Future<void> sortLists(FilterBy filterBy) async {
+    List<ToDoList> activeLists = await activeItemsFuture;
+    List<ToDoList> achievedLists = await achievedItemsFuture;
+
+    void sortFunction(List<ToDoList> lists) {
+      lists.sort((a, b) {
+        if (filterBy == FilterBy.creationLTN) {
+          return b.creationDate.compareTo(a.creationDate);
+        } else if (filterBy == FilterBy.creationNTL) {
+          return a.creationDate.compareTo(b.creationDate);
+        } else if (filterBy == FilterBy.deadlineLTN) {
+          if (!a.hasDeadline && b.hasDeadline) {
+            return 1;
+          } else if (a.hasDeadline && !b.hasDeadline) {
+            return -1;
+          }
+          return a.deadline.compareTo(b.deadline);
+        } else if (filterBy == FilterBy.deadlineNTL) {
+          if (!a.hasDeadline && b.hasDeadline) {
+            return 1;
+          } else if (a.hasDeadline && !b.hasDeadline) {
+            return -1;
+          }
+          return b.deadline.compareTo(a.deadline);
+        } else if (filterBy == FilterBy.progressBTS) {
+          double progressA =
+              a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems;
+          double progressB =
+              b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems;
+          return progressB
+              .compareTo(progressA); // Sorting by progress in descending order
+        } else if (filterBy == FilterBy.progressSTB) {
+          double progressA =
+              a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems;
+          double progressB =
+              b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems;
+          return progressA
+              .compareTo(progressB); // Sorting by progress in ascending order
+        }
+        return 0; // Default case
+      });
+    }
+
+    sortFunction(activeLists);
+    sortFunction(achievedLists);
+
+    setState(() {
+      activeItemsFuture = Future.value(activeLists);
+      achievedItemsFuture = Future.value(achievedLists);
+    });
+  }
+
   void deleteItem(ToDoList item) {
     setState(() {
       activeItemsFuture = activeItemsFuture.then((activeItems) {
@@ -96,11 +159,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
+    print(index);
     setState(() {
       selectedIndex.animateToPage(
         index,
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       currentIndex = index;
@@ -119,11 +183,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     provider = Provider.of<ListsProvider>(context);
     return Scaffold(
-      bottomNavigationBar: MyBottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: _onItemTapped,
+      bottomNavigationBar: DiamondBottomNavigation(
+        itemIcons: const [
+          Icons.checklist,
+          Icons.archive,
+          Icons.notifications_off_rounded,
+          Icons.settings,
+        ],
         add_item: addItem,
+        centerIcon: Icons.add_outlined,
+        selectedIndex: currentIndex,
+        onItemPressed: onItemTapped,
       ),
+      // bottomNavigationBar: MyBottomNavigationBar(
+      //   currentIndex: currentIndex,
+      //   onTap: onItemTapped,
+      //   add_item: addItem,
+      // ),
       body: RefreshIndicator(
         onRefresh: refreshLists,
         child: Container(
@@ -163,9 +239,40 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(
-                        width: 40,
-                      )
+                      PopupMenuButton<FilterBy>(
+                        icon: const Icon(Icons.filter_list),
+                        onSelected: (value) {
+                          setState(() {
+                            sortLists(value);
+                          });
+                        },
+                        itemBuilder: (BuildContext cnx) => [
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.creationLTN,
+                            child: Text('Creation Date: Newest to Oldest'),
+                          ),
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.creationNTL,
+                            child: Text('Creation Date: Oldest to Newest'),
+                          ),
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.deadlineLTN,
+                            child: Text('Deadline: Sooner to Later'),
+                          ),
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.deadlineNTL,
+                            child: Text('Deadline: Later to Sooner'),
+                          ),
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.progressBTS,
+                            child: Text('Progress: High to Low'),
+                          ),
+                          const PopupMenuItem<FilterBy>(
+                            value: FilterBy.progressSTB,
+                            child: Text('Progress: Low to High'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -183,7 +290,11 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 16.0),
                 Expanded(
                   child: PageView(
-                    onPageChanged: _onItemTapped,
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentIndex = index;
+                      });
+                    },
                     controller: selectedIndex,
                     children: [
                       FutureBuilder<List<ToDoList>>(
@@ -243,6 +354,16 @@ class _HomePageState extends State<HomePage> {
                             );
                           }
                         },
+                      ),
+                      Container(
+                        child: Center(
+                          child: Text("no deadline"),
+                        ),
+                      ),
+                      Container(
+                        child: Center(
+                          child: Text("settings"),
+                        ),
                       ),
                     ],
                   ),
