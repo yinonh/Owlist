@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:to_do/main.dart';
 
+import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
+import '../Widgets/settigns_widget.dart';
 import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Screens/auth_screen.dart';
@@ -34,12 +37,19 @@ class _HomePageState extends State<HomePage> {
   FilterBy selectedOption = FilterBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
-  final List<String> titles = [
-    'Active Items',
-    'Archived Items',
-    'Without Deadline',
-    'Settings'
-  ];
+  late List<String> titles;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    titles = [
+      AppLocalizations.of(context).translate("Active Items"),
+      AppLocalizations.of(context).translate("Archived Items"),
+      AppLocalizations.of(context).translate("Without Deadline"),
+      AppLocalizations.of(context).translate("Settings")
+    ];
+  }
 
   @override
   void initState() {
@@ -52,15 +62,20 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Allow Notifications'),
-              content: Text('Our app would like to send you notifications'),
+              title: Text(
+                AppLocalizations.of(context).translate("Allow Notifications"),
+              ),
+              content: Text(
+                AppLocalizations.of(context)
+                    .translate("Our app would like to send you notifications"),
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    'Don\'t Allow',
+                    AppLocalizations.of(context).translate("Dont Allow"),
                     style: TextStyle(color: Colors.grey, fontSize: 18),
                   ),
                 ),
@@ -69,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                       .requestPermissionToSendNotifications()
                       .then((_) => Navigator.pop(context)),
                   child: Text(
-                    'Allow',
+                    AppLocalizations.of(context).translate("Allow"),
                     style: TextStyle(
                       color: Color(0xFF636995),
                       fontSize: 18,
@@ -83,6 +98,7 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -186,7 +202,6 @@ class _HomePageState extends State<HomePage> {
           });
         });
       }
-      print("here");
       sortLists(FilterBy.creationNTL);
     });
   }
@@ -257,8 +272,8 @@ class _HomePageState extends State<HomePage> {
                         },
                         icon: Icon(Icons.logout),
                       ),
-                      const Text(
-                        'To-Do',
+                      Text(
+                        AppLocalizations.of(context).translate("To-Do"),
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
@@ -275,31 +290,47 @@ class _HomePageState extends State<HomePage> {
                                 });
                               },
                               itemBuilder: (BuildContext cnx) => [
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.creationNTL,
-                                  child:
-                                      Text('Creation Date: Newest to Oldest'),
+                                  child: Text(
+                                    AppLocalizations.of(context).translate(
+                                        "Creation Date: Newest to Oldest"),
+                                  ),
                                 ),
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.creationLTN,
-                                  child:
-                                      Text('Creation Date: Oldest to Newest'),
+                                  child: Text(
+                                    AppLocalizations.of(context).translate(
+                                        "Creation Date: Oldest to Newest"),
+                                  ),
                                 ),
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.deadlineLTN,
-                                  child: Text('Deadline: Sooner to Later'),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Deadline: Later to Sooner"),
+                                  ),
                                 ),
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.deadlineNTL,
-                                  child: Text('Deadline: Later to Sooner'),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Deadline: Sooner to Later"),
+                                  ),
                                 ),
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.progressBTS,
-                                  child: Text('Progress: High to Low'),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Progress: High to Low"),
+                                  ),
                                 ),
-                                const PopupMenuItem<FilterBy>(
+                                PopupMenuItem<FilterBy>(
                                   value: FilterBy.progressSTB,
-                                  child: Text('Progress: Low to High'),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Progress: Low to High"),
+                                  ),
                                 ),
                               ],
                             ),
@@ -328,6 +359,7 @@ class _HomePageState extends State<HomePage> {
                     controller: selectedIndex,
                     children: [
                       FutureBuilder<List<ToDoList>>(
+                        key: PageStorageKey(1),
                         future: activeItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -351,6 +383,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       FutureBuilder<List<ToDoList>>(
+                        key: PageStorageKey(2),
                         future: achievedItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -386,6 +419,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       FutureBuilder<List<ToDoList>>(
+                        key: PageStorageKey(3),
                         future: withoutDeadlineItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -420,11 +454,7 @@ class _HomePageState extends State<HomePage> {
                           }
                         },
                       ),
-                      Container(
-                        child: Center(
-                          child: Text("settings"),
-                        ),
-                      ),
+                      Settings(),
                     ],
                   ),
                 ),

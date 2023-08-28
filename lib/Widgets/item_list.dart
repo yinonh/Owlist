@@ -13,7 +13,7 @@ class ItemList extends StatefulWidget {
   final Function checkItem;
   final AnimatedListController controller;
 
-  const ItemList(
+  ItemList(
       {required this.editMode,
       required this.currentList,
       required this.editList,
@@ -62,12 +62,6 @@ class _ItemListState extends State<ItemList> {
             },
             onReorder: (oldIndex, newIndex) {
               widget.reorderItems(oldIndex, newIndex);
-              // // Reorder logic here
-              // setState(() {
-              //   if (newIndex > oldIndex) newIndex -= 1;
-              //   final ToDoItem item = widget.currentList.removeAt(oldIndex);
-              //   widget.currentList.insert(newIndex, item);
-              // });
             },
           )
         : AutomaticAnimatedListView<ToDoItem>(
@@ -76,30 +70,34 @@ class _ItemListState extends State<ItemList> {
               sameItem: (a, b) => a.id == b.id,
               sameContent: (a, b) => a.title == b.title,
             ),
-            itemBuilder: (context, item, data) => data.measuring
-                ? Container(margin: EdgeInsets.all(5), height: 50)
-                : Container(
-                    margin: EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          // offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: ToDoItemWidget(
-                      item,
-                      false,
-                      item.index,
-                      widget.checkItem,
-                      widget.deleteItem,
-                    ),
+            itemBuilder: (context, item, data) {
+              if (data.measuring) {
+                return Container(margin: EdgeInsets.all(5), height: 50);
+              } else {
+                return Container(
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        // offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
+                  child: ToDoItemWidget(
+                    item,
+                    false,
+                    item.index,
+                    widget.checkItem,
+                    widget.deleteItem,
+                  ),
+                );
+              }
+            },
             listController: widget.controller,
             addLongPressReorderable: false,
             detectMoves: false,

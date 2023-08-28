@@ -113,11 +113,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Checkbox(
-                  //   value: is_done,
-                  //   onChanged: (value) {},
-                  //   activeColor: Color(0xFF945985),
-                  // ),
                   FittedBox(
                     fit: BoxFit.fitWidth,
                     child: Text(

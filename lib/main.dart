@@ -6,8 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 // import 'package:workmanager/workmanager.dart';
 
+import 'l10n/app_localizations.dart';
 import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
@@ -75,26 +79,73 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  static void setLocale(BuildContext context, Locale newLocale) {
+    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    state.setLocale(newLocale);
+  }
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('en', '');
   late Widget initialScreen;
+
+  Future<void> setLanguage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? language = prefs.getString('selectedLanguage');
+
+    Locale newLocale;
+    switch (language) {
+      case 'en':
+        newLocale = const Locale('en', '');
+        break;
+      case 'he':
+        newLocale = const Locale('he', '');
+        break;
+      default:
+        newLocale = const Locale('en', '');
+    }
+    setLocale(newLocale);
+  }
+
+  void setLocale(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     User? currentUser = FirebaseAuth.instance.currentUser;
-    initialScreen = AuthScreen();
     if (currentUser != null) {
-      initialScreen = HomePage();
+      setState(() {
+        initialScreen = HomePage();
+      });
+    } else {
+      setState(() {
+        initialScreen = AuthScreen();
+      });
     }
+    setLanguage();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: _locale,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'),
+        const Locale('he', 'IL'),
+      ],
       theme: ThemeData(
         primaryColor:
             Colors.white, // Color for app bar and other primary elements

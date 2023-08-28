@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class DiamondButton extends StatelessWidget {
-  final IconData icon;
+  final Icon icon;
   final Function? onTap;
   final double screenWidth;
   final double screenHeight;
@@ -57,16 +57,12 @@ class DiamondButton extends StatelessWidget {
                     ],
                   ),
                 ),
-                height: getRelativeWidth(0.135),
-                width: getRelativeWidth(0.135),
+                height: getRelativeWidth(0.15),
+                width: getRelativeWidth(0.15),
                 child: Center(
                   child: Transform.rotate(
                     angle: math.pi / 4,
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: getRelativeWidth(0.1),
-                    ),
+                    child: icon,
                   ),
                 ),
               ),

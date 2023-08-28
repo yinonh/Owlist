@@ -154,7 +154,11 @@ class DiamondBottomNavigation extends StatelessWidget {
             ),
             Positioned.fill(
                 child: DiamondButton(
-              icon: Icons.add,
+              icon: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: getRelativeWidth(0.1),
+              ),
               onTap: () async {
                 TextEditingController new_title = TextEditingController();
                 DateTime new_deadline = DateTime.now().add(Duration(days: 7));

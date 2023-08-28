@@ -317,7 +317,15 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               bottom: 0,
                               child: editMode
                                   ? DiamondButton(
-                                      icon: Icons.calendar_month,
+                                      icon: Icon(
+                                        Icons.calendar_month,
+                                        color: widget.list.hasDeadline
+                                            ? Colors.white
+                                            : Colors.grey,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.07,
+                                      ),
                                       onTap: widget.list.hasDeadline
                                           ? () {
                                               _showChangeDateDialog(context);
@@ -329,7 +337,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                           MediaQuery.of(context).size.height,
                                     )
                                   : DiamondButton(
-                                      icon: Icons.add,
+                                      icon: Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                      ),
                                       onTap: () {
                                         _showNewItemDialog(context);
                                       },
