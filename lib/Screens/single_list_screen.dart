@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +6,7 @@ import 'package:great_list_view/great_list_view.dart';
 
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
+import '../Widgets/diamond_button.dart';
 import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
@@ -315,33 +316,55 @@ class _SingleListScreenState extends State<SingleListScreen> {
                             Positioned(
                               bottom: 0,
                               child: editMode
-                                  ? ElevatedButton(
-                                      onPressed: widget.list.hasDeadline
+                                  ? DiamondButton(
+                                      icon: Icons.calendar_month,
+                                      onTap: widget.list.hasDeadline
                                           ? () {
                                               _showChangeDateDialog(context);
                                             }
                                           : null,
-                                      child:
-                                          Icon(Icons.calendar_month, size: 30),
-                                      style: ElevatedButton.styleFrom(
-                                        shape: CircleBorder(),
-                                        backgroundColor: Color(0xFF635985),
-                                        padding: EdgeInsets.all(15),
-                                        elevation: 10,
-                                      ),
+                                      screenWidth:
+                                          MediaQuery.of(context).size.width,
+                                      screenHeight:
+                                          MediaQuery.of(context).size.height,
                                     )
-                                  : ElevatedButton(
-                                      onPressed: () {
+                                  : DiamondButton(
+                                      icon: Icons.add,
+                                      onTap: () {
                                         _showNewItemDialog(context);
                                       },
-                                      child: Icon(Icons.add, size: 30),
-                                      style: ElevatedButton.styleFrom(
-                                        shape: CircleBorder(),
-                                        backgroundColor: Color(0xFF635985),
-                                        padding: EdgeInsets.all(15),
-                                        elevation: 10,
-                                      ),
+                                      screenWidth:
+                                          MediaQuery.of(context).size.width,
+                                      screenHeight:
+                                          MediaQuery.of(context).size.height,
                                     ),
+                              // ? ElevatedButton(
+                              //     onPressed: widget.list.hasDeadline
+                              //         ? () {
+                              //             _showChangeDateDialog(context);
+                              //           }
+                              //         : null,
+                              //     child:
+                              //         Icon(Icons.calendar_month, size: 30),
+                              //     style: ElevatedButton.styleFrom(
+                              //       shape: CircleBorder(),
+                              //       backgroundColor: Color(0xFF635985),
+                              //       padding: EdgeInsets.all(15),
+                              //       elevation: 10,
+                              //     ),
+                              //   )
+                              // : ElevatedButton(
+                              //     onPressed: () {
+                              //       _showNewItemDialog(context);
+                              //     },
+                              //     child: Icon(Icons.add, size: 30),
+                              //     style: ElevatedButton.styleFrom(
+                              //       shape: CircleBorder(),
+                              //       backgroundColor: Color(0xFF635985),
+                              //       padding: EdgeInsets.all(15),
+                              //       elevation: 10,
+                              //     ),
+                              //   ),
                             ),
                           ],
                         ),

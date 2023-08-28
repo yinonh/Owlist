@@ -14,6 +14,7 @@ class ListsProvider with ChangeNotifier {
 
   List<ToDoList>? _activeItemsCache;
   List<ToDoList>? _achievedItemsCache;
+  List<ToDoList>? _withoutDeadlineItemsCache;
 
   Future<List<ToDoList>> getActiveItems() async {
     if (_activeItemsCache != null) {
@@ -31,15 +32,13 @@ class ListsProvider with ChangeNotifier {
     _activeItemsCache = snapshot.docs
         .where((doc) {
           var deadline = DateTime.parse(doc['deadline']);
-          return (doc['accomplishedItems'] < doc['totalItems'] ||
+          return doc['hasDeadline'] &&
+              (doc['accomplishedItems'] < doc['totalItems'] ||
                   doc['totalItems'] == 0) &&
               deadline.isAfter(currentDate);
         })
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
-    if (_activeItemsCache != null)
-      _activeItemsCache!
-          .sort((a, b) => a.notificationIndex.compareTo(b.notificationIndex));
 
     return _activeItemsCache!;
   }
@@ -67,11 +66,31 @@ class ListsProvider with ChangeNotifier {
         .map((doc) => ToDoList.fromSnapshot(doc))
         .toList();
 
-    if (_achievedItemsCache != null)
-      _achievedItemsCache!
-          .sort((a, b) => a.notificationIndex.compareTo(b.notificationIndex));
-
     return _achievedItemsCache!;
+  }
+
+  Future<List<ToDoList>> getWithoutDeadlineItems() async {
+    if (_withoutDeadlineItemsCache != null) {
+      return _withoutDeadlineItemsCache!;
+    }
+
+    String userId = _auth.currentUser!.uid;
+
+    QuerySnapshot snapshot = await _firestore
+        .collection('todo_lists')
+        .where('userID', isEqualTo: userId)
+        .get();
+
+    _withoutDeadlineItemsCache = snapshot.docs
+        .where((doc) {
+          return !doc['hasDeadline'] &&
+              (doc['accomplishedItems'] < doc['totalItems'] ||
+                  doc['totalItems'] == 0);
+        })
+        .map((doc) => ToDoList.fromSnapshot(doc))
+        .toList();
+
+    return _withoutDeadlineItemsCache!;
   }
 
   Future<void> add_new_list(ToDoList newList) async {
@@ -112,6 +131,7 @@ class ListsProvider with ChangeNotifier {
   void invalidateCache() {
     _activeItemsCache = null;
     _achievedItemsCache = null;
+    _withoutDeadlineItemsCache = null;
   }
 
   // int generateUniqueNumber() {

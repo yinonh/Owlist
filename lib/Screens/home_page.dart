@@ -30,9 +30,16 @@ class _HomePageState extends State<HomePage> {
   late ListsProvider provider;
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
+  late Future<List<ToDoList>> withoutDeadlineItemsFuture;
   FilterBy selectedOption = FilterBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
+  final List<String> titles = [
+    'Active Items',
+    'Archived Items',
+    'Without Deadline',
+    'Settings'
+  ];
 
   @override
   void initState() {
@@ -80,18 +87,22 @@ class _HomePageState extends State<HomePage> {
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getAchievedItems();
+    withoutDeadlineItemsFuture =
+        Provider.of<ListsProvider>(context, listen: false)
+            .getWithoutDeadlineItems();
   }
 
   Future<void> sortLists(FilterBy filterBy) async {
     List<ToDoList> activeLists = await activeItemsFuture;
     List<ToDoList> achievedLists = await achievedItemsFuture;
+    List<ToDoList> withoutDeadlineLists = await withoutDeadlineItemsFuture;
 
     void sortFunction(List<ToDoList> lists) {
       lists.sort((a, b) {
         if (filterBy == FilterBy.creationLTN) {
-          return b.creationDate.compareTo(a.creationDate);
-        } else if (filterBy == FilterBy.creationNTL) {
           return a.creationDate.compareTo(b.creationDate);
+        } else if (filterBy == FilterBy.creationNTL) {
+          return b.creationDate.compareTo(a.creationDate);
         } else if (filterBy == FilterBy.deadlineLTN) {
           if (!a.hasDeadline && b.hasDeadline) {
             return 1;
@@ -127,10 +138,12 @@ class _HomePageState extends State<HomePage> {
 
     sortFunction(activeLists);
     sortFunction(achievedLists);
+    sortFunction(withoutDeadlineLists);
 
     setState(() {
       activeItemsFuture = Future.value(activeLists);
       achievedItemsFuture = Future.value(achievedLists);
+      withoutDeadlineItemsFuture = Future.value(withoutDeadlineLists);
     });
   }
 
@@ -146,21 +159,39 @@ class _HomePageState extends State<HomePage> {
           return provider.getAchievedItems();
         });
       });
-    });
-  }
-
-  void addItem(String title, DateTime deadline, hasDeadline) {
-    setState(() {
-      activeItemsFuture = activeItemsFuture.then((activeItems) {
-        return provider.createNewList(title, deadline, hasDeadline).then((_) {
-          return provider.getActiveItems();
+      withoutDeadlineItemsFuture =
+          withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
+        return provider.deleteList(item.id).then((_) {
+          return provider.getWithoutDeadlineItems();
         });
       });
     });
   }
 
+  void addItem(String title, DateTime deadline, bool hasDeadline) {
+    setState(() {
+      if (hasDeadline) {
+        onItemTapped(0);
+        activeItemsFuture = activeItemsFuture.then((activeItems) {
+          return provider.createNewList(title, deadline, hasDeadline).then((_) {
+            return provider.getActiveItems();
+          });
+        });
+      } else {
+        onItemTapped(2);
+        withoutDeadlineItemsFuture =
+            withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
+          return provider.createNewList(title, deadline, hasDeadline).then((_) {
+            return provider.getWithoutDeadlineItems();
+          });
+        });
+      }
+      print("here");
+      sortLists(FilterBy.creationNTL);
+    });
+  }
+
   void onItemTapped(int index) {
-    print(index);
     setState(() {
       selectedIndex.animateToPage(
         index,
@@ -176,6 +207,7 @@ class _HomePageState extends State<HomePage> {
       provider.invalidateCache();
       activeItemsFuture = provider.getActiveItems();
       achievedItemsFuture = provider.getAchievedItems();
+      withoutDeadlineItemsFuture = provider.getWithoutDeadlineItems();
     });
   }
 
@@ -191,15 +223,9 @@ class _HomePageState extends State<HomePage> {
           Icons.settings,
         ],
         add_item: addItem,
-        centerIcon: Icons.add_outlined,
         selectedIndex: currentIndex,
         onItemPressed: onItemTapped,
       ),
-      // bottomNavigationBar: MyBottomNavigationBar(
-      //   currentIndex: currentIndex,
-      //   onTap: onItemTapped,
-      //   add_item: addItem,
-      // ),
       body: RefreshIndicator(
         onRefresh: refreshLists,
         child: Container(
@@ -239,47 +265,51 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                         ),
                       ),
-                      PopupMenuButton<FilterBy>(
-                        icon: const Icon(Icons.filter_list),
-                        onSelected: (value) {
-                          setState(() {
-                            sortLists(value);
-                          });
-                        },
-                        itemBuilder: (BuildContext cnx) => [
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.creationLTN,
-                            child: Text('Creation Date: Newest to Oldest'),
-                          ),
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.creationNTL,
-                            child: Text('Creation Date: Oldest to Newest'),
-                          ),
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.deadlineLTN,
-                            child: Text('Deadline: Sooner to Later'),
-                          ),
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.deadlineNTL,
-                            child: Text('Deadline: Later to Sooner'),
-                          ),
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.progressBTS,
-                            child: Text('Progress: High to Low'),
-                          ),
-                          const PopupMenuItem<FilterBy>(
-                            value: FilterBy.progressSTB,
-                            child: Text('Progress: Low to High'),
-                          ),
-                        ],
-                      ),
+                      currentIndex == 3
+                          ? IconButton(onPressed: () {}, icon: Icon(Icons.save))
+                          : PopupMenuButton<FilterBy>(
+                              icon: const Icon(Icons.filter_list),
+                              onSelected: (value) {
+                                setState(() {
+                                  sortLists(value);
+                                });
+                              },
+                              itemBuilder: (BuildContext cnx) => [
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.creationNTL,
+                                  child:
+                                      Text('Creation Date: Newest to Oldest'),
+                                ),
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.creationLTN,
+                                  child:
+                                      Text('Creation Date: Oldest to Newest'),
+                                ),
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.deadlineLTN,
+                                  child: Text('Deadline: Sooner to Later'),
+                                ),
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.deadlineNTL,
+                                  child: Text('Deadline: Later to Sooner'),
+                                ),
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.progressBTS,
+                                  child: Text('Progress: High to Low'),
+                                ),
+                                const PopupMenuItem<FilterBy>(
+                                  value: FilterBy.progressSTB,
+                                  child: Text('Progress: Low to High'),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    currentIndex == 0 ? 'Active Items' : 'Archived Items',
+                    titles[currentIndex],
                     style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -355,10 +385,40 @@ class _HomePageState extends State<HomePage> {
                           }
                         },
                       ),
-                      Container(
-                        child: Center(
-                          child: Text("no deadline"),
-                        ),
+                      FutureBuilder<List<ToDoList>>(
+                        future: withoutDeadlineItemsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 2),
+                                content: Text(
+                                  'Error',
+                                  style: TextStyle(
+                                    color: Colors.deepOrange,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                            return Text(
+                              'Error: ${snapshot.error}',
+                              style: TextStyle(color: Colors.white),
+                            );
+                          } else {
+                            return ItemsScreen(
+                              selectedIndex: 1,
+                              existingItems: snapshot.data!,
+                              deleteItem: deleteItem,
+                              refresh: refreshLists,
+                            );
+                          }
+                        },
                       ),
                       Container(
                         child: Center(
