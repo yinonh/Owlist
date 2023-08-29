@@ -352,33 +352,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                       screenHeight:
                                           MediaQuery.of(context).size.height,
                                     ),
-                              // ? ElevatedButton(
-                              //     onPressed: widget.list.hasDeadline
-                              //         ? () {
-                              //             _showChangeDateDialog(context);
-                              //           }
-                              //         : null,
-                              //     child:
-                              //         Icon(Icons.calendar_month, size: 30),
-                              //     style: ElevatedButton.styleFrom(
-                              //       shape: CircleBorder(),
-                              //       backgroundColor: Color(0xFF635985),
-                              //       padding: EdgeInsets.all(15),
-                              //       elevation: 10,
-                              //     ),
-                              //   )
-                              // : ElevatedButton(
-                              //     onPressed: () {
-                              //       _showNewItemDialog(context);
-                              //     },
-                              //     child: Icon(Icons.add, size: 30),
-                              //     style: ElevatedButton.styleFrom(
-                              //       shape: CircleBorder(),
-                              //       backgroundColor: Color(0xFF635985),
-                              //       padding: EdgeInsets.all(15),
-                              //       elevation: 10,
-                              //     ),
-                              //   ),
                             ),
                           ],
                         ),

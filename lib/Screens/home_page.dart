@@ -369,7 +369,8 @@ class _HomePageState extends State<HomePage> {
                             );
                           } else if (snapshot.hasError) {
                             return Text(
-                              'Error: ${snapshot.error}',
+                              AppLocalizations.of(context)
+                                  .translate("Error has occurred"),
                               style: TextStyle(color: Colors.white),
                             );
                           } else {
@@ -396,7 +397,8 @@ class _HomePageState extends State<HomePage> {
                               SnackBar(
                                 duration: Duration(seconds: 2),
                                 content: Text(
-                                  'Error',
+                                  AppLocalizations.of(context)
+                                      .translate("Error has occurred"),
                                   style: TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
@@ -405,7 +407,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                             return Text(
-                              'Error: ${snapshot.error}',
+                              AppLocalizations.of(context)
+                                  .translate("Error has occurred"),
                               style: TextStyle(color: Colors.white),
                             );
                           } else {
@@ -432,7 +435,8 @@ class _HomePageState extends State<HomePage> {
                               SnackBar(
                                 duration: Duration(seconds: 2),
                                 content: Text(
-                                  'Error',
+                                  AppLocalizations.of(context)
+                                      .translate("Error has occurred"),
                                   style: TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
@@ -441,7 +445,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                             return Text(
-                              'Error: ${snapshot.error}',
+                              AppLocalizations.of(context)
+                                  .translate("Error has occurred"),
                               style: TextStyle(color: Colors.white),
                             );
                           } else {

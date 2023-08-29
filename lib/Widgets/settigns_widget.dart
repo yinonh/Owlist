@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 
 class Settings extends StatefulWidget {
@@ -53,7 +55,7 @@ class _SettingsState extends State<Settings> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            "Choose language:",
+            AppLocalizations.of(context).translate("Choose language:"),
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
           ),
           ToggleButtons(

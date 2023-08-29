@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
+
 class DatePickerWidget extends StatefulWidget {
   final DateTime initialDate;
   final DateTime firstDate;
@@ -38,8 +40,8 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
             color: Color(0xFF635985),
           ),
           SizedBox(width: 8),
-          Text(
-              'Deadline: ${selectedDate != null ? DateFormat('dd/MM/yyyy').format(selectedDate!) : 'None'}'),
+          Text(AppLocalizations.of(context).translate("Deadline:") +
+              ' ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'),
         ],
       ),
     );

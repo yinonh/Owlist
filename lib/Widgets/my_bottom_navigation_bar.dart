@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/date_picker.dart';
 import '../Providers/lists_provider.dart';
@@ -172,8 +173,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      title: const Text(
-                        'Enter list title',
+                      title: Text(
+                        AppLocalizations.of(context)
+                            .translate("Enter list title"),
                         style: TextStyle(color: Color(0xFF635985)),
                       ),
                       content: StatefulBuilder(
@@ -185,7 +187,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                                 autofocus: true,
                                 controller: new_title,
                                 maxLength: 25,
-                                decoration: InputDecoration(hintText: "Title"),
+                                decoration: InputDecoration(
+                                    hintText: AppLocalizations.of(context)
+                                        .translate("Title")),
                               ),
                               FittedBox(
                                 child: Row(
@@ -204,9 +208,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                     ),
                                     hasDeadline
                                         ? DatePickerWidget(
-                                            initialDate: new_deadline ??
-                                                DateTime.now()
-                                                    .add(Duration(days: 7)),
+                                            initialDate: new_deadline,
                                             firstDate: DateTime.now(),
                                             lastDate: DateTime.now()
                                                 .add(Duration(days: 3650)),
@@ -215,7 +217,13 @@ class DiamondBottomNavigation extends StatelessWidget {
                                                 new_deadline = selectedDate;
                                             },
                                           )
-                                        : Text('Check for adding deadline'),
+                                        : FittedBox(
+                                            child: Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      "Check for adding deadline"),
+                                            ),
+                                          ),
                                   ],
                                 ),
                               ),
@@ -225,8 +233,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text(
-                            'Cancel',
+                          child: Text(
+                            AppLocalizations.of(context).translate("Cancel"),
                             style: TextStyle(
                               color: Colors.grey,
                               fontWeight: FontWeight.bold,
@@ -237,8 +245,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                           },
                         ),
                         TextButton(
-                          child: const Text(
-                            'Save',
+                          child: Text(
+                            AppLocalizations.of(context).translate("Save"),
                             style: TextStyle(
                               color: Color(0xFF635985),
                               fontWeight: FontWeight.bold,

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 
+import '../l10n/app_localizations.dart';
 import '../Screens/home_page.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -21,6 +22,29 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
+  String mapFirebaseErrorToMessage(errorCode) {
+    switch (errorCode) {
+      case "email_or_password_empty":
+        return AppLocalizations.of(context)
+            .translate("Email or password cannot be empty.");
+      case "channel-error":
+        return AppLocalizations.of(context).translate(
+            "There was a problem establishing a connection. Please try again later.");
+      case "invalid-email":
+        return AppLocalizations.of(context).translate(
+            "The email address you provided is not in a valid format.");
+      case "user-not-found" || "wrong-password":
+        return AppLocalizations.of(context).translate(
+            "Invalid email or password. Please check your credentials.");
+      case "too-many-requests":
+        return AppLocalizations.of(context).translate(
+            "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.");
+      default:
+        return AppLocalizations.of(context)
+            .translate("An error occurred. Please try again.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,8 +57,8 @@ class _AuthScreenState extends State<AuthScreen> {
             child: AnimatedSwitcher(
               duration: Duration(milliseconds: 300),
               child: _isLoginForm
-                  ? LogInForm(toggleFormMode)
-                  : SignUpForm(toggleFormMode),
+                  ? LogInForm(toggleFormMode, mapFirebaseErrorToMessage)
+                  : SignUpForm(toggleFormMode, mapFirebaseErrorToMessage),
               switchInCurve: Curves.easeInOut,
               switchOutCurve: Curves.easeInOut,
               transitionBuilder: (child, animation) {
@@ -58,7 +82,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
 class SignUpForm extends StatefulWidget {
   final Function toggleFormMode;
-  SignUpForm(this.toggleFormMode);
+  final Function mapFirebaseErrorToMessage;
+  SignUpForm(this.toggleFormMode, this.mapFirebaseErrorToMessage);
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
@@ -71,10 +96,6 @@ class _SignUpFormState extends State<SignUpForm> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-
-  String mapFirebaseErrorToMessage(errorCode) {
-    return "error";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +111,7 @@ class _SignUpFormState extends State<SignUpForm> {
             margin: EdgeInsets.all(5.0),
             padding: EdgeInsets.all(16),
             child: Text(
-              "✔️ Sign Up",
+              AppLocalizations.of(context).translate("✔️ Sign Up"),
               style: TextStyle(
                   fontSize: 50,
                   color: Color(0xFF18122B),
@@ -101,7 +122,7 @@ class _SignUpFormState extends State<SignUpForm> {
           TextField(
             controller: _emailController,
             decoration: InputDecoration(
-              hintText: 'Email',
+              hintText: AppLocalizations.of(context).translate("Email"),
               fillColor: Colors.white,
               filled: true,
               border: OutlineInputBorder(),
@@ -112,7 +133,7 @@ class _SignUpFormState extends State<SignUpForm> {
             controller: _passwordController,
             obscureText: !_isPasswordVisible,
             decoration: InputDecoration(
-              hintText: 'Password',
+              hintText: AppLocalizations.of(context).translate("Password"),
               fillColor: Colors.white,
               filled: true,
               border: OutlineInputBorder(),
@@ -134,7 +155,8 @@ class _SignUpFormState extends State<SignUpForm> {
             controller: _confirmPasswordController,
             obscureText: !_isConfirmPasswordVisible,
             decoration: InputDecoration(
-              hintText: 'Confirm Password',
+              hintText:
+                  AppLocalizations.of(context).translate("Confirm Password"),
               fillColor: Colors.white,
               filled: true,
               border: OutlineInputBorder(),
@@ -161,11 +183,13 @@ class _SignUpFormState extends State<SignUpForm> {
                     SizedBox(height: 10),
                     _passwordController.text == _confirmPasswordController.text
                         ? Text(
-                            'Passwords Match',
+                            AppLocalizations.of(context)
+                                .translate("Passwords Match"),
                             style: TextStyle(color: Colors.green),
                           )
                         : Text(
-                            'Passwords Do Not Match',
+                            AppLocalizations.of(context)
+                                .translate("Passwords Do Not Match"),
                             style: TextStyle(color: Colors.red),
                           ),
                     SizedBox(height: 20),
@@ -213,13 +237,11 @@ class _SignUpFormState extends State<SignUpForm> {
                       Navigator.of(context)
                           .pushReplacementNamed(HomePage.routeName);
                     } catch (e) {
-                      String errorMessage =
-                          "An error occurred. Please try again.";
-
+                      String errorMessage = AppLocalizations.of(context)
+                          .translate("An error occurred. Please try again.");
                       if (e is FirebaseAuthException) {
-                        errorMessage = mapFirebaseErrorToMessage(e.code);
+                        errorMessage = widget.mapFirebaseErrorToMessage(e.code);
                       }
-
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(errorMessage),
@@ -232,7 +254,7 @@ class _SignUpFormState extends State<SignUpForm> {
                     });
                   },
                   child: Text(
-                    'Sign Up',
+                    AppLocalizations.of(context).translate("Sign Up"),
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -241,7 +263,7 @@ class _SignUpFormState extends State<SignUpForm> {
               widget.toggleFormMode();
             },
             child: Text(
-              'Switch to Log In',
+              AppLocalizations.of(context).translate("Switch to Log In"),
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -253,7 +275,8 @@ class _SignUpFormState extends State<SignUpForm> {
 
 class LogInForm extends StatefulWidget {
   final Function toggleFormMode;
-  LogInForm(this.toggleFormMode);
+  final Function mapFirebaseErrorToMessage;
+  LogInForm(this.toggleFormMode, this.mapFirebaseErrorToMessage);
   @override
   _LogInFormState createState() => _LogInFormState();
 }
@@ -264,23 +287,6 @@ class _LogInFormState extends State<LogInForm> {
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
-
-  String mapFirebaseErrorToMessage(errorCode) {
-    switch (errorCode) {
-      case "email_or_password_empty":
-        return "Email or password cannot be empty.";
-      case "channel-error":
-        return "There was a problem establishing a connection. Please try again later.";
-      case "invalid-email":
-        return "The email address you provided is not in a valid format.";
-      case "user-not-found" || "wrong-password":
-        return "Invalid email or password. Please check your credentials.";
-      case "too-many-requests":
-        return "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.";
-      default:
-        return "An error occurred. Please try again.";
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +302,7 @@ class _LogInFormState extends State<LogInForm> {
             margin: EdgeInsets.all(5.0),
             padding: EdgeInsets.all(16),
             child: Text(
-              "✔️ Log in",
+              AppLocalizations.of(context).translate("✔️ Log in"),
               style: TextStyle(
                   fontSize: 50,
                   color: Color(0xFF18122B),
@@ -307,7 +313,7 @@ class _LogInFormState extends State<LogInForm> {
           TextField(
             controller: _emailController,
             decoration: InputDecoration(
-              hintText: 'Email',
+              hintText: AppLocalizations.of(context).translate("Email"),
               fillColor: Colors.white,
               filled: true,
               border: OutlineInputBorder(),
@@ -318,7 +324,7 @@ class _LogInFormState extends State<LogInForm> {
             controller: _passwordController,
             obscureText: !_isPasswordVisible,
             decoration: InputDecoration(
-              hintText: 'Password',
+              hintText: AppLocalizations.of(context).translate("Password"),
               fillColor: Colors.white,
               filled: true,
               border: OutlineInputBorder(),
@@ -367,12 +373,11 @@ class _LogInFormState extends State<LogInForm> {
                       Navigator.of(context)
                           .pushReplacementNamed(HomePage.routeName);
                     } catch (e) {
-                      String errorMessage =
-                          "An error occurred. Please try again."; // Default message
+                      String errorMessage = AppLocalizations.of(context)
+                          .translate("An error occurred. Please try again.");
 
-                      // Check if e is an instance of FirebaseAuthException
                       if (e is FirebaseAuthException) {
-                        errorMessage = mapFirebaseErrorToMessage(e.code);
+                        errorMessage = widget.mapFirebaseErrorToMessage(e.code);
                       }
 
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -389,7 +394,7 @@ class _LogInFormState extends State<LogInForm> {
                     });
                   },
                   child: Text(
-                    'Sign In',
+                    AppLocalizations.of(context).translate("Sign In"),
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -398,7 +403,7 @@ class _LogInFormState extends State<LogInForm> {
               widget.toggleFormMode();
             },
             child: Text(
-              'Switch to Sign Up',
+              AppLocalizations.of(context).translate("Switch to Sign Up"),
               style: TextStyle(color: Colors.white),
             ),
           ),

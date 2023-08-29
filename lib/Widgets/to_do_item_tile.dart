@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Screens/single_list_screen.dart';
 
@@ -28,18 +29,21 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               10.0,
             ),
           ),
-          title: const Text(
-            'Confirm Deletion',
+          title: Text(
+            AppLocalizations.of(context).translate("Confirm Deletion"),
             style: TextStyle(color: Color(0xFF864879)),
           ),
-          content: const Text('Are you sure you want to delete this item?'),
+          content: Text(
+            AppLocalizations.of(context)
+                .translate("Are you sure you want to delete this item?"),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: const Text(
-                'Cancel',
+              child: Text(
+                AppLocalizations.of(context).translate("Cancel"),
                 style: TextStyle(
                   color: Color(0xFF864879),
                 ),
@@ -49,8 +53,8 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: const Text(
-                'Delete',
+              child: Text(
+                AppLocalizations.of(context).translate("Delete"),
                 style: TextStyle(
                   color: Colors.red,
                 ),
@@ -72,8 +76,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
 
   @override
   Widget build(BuildContext context) {
-    // is_done = item.deadline.isBefore(DateTime.now()) ||
-    //     item.totalItems == item.accomplishedItems;
     final DateTime currentDate = DateTime.now();
 
     final int totalDays =
@@ -100,8 +102,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
       },
       child: Container(
         decoration: BoxDecoration(
-          // border:
-          //     is_done ? Border.all(color: Color(0xFF936995), width: 5) : null,
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -129,7 +129,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                         _showDeleteConfirmation(context);
                       },
                       icon: Icon(Icons.delete, color: Color(0xFF393053)))
-                  // Icon(Icons.delete, color: Colors.black),
                 ],
               ),
               widget.item.hasDeadline
@@ -169,14 +168,17 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            'Remaining Days: ${remainingDays <= 0 ? "done" : remainingDays}',
+                            AppLocalizations.of(context)
+                                    .translate("Remaining Days:") +
+                                ' ${remainingDays <= 0 ? AppLocalizations.of(context).translate("Done") : remainingDays}',
                             // style: TextStyle(fontSize: 16.0),
                           ),
                         ],
                       ),
                     )
                   : Text(
-                      "Creation Date: " +
+                      AppLocalizations.of(context)
+                              .translate("Creation Date: ") +
                           formatDate(
                               widget.item.creationDate), // Format creationDate
                       style: const TextStyle(
@@ -189,12 +191,15 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total Items: ${widget.item.totalItems}',
+                    AppLocalizations.of(context).translate("Total Items:") +
+                        ' ${widget.item.totalItems}',
                     // style: TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'Accomplished Items: ${widget.item.accomplishedItems}',
+                    AppLocalizations.of(context)
+                            .translate("Accomplished Items:") +
+                        ' ${widget.item.accomplishedItems}',
                     // style: const TextStyle(fontSize: 16.0),
                   ),
                 ],
@@ -213,7 +218,9 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            'Progress: ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                            AppLocalizations.of(context)
+                                    .translate("Progress:") +
+                                ' ${(progressPercentage * 100).toStringAsFixed(0)}%',
                           ),
                         ],
                       ),

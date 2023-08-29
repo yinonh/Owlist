@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 class EditItemDialog extends StatefulWidget {
   final Function(String) addNewItem; // Function parameter
 
@@ -20,11 +22,14 @@ class _EditItemDialogState extends State<EditItemDialog> {
           10.0,
         ),
       ),
-      title: Text('Enter New Item Title',
+      title: Text(
+          AppLocalizations.of(context).translate("Enter New Item Title"),
           style: TextStyle(color: Color(0xFF635985))),
       content: TextField(
         maxLength: 35,
         autofocus: true,
+        decoration: InputDecoration(
+            hintText: AppLocalizations.of(context).translate("Title")),
         onChanged: (value) {
           setState(() {
             newTitle = value;
@@ -36,14 +41,16 @@ class _EditItemDialogState extends State<EditItemDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancel', style: TextStyle(color: Color(0xFF635985))),
+          child: Text(AppLocalizations.of(context).translate("Cancel"),
+              style: TextStyle(color: Color(0xFF635985))),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             widget.addNewItem(newTitle); // Use the passed function
           },
-          child: Text('Add', style: TextStyle(color: Color(0xFF635985))),
+          child: Text(AppLocalizations.of(context).translate("Add"),
+              style: TextStyle(color: Color(0xFF635985))),
         ),
       ],
     );
