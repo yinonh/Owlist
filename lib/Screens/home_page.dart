@@ -125,14 +125,14 @@ class _HomePageState extends State<HomePage> {
           } else if (a.hasDeadline && !b.hasDeadline) {
             return -1;
           }
-          return a.deadline.compareTo(b.deadline);
+          return b.deadline.compareTo(a.deadline);
         } else if (filterBy == FilterBy.deadlineNTL) {
           if (!a.hasDeadline && b.hasDeadline) {
             return 1;
           } else if (a.hasDeadline && !b.hasDeadline) {
             return -1;
           }
-          return b.deadline.compareTo(a.deadline);
+          return a.deadline.compareTo(b.deadline);
         } else if (filterBy == FilterBy.progressBTS) {
           double progressA =
               a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems;

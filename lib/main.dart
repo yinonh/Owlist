@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // import 'package:workmanager/workmanager.dart';
 
@@ -45,6 +46,7 @@ import './Providers/item_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
