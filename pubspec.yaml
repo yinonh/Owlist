@@ -50,6 +50,7 @@ dependencies:
   flutter_localization: ^0.1.13
   shared_preferences: ^2.2.0
   google_mobile_ads: ^3.0.0
+  flutter_local_notifications: ^15.1.1
 #  firebase_messaging: ^14.6.6
 #  workmanager: ^0.5.1
 

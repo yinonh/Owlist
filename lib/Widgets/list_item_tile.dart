@@ -106,7 +106,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -165,6 +165,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                             backgroundColor: Colors.grey[300],
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 Color(0xFF393053)),
+                            minHeight: 10.0,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
@@ -215,6 +216,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                             backgroundColor: Colors.grey[300],
                             valueColor: const AlwaysStoppedAnimation<Color>(
                                 Color(0xFF635985)),
+                            minHeight: 10.0,
                           ),
                           const SizedBox(height: 8.0),
                           Text(

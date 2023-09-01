@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import './to_do_item_tile.dart';
+import './list_item_tile.dart';
 import '../Models/to_do_list.dart';
 
 class ItemsScreen extends StatefulWidget {
