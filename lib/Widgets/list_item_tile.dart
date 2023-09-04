@@ -30,12 +30,12 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
             ),
           ),
           title: Text(
-            AppLocalizations.of(context).translate("Confirm Deletion"),
-            style: TextStyle(color: Color(0xFF864879)),
-          ),
+              AppLocalizations.of(context).translate("Confirm Deletion"),
+              style: Theme.of(context).textTheme.titleMedium),
           content: Text(
             AppLocalizations.of(context)
                 .translate("Are you sure you want to delete this item?"),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           actions: [
             TextButton(
@@ -44,9 +44,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               },
               child: Text(
                 AppLocalizations.of(context).translate("Cancel"),
-                style: TextStyle(
-                  color: Color(0xFF864879),
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             TextButton(
@@ -56,6 +54,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               child: Text(
                 AppLocalizations.of(context).translate("Delete"),
                 style: TextStyle(
+                  fontSize: 17,
                   color: Colors.red,
                 ),
               ),
@@ -102,7 +101,16 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor,
+              offset: Offset.fromDirection(3.7),
+              spreadRadius: -0.4,
+              //Use negative value above for the inner shadow effect
+              blurRadius: 2.0,
+            ),
+          ],
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
@@ -117,18 +125,16 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                     fit: BoxFit.fitWidth,
                     child: Text(
                       widget.item.title,
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF864879),
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                   IconButton(
-                      onPressed: () {
-                        _showDeleteConfirmation(context);
-                      },
-                      icon: Icon(Icons.delete, color: Color(0xFF393053)))
+                    onPressed: () {
+                      _showDeleteConfirmation(context);
+                    },
+                    icon: Icon(Icons.delete,
+                        color: Theme.of(context).highlightColor),
+                  ),
                 ],
               ),
               widget.item.hasDeadline
@@ -142,18 +148,10 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                               Text(
                                 formatDate(widget
                                     .item.creationDate), // Format creationDate
-                                style: const TextStyle(
-                                  // fontSize: 16.0,
-                                  color: Colors.black,
-                                ),
                               ),
                               Text(
                                 formatDate(
                                     widget.item.deadline), // Format deadline
-                                style: const TextStyle(
-                                  // fontSize: 16.0,
-                                  color: Colors.black,
-                                ),
                               ),
                             ],
                           ),
@@ -182,10 +180,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                               .translate("Creation Date: ") +
                           formatDate(
                               widget.item.creationDate), // Format creationDate
-                      style: const TextStyle(
-                        // fontSize: 16.0,
-                        color: Colors.black,
-                      ),
                     ),
               const SizedBox(height: 8.0),
               Row(
@@ -194,7 +188,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                   Text(
                     AppLocalizations.of(context).translate("Total Items:") +
                         ' ${widget.item.totalItems}',
-                    // style: TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 8.0),
                   Text(

@@ -13,6 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // import 'package:workmanager/workmanager.dart';
 
+import 'themes.dart';
 import 'l10n/app_localizations.dart';
 import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
@@ -90,12 +91,23 @@ class MyApp extends StatefulWidget {
     state.setLocale(newLocale);
   }
 
+  static void setTheme(BuildContext context) {
+    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    state.setTheme(toggleTheme(state.currentTheme));
+  }
+
+  static bool isDark(BuildContext context) {
+    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    return state.currentTheme == darkTheme;
+  }
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en', '');
+  late ThemeData currentTheme = lightTheme;
   late Widget initialScreen;
 
   Future<void> setLanguage() async {
@@ -122,6 +134,12 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void setTheme(ThemeData newTheme) {
+    setState(() {
+      currentTheme = newTheme;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -135,8 +153,27 @@ class _MyAppState extends State<MyApp> {
         initialScreen = AuthScreen();
       });
     }
+    Future.delayed(Duration.zero, () {
+      var brightness = MediaQuery.of(context).platformBrightness;
+      print(brightness);
+      if (brightness == Brightness.dark)
+        currentTheme = darkTheme;
+      else
+        currentTheme = lightTheme;
+    });
     setLanguage();
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   var brightness = MediaQuery.of(context).platformBrightness;
+  //   print(brightness);
+  //   if (brightness == Brightness.dark)
+  //     currentTheme = darkTheme;
+  //   else
+  //     currentTheme = lightTheme;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -152,25 +189,7 @@ class _MyAppState extends State<MyApp> {
         const Locale('en', 'US'),
         const Locale('he', 'IL'),
       ],
-      theme: ThemeData(
-        primaryColor:
-            Colors.white, // Color for app bar and other primary elements
-        scaffoldBackgroundColor: Colors.transparent,
-
-        datePickerTheme: DatePickerThemeData(
-          headerBackgroundColor: Color(0xFF636995),
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
-        progressIndicatorTheme: ProgressIndicatorThemeData(color: Colors.white),
-
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Color(0xFF636995),
-          backgroundColor: Color(0xFF18122B),
-        ),
-      ),
+      theme: currentTheme,
       routes: {
         HomePage.routeName: (context) => HomePage(),
         AuthScreen.routeName: (context) => AuthScreen(),

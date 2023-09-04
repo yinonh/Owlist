@@ -202,11 +202,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF635985), Color(0xFF18122B)],
+            colors: [
+              Theme.of(context).primaryColorLight,
+              Theme.of(context).primaryColorDark
+            ],
           ),
         ),
         child: SafeArea(

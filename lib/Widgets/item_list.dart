@@ -41,7 +41,7 @@ class _ItemListState extends State<ItemList> {
                 margin: EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),
@@ -78,7 +78,7 @@ class _ItemListState extends State<ItemList> {
                   margin: EdgeInsets.symmetric(vertical: 5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.5),

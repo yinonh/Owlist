@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 
+import '../themes.dart';
 import '../l10n/app_localizations.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/date_picker.dart';
@@ -14,6 +15,7 @@ class DiamondBottomNavigation extends StatelessWidget {
   final Color selectedColor;
   final Color selectedLightColor;
   final Color unselectedColor;
+  final Color bgColor;
   final Function add_item;
   bool hasDeadline = true;
 
@@ -27,6 +29,7 @@ class DiamondBottomNavigation extends StatelessWidget {
     this.selectedColor = const Color(0xFF635985),
     this.unselectedColor = Colors.grey,
     this.selectedLightColor = const Color(0xFF634999),
+    this.bgColor = Colors.white,
   })  : assert(itemIcons.length == 4, "Item must equal 4"),
         super(key: key);
 
@@ -37,7 +40,7 @@ class DiamondBottomNavigation extends StatelessWidget {
 
     return Container(
       // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      color: Colors.white,
+      color: bgColor,
       child: SizedBox(
         height: height + getRelativeHeight(0.01),
         child: Stack(
@@ -46,7 +49,7 @@ class DiamondBottomNavigation extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: height,
-                color: Colors.white,
+                color: bgColor,
                 child: Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: getRelativeWidth(0.1)),
@@ -157,7 +160,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                 child: DiamondButton(
               icon: Icon(
                 Icons.add,
-                color: Colors.white,
+                color: bgColor,
                 size: getRelativeWidth(0.1),
               ),
               onTap: () async {
@@ -184,12 +187,23 @@ class DiamondBottomNavigation extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               TextFormField(
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
                                 autofocus: true,
                                 controller: new_title,
                                 maxLength: 25,
                                 decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)
-                                        .translate("Title")),
+                                  hintText: AppLocalizations.of(context)
+                                      .translate("Title"),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).dividerColor),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).dividerColor),
+                                  ),
+                                ),
                               ),
                               FittedBox(
                                 child: Row(
@@ -204,7 +218,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                               false; // Ensure a default value
                                         });
                                       },
-                                      activeColor: Color(0xFF945985),
+                                      // activeColor: Color(0xFF945985),
                                     ),
                                     hasDeadline
                                         ? DatePickerWidget(
@@ -235,10 +249,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                         TextButton(
                           child: Text(
                             AppLocalizations.of(context).translate("Cancel"),
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -247,10 +258,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                         TextButton(
                           child: Text(
                             AppLocalizations.of(context).translate("Save"),
-                            style: TextStyle(
-                              color: Color(0xFF635985),
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                           onPressed: () {
                             if (new_title.text != '') {

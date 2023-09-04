@@ -17,19 +17,28 @@ class _EditItemDialogState extends State<EditItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          10.0,
-        ),
-      ),
       title: Text(
-          AppLocalizations.of(context).translate("Enter New Item Title"),
-          style: TextStyle(color: Color(0xFF635985))),
+        AppLocalizations.of(context).translate("Enter New Item Title"),
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
       content: TextField(
+        // decoration: InputDecoration(
+        // labelText: 'Username',
+        // labelStyle: TextStyle(color: Colors.grey),
+        // enabledBorder: UnderlineInputBorder(
+        // borderSide: BorderSide(color: Colors.red),
+        // ),),
         maxLength: 35,
         autofocus: true,
         decoration: InputDecoration(
-            hintText: AppLocalizations.of(context).translate("Title")),
+          hintText: AppLocalizations.of(context).translate("Title"),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Theme.of(context).dividerColor),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Theme.of(context).dividerColor),
+          ),
+        ),
         onChanged: (value) {
           setState(() {
             newTitle = value;
@@ -41,16 +50,20 @@ class _EditItemDialogState extends State<EditItemDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text(AppLocalizations.of(context).translate("Cancel"),
-              style: TextStyle(color: Color(0xFF635985))),
+          child: Text(
+            AppLocalizations.of(context).translate("Cancel"),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             widget.addNewItem(newTitle); // Use the passed function
           },
-          child: Text(AppLocalizations.of(context).translate("Add"),
-              style: TextStyle(color: Color(0xFF635985))),
+          child: Text(
+            AppLocalizations.of(context).translate("Add"),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
       ],
     );

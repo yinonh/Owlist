@@ -25,8 +25,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       height: 55,
-      duration: const Duration(milliseconds: 500),
-      decoration: BoxDecoration(),
+      duration: const Duration(milliseconds: 100),
+      // decoration: BoxDecoration(),
       child: Dismissible(
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
@@ -49,25 +49,20 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             print("move to" + widget.item.id + "page");
           },
           leading: widget.editMode
-              ? Icon(Icons.drag_handle)
+              ? Icon(
+                  Icons.drag_handle,
+                  color: Theme.of(context).hintColor,
+                )
               : Text(
                   (widget.index + 1).toString(),
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Color(0xFF945985),
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
           title: Text(
             widget.item.title,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              //fontSize: 20,
-            ),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           trailing: Checkbox(
-            activeColor: Color(0xFF945985),
+            // activeColor: Color(0xFF945985),
             value: widget.item.done,
             onChanged: widget.editMode
                 ? null

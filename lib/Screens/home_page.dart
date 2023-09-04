@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       selectedIndex.animateToPage(
         index,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 50),
         curve: Curves.easeInOut,
       );
       currentIndex = index;
@@ -240,15 +240,21 @@ class _HomePageState extends State<HomePage> {
         add_item: addItem,
         selectedIndex: currentIndex,
         onItemPressed: onItemTapped,
+        bgColor: Theme.of(context).primaryColor,
+        selectedColor: Theme.of(context).focusColor,
+        unselectedColor: Theme.of(context).unselectedWidgetColor,
       ),
       body: RefreshIndicator(
         onRefresh: refreshLists,
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF635985), Color(0xFF18122B)],
+              colors: [
+                Theme.of(context).primaryColorLight,
+                Theme.of(context).primaryColorDark
+              ],
             ),
           ),
           child: SafeArea(
@@ -295,6 +301,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Newest to Oldest"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 PopupMenuItem<FilterBy>(
@@ -302,6 +310,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Oldest to Newest"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 PopupMenuItem<FilterBy>(
@@ -309,6 +319,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Later to Sooner"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 PopupMenuItem<FilterBy>(
@@ -316,6 +328,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Sooner to Later"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 PopupMenuItem<FilterBy>(
@@ -323,6 +337,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: High to Low"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 PopupMenuItem<FilterBy>(
@@ -330,6 +346,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: Low to High"),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                               ],
