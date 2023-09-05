@@ -120,6 +120,9 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
           SizedBox(height: 20),
           TextField(
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            textCapitalization: TextCapitalization.none,
             controller: _emailController,
             decoration: InputDecoration(
               hintText: AppLocalizations.of(context).translate("Email"),
@@ -311,6 +314,9 @@ class _LogInFormState extends State<LogInForm> {
           ),
           SizedBox(height: 20),
           TextField(
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            textCapitalization: TextCapitalization.none,
             controller: _emailController,
             decoration: InputDecoration(
               hintText: AppLocalizations.of(context).translate("Email"),

@@ -110,7 +110,7 @@ class _MyAppState extends State<MyApp> {
   late ThemeData currentTheme = lightTheme;
   late Widget initialScreen;
 
-  Future<void> setLanguage() async {
+  Future<void> setPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? language = prefs.getString('selectedLanguage');
 
@@ -126,6 +126,22 @@ class _MyAppState extends State<MyApp> {
         newLocale = const Locale('en', '');
     }
     setLocale(newLocale);
+
+    String? themePref = prefs.getString('selectedTheme');
+    ThemeData newTheme;
+    switch (themePref) {
+      case 'dark':
+        newTheme = darkTheme;
+        break;
+      case 'light':
+        newTheme = lightTheme;
+        break;
+      default:
+        newTheme = MediaQuery.of(context).platformBrightness == Brightness.dark
+            ? darkTheme
+            : lightTheme;
+    }
+    setTheme(newTheme);
   }
 
   void setLocale(Locale newLocale) {
@@ -153,15 +169,15 @@ class _MyAppState extends State<MyApp> {
         initialScreen = AuthScreen();
       });
     }
-    Future.delayed(Duration.zero, () {
-      var brightness = MediaQuery.of(context).platformBrightness;
-      print(brightness);
-      if (brightness == Brightness.dark)
-        currentTheme = darkTheme;
-      else
-        currentTheme = lightTheme;
-    });
-    setLanguage();
+    // Future.delayed(Duration.zero, () {
+    //   var brightness = MediaQuery.of(context).platformBrightness;
+    //   print(brightness);
+    //   if (brightness == Brightness.dark)
+    //     currentTheme = darkTheme;
+    //   else
+    //     currentTheme = lightTheme;
+    // });
+    setPreferences();
   }
 
   // @override
