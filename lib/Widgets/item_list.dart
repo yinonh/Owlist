@@ -81,9 +81,9 @@ class _ItemListState extends State<ItemList> {
                     color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
+                        color: Theme.of(context).hintColor.withOpacity(0.5),
+                        spreadRadius: 0.5,
+                        blurRadius: 1.5,
                         // offset: Offset(0, 3),
                       ),
                     ],

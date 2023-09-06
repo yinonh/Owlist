@@ -103,7 +103,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).shadowColor,
+              color: Theme.of(context).hintColor,
               offset: Offset.fromDirection(3.7),
               spreadRadius: -0.4,
               //Use negative value above for the inner shadow effect

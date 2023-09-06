@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:intl/intl.dart';
-// import 'package:workmanager/workmanager.dart';
 
 import '../Models/to_do_list.dart';
 
@@ -334,3 +332,200 @@ class ListsProvider with ChangeNotifier {
     }
   }
 }
+
+// import 'package:flutter/material.dart';
+// import 'package:intl/intl.dart';
+// import 'package:sqflite/sqflite.dart';
+// import 'package:path/path.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
+//
+// import '../Models/to_do_list.dart';
+//
+// class ListsProvider with ChangeNotifier {
+//   Database? _database;
+//   List<ToDoList>? _activeItemsCache;
+//   List<ToDoList>? _achievedItemsCache;
+//   List<ToDoList>? _withoutDeadlineItemsCache;
+//
+//   Future<Database> get database async {
+//     if (_database != null) return _database!;
+//     _database = await initDB();
+//     return _database!;
+//   }
+//
+//   initDB() async {
+//     return await openDatabase(
+//       join(await getDatabasesPath(), 'to_do_lists.db'),
+//       onCreate: (db, version) async {
+//         await db.execute('''
+//           CREATE TABLE todo_lists(
+//             id TEXT PRIMARY KEY,
+//             title TEXT,
+//             creationDate TEXT,
+//             deadline TEXT,
+//             hasDeadline INTEGER,
+//             totalItems INTEGER,
+//             accomplishedItems INTEGER
+//           )
+//         ''');
+//       },
+//       version: 1,
+//     );
+//   }
+//
+//   Future<List<ToDoList>?> getActiveItems() async {
+//     if (_activeItemsCache != null) {
+//       return _activeItemsCache!;
+//     }
+//
+//     final Database db = await database;
+//
+//     final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+//
+//     _activeItemsCache = List.generate(maps.length, (i) {
+//       var deadline = DateTime.parse(maps[i]['deadline']);
+//       return ToDoList(
+//         id: maps[i]['id'],
+//         title: maps[i]['title'],
+//         creationDate: DateTime.parse(maps[i]['creationDate']),
+//         deadline: deadline,
+//         hasDeadline: maps[i]['hasDeadline'] == 1,
+//         totalItems: maps[i]['totalItems'],
+//         accomplishedItems: maps[i]['accomplishedItems'],
+//         userID: maps[i]['userID'],
+//         notificationIndex: maps[i]['notificationIndex'],
+//       );
+//     }).where((item) {
+//       return item.hasDeadline &&
+//           (item.accomplishedItems < item.totalItems || item.totalItems == 0) &&
+//           item.deadline.isAfter(DateTime.now());
+//     }).toList();
+//
+//     return _activeItemsCache!;
+//   }
+//
+//   Future<List<ToDoList>?> getAchievedItems() async {
+//     if (_achievedItemsCache != null) {
+//       return _achievedItemsCache!;
+//     }
+//
+//     final Database db = await database;
+//
+//     final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+//
+//     _achievedItemsCache = List.generate(maps.length, (i) {
+//       var deadline = DateTime.parse(maps[i]['deadline']);
+//       return ToDoList(
+//         id: maps[i]['id'],
+//         title: maps[i]['title'],
+//         creationDate: DateTime.parse(maps[i]['creationDate']),
+//         deadline: deadline,
+//         hasDeadline: maps[i]['hasDeadline'] == 1,
+//         totalItems: maps[i]['totalItems'],
+//         accomplishedItems: maps[i]['accomplishedItems'],
+//         userID: maps[i]['userID'],
+//         notificationIndex: maps[i]['notificationIndex'],
+//       );
+//     }).where((item) {
+//       return item.hasDeadline &&
+//               (item.accomplishedItems == item.totalItems &&
+//                   item.totalItems > 0) ||
+//           item.deadline.isBefore(DateTime.now());
+//     }).toList();
+//
+//     return _achievedItemsCache;
+//   }
+//
+//   Future<List<ToDoList>?> getWithoutDeadlineItems() async {
+//     if (_withoutDeadlineItemsCache != null) {
+//       return _withoutDeadlineItemsCache!;
+//     }
+//
+//     final Database db = await database;
+//
+//     final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+//
+//     _withoutDeadlineItemsCache = List.generate(maps.length, (i) {
+//       var deadline = DateTime.parse(maps[i]['deadline']);
+//       return ToDoList(
+//         id: maps[i]['id'],
+//         title: maps[i]['title'],
+//         creationDate: DateTime.parse(maps[i]['creationDate']),
+//         deadline: deadline,
+//         hasDeadline: maps[i]['hasDeadline'] == 1,
+//         totalItems: maps[i]['totalItems'],
+//         accomplishedItems: maps[i]['accomplishedItems'],
+//         userID: maps[i]['userID'],
+//         notificationIndex: maps[i]['notificationIndex'],
+//       );
+//     }).where((item) {
+//       return !item.hasDeadline &&
+//           (item.accomplishedItems < item.totalItems || item.totalItems > 0);
+//     }).toList();
+//
+//     return _withoutDeadlineItemsCache;
+//   }
+//
+//   Future<void> addNewList(ToDoList newList) async {
+//     try {
+//       // Insert the new list into the SQLite database
+//       await _database!.insert('todo_lists', newList.toMap());
+//
+//       if (newList.hasDeadline) {
+//         // Add local notification logic using flutter_local_notifications package.
+//         await AwesomeNotifications().createNotification(
+//           content: NotificationContent(
+//             id: newList.notificationIndex,
+//             channelKey: 'task_deadline_channel',
+//             title: '${newList.title}',
+//             body: 'Task deadline is about to end',
+//             color: Color(0xFF635985),
+//             // groupKey: "1",
+//           ),
+//           schedule: NotificationCalendar.fromDate(
+//             date: DateTime.now().add(
+//               Duration(seconds: 30),
+//             ),
+//           ),
+//         );
+//       }
+//     } catch (e) {
+//       print('Error adding new list: $e');
+//     }
+//   }
+//
+//   Future<void> createNewList(
+//       String title, DateTime deadline, bool hasDeadline) async {
+//     try {
+//       final List<Map<String, dynamic>> snapshot = await _database!.rawQuery(
+//           'SELECT MAX(notification_index) as maxIndex FROM todo_lists');
+//
+//       int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
+//
+//       ToDoList newList = ToDoList(
+//         id: '0', // SQLite will auto-generate the ID
+//         userID: '1',
+//         notificationIndex: notificationIndex,
+//         hasDeadline: hasDeadline,
+//         title: title,
+//         creationDate: DateTime.now(),
+//         deadline: deadline,
+//         totalItems: 0,
+//         accomplishedItems: 0,
+//       );
+//
+//       await addNewList(newList).then((_) {
+//         invalidateCache();
+//         notifyListeners();
+//       });
+//     } catch (error) {
+//       print("Error adding new item: $error");
+//     }
+//   }
+//
+//   void invalidateCache() {
+//     _activeItemsCache = null;
+//     _achievedItemsCache = null;
+//     _withoutDeadlineItemsCache = null;
+//   }
+// }

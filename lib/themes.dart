@@ -56,7 +56,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   primaryColorLight: Color(0xFF42385E),
   primaryColor: Color(0xFF18122B),
   focusColor: Color(0xFF864879),
-  shadowColor: Colors.white,
+  // shadowColor: Colors.white,
   unselectedWidgetColor: Colors.grey,
   highlightColor: Color(0xFF9685D9),
   cardColor: Color(0xFF38305B),

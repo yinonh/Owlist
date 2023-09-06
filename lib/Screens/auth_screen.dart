@@ -96,181 +96,197 @@ class _SignUpFormState extends State<SignUpForm> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-                color: Color(0xFF636995),
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            margin: EdgeInsets.all(5.0),
-            padding: EdgeInsets.all(16),
-            child: Text(
-              AppLocalizations.of(context).translate("✔️ Sign Up"),
-              style: TextStyle(
-                  fontSize: 50,
-                  color: Color(0xFF18122B),
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 20),
-          TextField(
-            keyboardType: TextInputType.emailAddress,
-            autocorrect: false,
-            textCapitalization: TextCapitalization.none,
-            controller: _emailController,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context).translate("Email"),
-              fillColor: Colors.white,
-              filled: true,
-              border: OutlineInputBorder(),
-            ),
-          ),
-          SizedBox(height: 15),
-          TextField(
-            controller: _passwordController,
-            obscureText: !_isPasswordVisible,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context).translate("Password"),
-              fillColor: Colors.white,
-              filled: true,
-              border: OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
+      child: Form(
+        key: formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                  color: Color(0xFF636995),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              margin: EdgeInsets.all(5.0),
+              padding: EdgeInsets.all(16),
+              child: Text(
+                AppLocalizations.of(context).translate("✔️ Sign Up"),
+                style: TextStyle(
+                    fontSize: 50,
+                    color: Color(0xFF18122B),
+                    fontWeight: FontWeight.bold),
               ),
             ),
-          ),
-          SizedBox(height: 15),
-          TextField(
-            controller: _confirmPasswordController,
-            obscureText: !_isConfirmPasswordVisible,
-            decoration: InputDecoration(
-              hintText:
-                  AppLocalizations.of(context).translate("Confirm Password"),
-              fillColor: Colors.white,
-              filled: true,
-              border: OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _isConfirmPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                  });
-                },
+            SizedBox(height: 20),
+            TextFormField(
+              keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              textCapitalization: TextCapitalization.none,
+              controller: _emailController,
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).translate("Email"),
+                fillColor: Colors.white,
+                suffixIcon: Icon(Icons.mail),
+                filled: true,
+                border: OutlineInputBorder(),
               ),
             ),
-          ),
-          _passwordController.text != '' &&
-                  _confirmPasswordController.text != ''
-              ? Container(
-                  child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    _passwordController.text == _confirmPasswordController.text
-                        ? Text(
-                            AppLocalizations.of(context)
-                                .translate("Passwords Match"),
-                            style: TextStyle(color: Colors.green),
-                          )
-                        : Text(
-                            AppLocalizations.of(context)
-                                .translate("Passwords Do Not Match"),
-                            style: TextStyle(color: Colors.red),
-                          ),
-                    SizedBox(height: 20),
-                  ],
-                ))
-              : SizedBox(height: 30),
-          _isLoading
-              ? CircularProgressIndicator()
-              : ElevatedButton(
-                  style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.fromLTRB(50, 20, 50, 20)),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Color(0xFF636995))),
-                  onPressed: () async {
+            SizedBox(height: 15),
+            TextFormField(
+              validator: (value) {
+                if (value != null && value != '' && value.length < 6)
+                  return AppLocalizations.of(context)
+                      .translate("Password must contain at least 6 characters");
+                return null;
+              },
+              controller: _passwordController,
+              obscureText: !_isPasswordVisible,
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).translate("Password"),
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
                     setState(() {
-                      _isLoading = true;
-                    });
-
-                    String email = _emailController.text.trim();
-                    String password = _passwordController.text.trim();
-
-                    try {
-                      if (email == "" || password == "") {
-                        throw FirebaseAuthException(
-                            code: "email_or_password_empty");
-                      }
-                      if (password != _confirmPasswordController.text) {
-                        throw FirebaseAuthException(code: "password_mismatch");
-                      }
-
-                      // Use Firebase Auth to sign up
-                      UserCredential result =
-                          await _auth.createUserWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
-
-                      // Log in the user and navigate to the home screen
-                      await _auth.signInWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
-
-                      Navigator.of(context)
-                          .pushReplacementNamed(HomePage.routeName);
-                    } catch (e) {
-                      String errorMessage = AppLocalizations.of(context)
-                          .translate("An error occurred. Please try again.");
-                      if (e is FirebaseAuthException) {
-                        errorMessage = widget.mapFirebaseErrorToMessage(e.code);
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(errorMessage),
-                        ),
-                      );
-                    }
-
-                    setState(() {
-                      _isLoading = false;
+                      _isPasswordVisible = !_isPasswordVisible;
                     });
                   },
-                  child: Text(
-                    AppLocalizations.of(context).translate("Sign Up"),
-                    style: TextStyle(fontSize: 20),
-                  ),
                 ),
-          TextButton(
-            onPressed: () {
-              widget.toggleFormMode();
-            },
-            child: Text(
-              AppLocalizations.of(context).translate("Switch to Log In"),
-              style: TextStyle(color: Colors.white),
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 15),
+            TextFormField(
+              controller: _confirmPasswordController,
+              obscureText: !_isConfirmPasswordVisible,
+              decoration: InputDecoration(
+                hintText:
+                    AppLocalizations.of(context).translate("Confirm Password"),
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isConfirmPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                    });
+                  },
+                ),
+              ),
+            ),
+            _passwordController.text != ''
+                ? Container(
+                    child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      _passwordController.text ==
+                              _confirmPasswordController.text
+                          ? Text(
+                              AppLocalizations.of(context)
+                                  .translate("Passwords Match"),
+                              style: TextStyle(color: Colors.green),
+                            )
+                          : Text(
+                              AppLocalizations.of(context)
+                                  .translate("Passwords Do Not Match"),
+                              style: TextStyle(color: Colors.red),
+                            ),
+                      SizedBox(height: 20),
+                    ],
+                  ))
+                : SizedBox(height: 30),
+            _isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.fromLTRB(50, 20, 50, 20)),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Color(0xFF636995))),
+                    onPressed: () async {
+                      if (!formKey.currentState!.validate()) return;
+                      setState(() {
+                        _isLoading = true;
+                      });
+
+                      String email = _emailController.text.trim();
+                      String password = _passwordController.text.trim();
+
+                      try {
+                        if (email.trim() == "" || password == "") {
+                          throw FirebaseAuthException(
+                              code: "email_or_password_empty");
+                        }
+                        if (password != _confirmPasswordController.text) {
+                          throw FirebaseAuthException(
+                              code: "password_mismatch");
+                        }
+
+                        // Use Firebase Auth to sign up
+                        UserCredential result =
+                            await _auth.createUserWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+
+                        // Log in the user and navigate to the home screen
+                        await _auth.signInWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+
+                        Navigator.of(context)
+                            .pushReplacementNamed(HomePage.routeName);
+                      } catch (e) {
+                        String errorMessage = AppLocalizations.of(context)
+                            .translate("An error occurred. Please try again.");
+                        if (e is FirebaseAuthException) {
+                          errorMessage =
+                              widget.mapFirebaseErrorToMessage(e.code);
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                          ),
+                        );
+                      }
+
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    },
+                    child: Text(
+                      AppLocalizations.of(context).translate("Sign Up"),
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+            TextButton(
+              onPressed: () {
+                widget.toggleFormMode();
+              },
+              child: Text(
+                AppLocalizations.of(context).translate("Switch to Log In"),
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -313,12 +329,13 @@ class _LogInFormState extends State<LogInForm> {
             ),
           ),
           SizedBox(height: 20),
-          TextField(
+          TextFormField(
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
             textCapitalization: TextCapitalization.none,
             controller: _emailController,
             decoration: InputDecoration(
+              suffixIcon: Icon(Icons.mail),
               hintText: AppLocalizations.of(context).translate("Email"),
               fillColor: Colors.white,
               filled: true,
@@ -326,7 +343,7 @@ class _LogInFormState extends State<LogInForm> {
             ),
           ),
           SizedBox(height: 15),
-          TextField(
+          TextFormField(
             controller: _passwordController,
             obscureText: !_isPasswordVisible,
             decoration: InputDecoration(
@@ -365,7 +382,7 @@ class _LogInFormState extends State<LogInForm> {
                     String password = _passwordController.text.trim();
 
                     try {
-                      if (email == "" || password == "") {
+                      if (email.trim() == "" || password == "") {
                         throw FirebaseAuthException(
                             code: "email_or_password_empty");
                       }

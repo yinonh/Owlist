@@ -323,7 +323,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                       icon: Icon(
                                         Icons.calendar_month,
                                         color: widget.list.hasDeadline
-                                            ? Colors.white
+                                            ? Theme.of(context).primaryColor
                                             : Colors.grey,
                                         size:
                                             MediaQuery.of(context).size.width *
@@ -342,7 +342,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   : DiamondButton(
                                       icon: Icon(
                                         Icons.add,
-                                        color: Colors.white,
+                                        color: Theme.of(context).primaryColor,
                                         size:
                                             MediaQuery.of(context).size.width *
                                                 0.1,

@@ -51,6 +51,8 @@ dependencies:
   shared_preferences: ^2.2.0
   google_mobile_ads: ^3.0.0
   flutter_local_notifications: ^15.1.1
+  sqflite: ^2.3.0
+  path: ^1.8.3
 #  firebase_messaging: ^14.6.6
 #  workmanager: ^0.5.1
 
