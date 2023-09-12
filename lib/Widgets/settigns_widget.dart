@@ -113,8 +113,8 @@ class _SettingsState extends State<Settings> {
                 child: Transform.scale(
                   scale: 1.5,
                   child: Switch(
-                    activeThumbImage: AssetImage('Assets/lightMode.png'),
-                    inactiveThumbImage: AssetImage('Assets/darkMode.png'),
+                    activeThumbImage: AssetImage('Assets/darkMode.png'),
+                    inactiveThumbImage: AssetImage('Assets/lightMode.png'),
                     onChanged: (mode) async {
                       WidgetsBinding.instance!.addPostFrameCallback((_) {
                         MyApp.setTheme(context);
@@ -125,8 +125,6 @@ class _SettingsState extends State<Settings> {
                           'selectedTheme', mode ? "dark" : "light");
                     },
                     value: MyApp.isDark(context),
-
-                    // child: Text('Switch Theme'),
                   ),
                 ),
               ),

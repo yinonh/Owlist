@@ -89,7 +89,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
       progressPercentage = 1;
     }
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         Navigator.pushNamed(context, SingleListScreen.routeName,
                 arguments: widget.item)

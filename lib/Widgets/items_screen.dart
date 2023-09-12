@@ -36,7 +36,9 @@ class _ItemsScreenState extends State<ItemsScreen> {
   @override
   void initState() {
     super.initState();
-    randomNumber = Random().nextInt(widget.existingItems.length);
+    randomNumber = widget.existingItems.length > 0
+        ? Random().nextInt(widget.existingItems.length)
+        : 0;
   }
 
   @override

@@ -51,8 +51,17 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: Color(0xFF18122B),
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height -
-              MediaQuery.of(context).viewPadding.top,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).primaryColorLight,
+                Theme.of(context).primaryColorDark
+              ],
+            ),
+          ),
           child: SafeArea(
             child: AnimatedSwitcher(
               duration: Duration(milliseconds: 300),

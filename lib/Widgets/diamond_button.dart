@@ -31,39 +31,38 @@ class DiamondButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            customBorder: const CircleBorder(),
-            child: GestureDetector(
-              onTap: onTap != null
-                  ? () {
-                      onTap!();
-                    }
-                  : null,
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 25,
-                      offset: const Offset(0, 5),
-                      color: Color(0xFF635985).withOpacity(0.5),
-                    )
+            customBorder: CircleBorder(),
+            onTap: onTap != null
+                ? () {
+                    onTap!();
+                  }
+                : null,
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 25,
+                    offset: const Offset(0, 5),
+                    color: Color(0xFF635985).withOpacity(0.5),
+                  )
+                ],
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF634999),
+                    Color(0xFF635985),
                   ],
-                  borderRadius: const BorderRadius.all(Radius.circular(18)),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF634999),
-                      Color(0xFF635985),
-                    ],
-                  ),
                 ),
-                height: getRelativeWidth(0.15),
-                width: getRelativeWidth(0.15),
-                child: Center(
-                  child: Transform.rotate(
-                    angle: math.pi / 4,
-                    child: icon,
-                  ),
+              ),
+              height: getRelativeWidth(0.15),
+              width: getRelativeWidth(0.15),
+              child: Center(
+                child: Transform.rotate(
+                  angle: math.pi / 4,
+                  child: icon,
                 ),
               ),
             ),

@@ -45,7 +45,7 @@ final ThemeData lightTheme = ThemeData(
     checkColor: MaterialStateProperty.all<Color>(Colors.white),
   ),
   switchTheme: SwitchThemeData(
-    trackColor: MaterialStateProperty.all<Color>(Colors.black),
+    trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
   ),
 );
 
@@ -95,7 +95,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     checkColor: MaterialStateProperty.all<Color>(Colors.black),
   ),
   switchTheme: SwitchThemeData(
-    trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
+    trackColor: MaterialStateProperty.all<Color>(Colors.black),
   ),
 );
 
