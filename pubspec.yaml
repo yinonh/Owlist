@@ -53,6 +53,7 @@ dependencies:
   flutter_local_notifications: ^15.1.1
   sqflite: ^2.3.0
   path: ^1.8.3
+  firebase_messaging: ^14.6.7
 #  firebase_messaging: ^14.6.6
 #  workmanager: ^0.5.1
 

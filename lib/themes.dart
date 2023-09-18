@@ -47,6 +47,49 @@ final ThemeData lightTheme = ThemeData(
   switchTheme: SwitchThemeData(
     trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
   ),
+  progressIndicatorTheme: ProgressIndicatorThemeData(
+    color: Color(0xFF9685D9),
+    linearTrackColor: Colors.grey.shade300,
+    linearMinHeight: 10.0,
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF635985))),
+  ),
+  datePickerTheme: DatePickerThemeData(
+    yearBackgroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Color(0xFF9685D9);
+      }
+      if (states.contains(MaterialState.disabled)) {
+        return Colors.grey.shade300;
+      }
+      return Colors.white;
+    }),
+    yearForegroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Colors.white;
+      }
+      return Colors.black;
+    }),
+    todayForegroundColor: MaterialStateProperty.all<Color>(Colors.black),
+    todayBackgroundColor:
+        MaterialStateProperty.all<Color>(Color(0xFF9685D9).withOpacity(0.5)),
+    headerBackgroundColor: Color(0xFF635985),
+    dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Color(0xFF9685D9);
+      }
+      return Colors.white;
+    }),
+    dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.disabled)) {
+        return Colors.grey;
+      }
+      return Colors.black;
+    }),
+    dayStyle: TextStyle(color: Colors.white),
+  ),
 );
 
 final ThemeData darkTheme = ThemeData.dark().copyWith(
@@ -80,6 +123,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     headlineSmall: TextStyle(color: Colors.white, fontSize: 17),
   ),
   colorScheme: ColorScheme.fromSwatch(
+    brightness: Brightness.dark,
     accentColor: Color(0xFF18122B),
   ),
   dialogTheme: DialogTheme(
@@ -96,6 +140,70 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   ),
   switchTheme: SwitchThemeData(
     trackColor: MaterialStateProperty.all<Color>(Colors.black),
+  ),
+  progressIndicatorTheme: ProgressIndicatorThemeData(
+    color: Color(0xFF635985),
+    linearTrackColor: Color(0xFF18122B),
+    linearMinHeight: 10.0,
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF9685D9))),
+  ),
+
+  datePickerTheme: DatePickerThemeData(
+    // dayOverlayColor: MaterialStateProperty.all<Color>(Colors.white),
+    // headerHeadlineStyle: TextStyle(color: Colors.white),
+    // headerForegroundColor: Colors.white,
+    // headerHelpStyle: TextStyle(color: Colors.white),
+    // rangePickerHeaderBackgroundColor: Colors.white,
+    // rangeSelectionBackgroundColor: Colors.white,
+    // rangePickerBackgroundColor: Colors.white,
+    // rangePickerHeaderForegroundColor: Colors.white,
+    // rangePickerHeaderHeadlineStyle: TextStyle(color: Colors.white),
+    // rangePickerHeaderHelpStyle: TextStyle(color: Colors.white),
+    // surfaceTintColor: Colors.white,
+    // rangePickerShadowColor: Colors.white,
+    // rangePickerSurfaceTintColor: Colors.white,
+    // rangeSelectionOverlayColor: MaterialStateProperty.all<Color>(Colors.white),
+    // shadowColor: Colors.white,
+    // yearStyle: TextStyle(color: Colors.white),
+
+    backgroundColor: Color(0xFF18122B),
+    weekdayStyle: TextStyle(color: Colors.white),
+    yearBackgroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Color(0xFF9685D9);
+      }
+      if (states.contains(MaterialState.disabled)) {
+        return Colors.grey.shade700;
+      }
+      return Colors.transparent;
+    }),
+    yearForegroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Colors.black;
+      }
+      return Colors.white;
+    }),
+    todayForegroundColor: MaterialStateProperty.all<Color>(Colors.white),
+    todayBackgroundColor:
+        MaterialStateProperty.all<Color>(Color(0xFF635985).withOpacity(0.5)),
+    headerBackgroundColor: Color(0xFF635985),
+    dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Color(0xFF635985);
+      }
+      return Colors.transparent;
+    }),
+    yearOverlayColor: MaterialStateProperty.all<Color>(Colors.white),
+    dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.disabled)) {
+        return Colors.grey.shade700;
+      }
+      return Colors.white;
+    }),
+    dayStyle: TextStyle(color: Colors.white),
   ),
 );
 

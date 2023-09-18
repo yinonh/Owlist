@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:to_do/main.dart';
 
@@ -51,11 +53,8 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  @override
-  void initState() {
-    super.initState();
-    currentIndex = 0;
-    selectedIndex = PageController(initialPage: 0);
+  Future<void> setUpNotifications() async {
+    // final fcm = FirebaseMessaging.instance;
     AwesomeNotifications().isNotificationAllowed().then(
       (isAllowed) {
         if (!isAllowed) {
@@ -98,6 +97,16 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+    // final _token = await fcm.getToken();
+    // print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + _token.toString());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = 0;
+    selectedIndex = PageController(initialPage: 0);
+    setUpNotifications();
 
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();

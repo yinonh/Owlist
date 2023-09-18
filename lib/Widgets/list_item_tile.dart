@@ -160,10 +160,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                             value: remainingDays <= 0
                                 ? 1
                                 : (totalDays - remainingDays) / totalDays,
-                            backgroundColor: Colors.grey[300],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF393053)),
-                            minHeight: 10.0,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
@@ -206,10 +202,6 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                         children: [
                           LinearProgressIndicator(
                             value: progressPercentage,
-                            backgroundColor: Colors.grey[300],
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                                Color(0xFF635985)),
-                            minHeight: 10.0,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
