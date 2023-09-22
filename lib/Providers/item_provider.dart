@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Models/to_do_item.dart';
+import './item_abstract.dart';
 
-class ItemProvider with ChangeNotifier {
+class ItemProvider extends ItemsAbstract with ChangeNotifier {
   Future<List<ToDoItem>> itemsByListId(String listId) async {
     try {
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -18,7 +19,7 @@ class ItemProvider with ChangeNotifier {
           title: doc['title'],
           content: doc['content'],
           done: doc['done'],
-          index: doc['index'],
+          itemIndex: doc['itemIndex'],
         );
       }).toList();
     } catch (error) {
@@ -32,7 +33,7 @@ class ItemProvider with ChangeNotifier {
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('todoItems')
           .where('listId', isEqualTo: listId)
-          .orderBy('index', descending: true)
+          .orderBy('itemIndex', descending: true)
           .limit(1)
           .get();
 
@@ -40,7 +41,7 @@ class ItemProvider with ChangeNotifier {
 
       if (snapshot.docs.isNotEmpty) {
         final highestIndexItem = snapshot.docs.first;
-        final highestIndex = highestIndexItem['index'] as int;
+        final highestIndex = highestIndexItem['itemIndex'] as int;
         newIndex = highestIndex + 1;
       }
 
@@ -49,7 +50,7 @@ class ItemProvider with ChangeNotifier {
         'title': title,
         'content': '',
         'done': false,
-        'index': newIndex,
+        'itemIndex': newIndex,
       };
 
       final newItemRef = await FirebaseFirestore.instance
@@ -67,7 +68,7 @@ class ItemProvider with ChangeNotifier {
         title: title,
         content: '',
         done: false,
-        index: newIndex,
+        itemIndex: newIndex,
       );
 
       notifyListeners();
@@ -149,7 +150,7 @@ class ItemProvider with ChangeNotifier {
           FirebaseFirestore.instance.collection('todoItems').doc(itemId);
 
       // Update the 'index' field value
-      await itemRef.update({'index': newIndex});
+      await itemRef.update({'itemIndex': newIndex});
 
       // Notify listeners or perform any other necessary actions
       notifyListeners();
@@ -158,3 +159,254 @@ class ItemProvider with ChangeNotifier {
     }
   }
 }
+
+/*import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqlite_api.dart';
+import 'package:path/path.dart' as path;
+
+import '../Models/to_do_item.dart';
+import './item_abstract.dart';
+
+const VERSION = 1;
+
+class ItemProvider extends ItemsAbstract with ChangeNotifier {
+  Database? _database;
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await initDB();
+    return _database!;
+  }
+
+  initDB() async {
+    return await sql.openDatabase(
+      path.join(await sql.getDatabasesPath(), 'to_do.db'),
+      version: VERSION,
+    );
+  }
+
+  Future<List<ToDoItem>> itemsByListId(String listId) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'todo_items',
+      where: "listId = ?",
+      whereArgs: [listId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return ToDoItem(
+        id: maps[i]['id'],
+        listId: maps[i]['listId'],
+        title: maps[i]['title'],
+        content: maps[i]['content'],
+        done: maps[i]['done'] == 1,
+        itemIndex: maps[i]['itemIndex'],
+      );
+    });
+  }
+
+  Future<ToDoItem?> addNewItem(String listId, String title) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'todo_items',
+      where: "listId = ?",
+      whereArgs: [listId],
+      orderBy: "itemIndex DESC",
+      limit: 1,
+    );
+
+    int newIndex = 0;
+    if (maps.isNotEmpty) {
+      newIndex = maps.first['itemIndex'] + 1;
+    }
+
+    final newItemData = {
+      'id': DateTime.now().toIso8601String(),
+      'listId': listId,
+      'title': title,
+      'content': '',
+      'done': 0,
+      'itemIndex': newIndex,
+    };
+
+    await db.insert(
+      'todo_items',
+      newItemData,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+          'UPDATE todo_lists SET totalItems = totalItems - 1 WHERE id = ?',
+          [listId]);
+    });
+
+    final newItem = ToDoItem(
+      id: newItemData['id'] as String,
+      listId: listId,
+      title: title,
+      content: '',
+      done: false,
+      itemIndex: newIndex,
+    );
+
+    notifyListeners();
+
+    return newItem;
+  }
+
+  Future<void> deleteItemById(String id, bool isDone) async {
+    try {
+      final Database db = await database;
+
+      // Fetch the listId of the item from the SQLite database
+      List<Map<String, dynamic>> result = await db.query(
+        'todo_items',
+        columns: ['listId'],
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (result.isNotEmpty) {
+        String listId = result[0]['listId'];
+
+        // Delete the item from the SQLite database
+        await db.delete(
+          'todo_items',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+
+        // Update totalItems and accomplishedItems in the todo_lists table
+        await db.transaction((txn) async {
+          await txn.rawUpdate(
+              'UPDATE todo_lists SET totalItems = totalItems - 1 WHERE id = ?',
+              [listId]);
+
+          if (isDone) {
+            await txn.rawUpdate(
+                'UPDATE todo_lists SET accomplishedItems = accomplishedItems - 1 WHERE id = ?',
+                [listId]);
+          }
+        });
+
+        // Close the database
+        // await db.close();
+
+        print('Item with ID $id deleted successfully!');
+      } else {
+        print('Item with ID $id not found in the database!');
+      }
+
+      // Notify listeners to reflect the changes
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting item: $e');
+    }
+  }
+
+  Future<void> toggleItemDone(String itemId, String listId, bool isDone) async {
+    try {
+      // Open or create the SQLite database
+      final Database db = await database;
+
+      // Fetch the current item data
+      List<Map<String, dynamic>> result = await db.query(
+        'todo_items',
+        columns: ['done'],
+        where: 'id = ?',
+        whereArgs: [itemId],
+      );
+
+      if (result.isNotEmpty) {
+        bool currentDoneValue = result[0]['done'] == 1;
+
+        // Toggle the 'done' field value
+        await db.update(
+          'todo_items',
+          {'done': currentDoneValue ? 0 : 1},
+          where: 'id = ?',
+          whereArgs: [itemId],
+        );
+
+        // Fetch the list data to update 'accomplishedItems'
+        List<Map<String, dynamic>> listResult = await db.query(
+          'todo_lists',
+          columns: ['accomplishedItems'],
+          where: 'id = ?',
+          whereArgs: [listId],
+        );
+
+        if (listResult.isNotEmpty) {
+          int accomplishedItems = listResult[0]['accomplishedItems'] as int;
+
+          if (currentDoneValue) {
+            accomplishedItems--;
+          } else {
+            accomplishedItems++;
+          }
+
+          // Update 'accomplishedItems' in the todo_lists table
+          await db.update(
+            'todo_lists',
+            {'accomplishedItems': accomplishedItems},
+            where: 'id = ?',
+            whereArgs: [listId],
+          );
+
+          notifyListeners();
+        }
+      }
+
+      // Close the database
+      // await db.close();
+    } catch (error) {
+      print("Error toggling item's done state: $error");
+    }
+  }
+
+  // Future<void> deleteItemById(String id) async {
+  //   final Database db = await database;
+  //   await db.delete(
+  //     'todo_items',
+  //     where: "id = ?",
+  //     whereArgs: [id],
+  //   );
+  //
+  //   notifyListeners();
+  // }
+  //
+  // Future<void> toggleItemDone(String itemId) async {
+  //   final Database db = await database;
+  //   final List<Map<String, dynamic>> maps = await db.query(
+  //     'todo_items',
+  //     where: "id = ?",
+  //     whereArgs: [itemId],
+  //   );
+  //
+  //   if (maps.isNotEmpty) {
+  //     final currentDoneValue = maps.first['done'] == 1;
+  //     await db.update(
+  //       'todo_items',
+  //       {'done': currentDoneValue ? 0 : 1},
+  //       where: "id = ?",
+  //       whereArgs: [itemId],
+  //     );
+  //
+  //     notifyListeners();
+  //   }
+  // }
+
+  Future<void> editIndex(String itemId, int newIndex) async {
+    final Database db = await database;
+    await db.update(
+      'todo_items',
+      {'itemIndex': newIndex},
+      where: "id = ?",
+      whereArgs: [itemId],
+    );
+
+    notifyListeners();
+  }
+}*/

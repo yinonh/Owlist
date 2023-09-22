@@ -54,7 +54,7 @@ class _ItemListState extends State<ItemList> {
                 child: ToDoItemWidget(
                   item,
                   true,
-                  item.index,
+                  item.itemIndex,
                   widget.checkItem,
                   widget.deleteItem,
                 ),
@@ -91,7 +91,7 @@ class _ItemListState extends State<ItemList> {
                   child: ToDoItemWidget(
                     item,
                     false,
-                    item.index,
+                    item.itemIndex,
                     widget.checkItem,
                     widget.deleteItem,
                   ),

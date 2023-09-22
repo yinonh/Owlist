@@ -54,7 +54,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
         .itemsByListId(widget.list.id);
     currentList.sort((a, b) {
       if (a.done == b.done) {
-        return a.index.compareTo(b.index);
+        return a.itemIndex.compareTo(b.itemIndex);
       } else {
         return a.done ? 1 : -1;
       }
@@ -133,7 +133,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
         temp.add(newItem);
         temp.sort((a, b) {
           if (a.done == b.done) {
-            return a.index.compareTo(b.index);
+            return a.itemIndex.compareTo(b.itemIndex);
           } else {
             return a.done ? 1 : -1;
           }
@@ -166,7 +166,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
           .editTitle(widget.list.id, _titleController.text);
     }
     for (int i = 0; i < editList.length; i++) {
-      if (editList[i].index != i) {
+      if (editList[i].itemIndex != i) {
         await Provider.of<ItemProvider>(context, listen: false)
             .editIndex(editList[i].id, i);
       }
@@ -188,7 +188,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     }
     temp.sort((a, b) {
       if (a.done == b.done) {
-        return a.index.compareTo(b.index);
+        return a.itemIndex.compareTo(b.itemIndex);
       } else {
         return a.done ? 1 : -1;
       }

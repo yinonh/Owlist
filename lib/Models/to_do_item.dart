@@ -4,7 +4,7 @@ class ToDoItem {
   final String title;
   final String content;
   bool done;
-  int index;
+  int itemIndex;
 
   ToDoItem({
     required this.id,
@@ -12,6 +12,6 @@ class ToDoItem {
     required this.title,
     required this.content,
     required this.done,
-    required this.index,
+    required this.itemIndex,
   });
 }

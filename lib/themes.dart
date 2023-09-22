@@ -116,10 +116,9 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     ),
-    titleLarge: TextStyle(
-      color: Colors.grey,
-      // fontWeight: FontWeight.bold,
-    ),
+    titleLarge: TextStyle(color: Colors.grey, fontSize: 17
+        // fontWeight: FontWeight.bold,
+        ),
     headlineSmall: TextStyle(color: Colors.white, fontSize: 17),
   ),
   colorScheme: ColorScheme.fromSwatch(
