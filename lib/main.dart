@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -159,51 +159,33 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      setState(() {
-        initialScreen = HomePage();
-      });
-    } else {
-      setState(() {
-        initialScreen = AuthScreen();
-      });
-    }
-    // Future.delayed(Duration.zero, () {
-    //   var brightness = MediaQuery.of(context).platformBrightness;
-    //   print(brightness);
-    //   if (brightness == Brightness.dark)
-    //     currentTheme = darkTheme;
-    //   else
-    //     currentTheme = lightTheme;
-    // });
+    // User? currentUser = FirebaseAuth.instance.currentUser;
+    initialScreen = HomePage();
+    // if (currentUser != null) {
+    //   setState(() {
+    //     initialScreen = HomePage();
+    //   });
+    // } else {
+    //   setState(() {
+    //     initialScreen = AuthScreen();
+    //   });
+    // }
     setPreferences();
   }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   var brightness = MediaQuery.of(context).platformBrightness;
-  //   print(brightness);
-  //   if (brightness == Brightness.dark)
-  //     currentTheme = darkTheme;
-  //   else
-  //     currentTheme = lightTheme;
-  // }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       locale: _locale,
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         ...GlobalMaterialLocalizations.delegates,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en', 'US'),
-        const Locale('he', 'IL'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('he', 'IL'),
       ],
       theme: currentTheme,
       routes: {

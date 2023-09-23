@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Models/to_do_item.dart';
@@ -158,9 +158,9 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
       print("Error editing item index: $error");
     }
   }
-}
+}*/
 
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
@@ -238,7 +238,7 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
 
     await db.transaction((txn) async {
       await txn.rawUpdate(
-          'UPDATE todo_lists SET totalItems = totalItems - 1 WHERE id = ?',
+          'UPDATE todo_lists SET totalItems = totalItems + 1 WHERE id = ?',
           [listId]);
     });
 
@@ -409,4 +409,4 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
 
     notifyListeners();
   }
-}*/
+}

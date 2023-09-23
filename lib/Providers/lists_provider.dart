@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -112,15 +112,6 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
             ),
           ),
         );
-        // final selectedDate = DateTime.now().add(Duration(seconds: 30));
-        // final isoFormattedDate = selectedDate.toIso8601String();
-        // Workmanager().registerOneOffTask(
-        //   '12',
-        //   '23',
-        //   inputData: {
-        //     'notificationDate': isoFormattedDate,
-        //   },
-        // );
       }
     } catch (e) {
       print('Error adding new list: $e');
@@ -133,22 +124,6 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     _withoutDeadlineItemsCache = null;
   }
 
-  // int generateUniqueNumber() {
-  //   DateTime now = DateTime.now();
-  //   int year = now.year % 100; // Use only the last two digits
-  //   int month = now.month;
-  //   int day = now.day;
-  //   int minutes = now.minute;
-  //   int seconds = now.second;
-  //
-  //   int uniqueNumber = year * 100000000 +
-  //       month * 1000000 +
-  //       day * 10000 +
-  //       minutes * 100 +
-  //       seconds;
-  //
-  //   return uniqueNumber;
-  // }
 
   Future<void> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
@@ -332,9 +307,9 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
       print('Error updating the deadline: $e');
     }
   }
-}
+}*/
 
-/*import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -445,7 +420,13 @@ class ListsProvider with ChangeNotifier {
 
     final Database db = await database;
 
-    final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT *
+    FROM todo_lists
+    WHERE hasDeadline = 1
+      AND (accomplishedItems < totalItems OR totalItems = 0)
+      AND deadline > ?
+  ''', [DateTime.now().toIso8601String()]);
 
     _activeItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
@@ -460,11 +441,7 @@ class ListsProvider with ChangeNotifier {
         userID: maps[i]['userID'],
         notificationIndex: maps[i]['notificationIndex'],
       );
-    }).where((item) {
-      return item.hasDeadline &&
-          (item.accomplishedItems < item.totalItems || item.totalItems == 0) &&
-          item.deadline.isAfter(DateTime.now());
-    }).toList();
+    });
 
     return _activeItemsCache ?? [];
   }
@@ -476,7 +453,12 @@ class ListsProvider with ChangeNotifier {
 
     final Database db = await database;
 
-    final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT *
+    FROM todo_lists
+    WHERE (accomplishedItems >= totalItems AND totalItems > 0)
+        OR deadline < ?
+  ''', [DateTime.now().toIso8601String()]);
 
     _achievedItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
@@ -491,12 +473,7 @@ class ListsProvider with ChangeNotifier {
         userID: maps[i]['userID'],
         notificationIndex: maps[i]['notificationIndex'],
       );
-    }).where((item) {
-      return item.hasDeadline &&
-              (item.accomplishedItems == item.totalItems &&
-                  item.totalItems > 0) ||
-          item.deadline.isBefore(DateTime.now());
-    }).toList();
+    });
 
     return _achievedItemsCache ?? [];
   }
@@ -508,7 +485,13 @@ class ListsProvider with ChangeNotifier {
 
     final Database db = await database;
 
-    final List<Map<String, dynamic>> maps = await db.query('todo_lists');
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT *
+    FROM todo_lists
+    WHERE hasDeadline = 0
+    AND (accomplishedItems < totalItems OR totalItems = 0)
+      AND deadline > ?
+  ''', [DateTime.now().toIso8601String()]);
 
     _withoutDeadlineItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
@@ -523,10 +506,7 @@ class ListsProvider with ChangeNotifier {
         userID: maps[i]['userID'],
         notificationIndex: maps[i]['notificationIndex'],
       );
-    }).where((item) {
-      return !item.hasDeadline &&
-          (item.accomplishedItems < item.totalItems || item.totalItems > 0);
-    }).toList();
+    });
 
     return _withoutDeadlineItemsCache ?? [];
   }
@@ -572,7 +552,7 @@ class ListsProvider with ChangeNotifier {
       ToDoList newList = ToDoList(
         id: '0',
         // SQLite will auto-generate the ID
-        userID: FirebaseAuth.instance.currentUser!.uid,
+        userID: '1', // FirebaseAuth.instance.currentUser!.uid,
         notificationIndex: notificationIndex,
         hasDeadline: hasDeadline,
         title: title,
@@ -636,9 +616,6 @@ class ListsProvider with ChangeNotifier {
         whereArgs: [id],
       );
 
-      // Close the database
-      // await db.close();
-
       if (result.isNotEmpty) {
         return result[0]['title'];
       } else {
@@ -662,9 +639,6 @@ class ListsProvider with ChangeNotifier {
         where: 'id = ?',
         whereArgs: [listId],
       );
-
-      // Close the database
-      // await db.close();
 
       if (result.isNotEmpty) {
         int totalItems = result[0]['totalItems'];
@@ -715,9 +689,6 @@ class ListsProvider with ChangeNotifier {
           whereArgs: [listId],
         );
 
-        // Close the database
-        // await db.close();
-
         // Invalidate cache and notify listeners to reflect the changes
         invalidateCache();
         notifyListeners();
@@ -747,9 +718,6 @@ class ListsProvider with ChangeNotifier {
         whereArgs: [listId],
       );
 
-      // Close the database
-      // await db.close();
-
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
@@ -757,4 +725,4 @@ class ListsProvider with ChangeNotifier {
       print('Error updating the title: $e');
     }
   }
-}*/
+}

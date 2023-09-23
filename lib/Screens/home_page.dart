@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -276,23 +276,26 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut();
-                          provider.invalidateCache();
-                          Navigator.pushReplacementNamed(
-                            context,
-                            AuthScreen.routeName,
-                          );
-                        },
-                        icon: Icon(Icons.logout),
-                      ),
-                      Text(
-                        AppLocalizations.of(context).translate("To-Do"),
-                        style: TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      // IconButton(
+                      //   onPressed: () async {
+                      //     await FirebaseAuth.instance.signOut();
+                      //     provider.invalidateCache();
+                      //     Navigator.pushReplacementNamed(
+                      //       context,
+                      //       AuthScreen.routeName,
+                      //     );
+                      //   },
+                      //   icon: Icon(Icons.logout),
+                      // ),
+                      Center(
+                        child: Text(
+                          AppLocalizations.of(context).translate("To-Do"),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       currentIndex == 3
