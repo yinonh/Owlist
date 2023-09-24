@@ -309,7 +309,6 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
   }
 }*/
 
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -318,10 +317,11 @@ import 'package:path/path.dart' as path;
 import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Models/to_do_list.dart';
+import './list_abstract.dart';
 
 const VERSION = 1;
 
-class ListsProvider with ChangeNotifier {
+class ListsProvider extends ListProviderAbstract with ChangeNotifier {
   Database? _database;
   List<ToDoList>? _activeItemsCache;
   List<ToDoList>? _achievedItemsCache;

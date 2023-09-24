@@ -19,6 +19,7 @@ import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
 import './Screens/auth_screen.dart';
+import './Screens/content_screen.dart';
 import './Providers/lists_provider.dart';
 import './Providers/item_provider.dart';
 
@@ -191,6 +192,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         HomePage.routeName: (context) => HomePage(),
         AuthScreen.routeName: (context) => AuthScreen(),
+        ContentScreen.routeName: (context) => ContentScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == SingleListScreen.routeName) {

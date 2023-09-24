@@ -77,10 +77,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
     }
   }
 
-  void _moveToItemPage(BuildContext context, String itemID) {
-    print("Moving to item page: $itemID");
-  }
-
   void _showNewItemDialog(BuildContext context) {
     showDialog(
       context: context,

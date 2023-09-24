@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
 
@@ -46,6 +47,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         ),
         child: ListTile(
           onTap: () {
+            Navigator.pushNamed(context, ContentScreen.routeName);
             print("move to" + widget.item.id + "page");
           },
           leading: widget.editMode

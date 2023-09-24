@@ -157,125 +157,129 @@ class DiamondBottomNavigation extends StatelessWidget {
               ),
             ),
             Positioned.fill(
-                child: DiamondButton(
-              icon: Icon(
-                Icons.add,
-                color: bgColor,
-                size: getRelativeWidth(0.1),
-              ),
-              onTap: () async {
-                TextEditingController new_title = TextEditingController();
-                DateTime new_deadline = DateTime.now().add(Duration(days: 7));
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (BuildContext context) {
-                    hasDeadline = true;
+              child: DiamondButton(
+                icon: Icon(
+                  Icons.add,
+                  color: bgColor,
+                  size: getRelativeWidth(0.1),
+                ),
+                onTap: () async {
+                  TextEditingController new_title = TextEditingController();
+                  DateTime new_deadline = DateTime.now().add(Duration(days: 7));
+                  showDialog<void>(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext context) {
+                      hasDeadline = true;
 
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      title: Text(
-                        AppLocalizations.of(context)
-                            .translate("Enter list title"),
-                        style: TextStyle(color: Color(0xFF635985)),
-                      ),
-                      content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextFormField(
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                                autofocus: true,
-                                controller: new_title,
-                                maxLength: 25,
-                                decoration: InputDecoration(
-                                  hintText: AppLocalizations.of(context)
-                                      .translate("Title"),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).dividerColor),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).dividerColor),
-                                  ),
-                                ),
-                              ),
-                              FittedBox(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Checkbox(
-                                      value: hasDeadline,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          hasDeadline = val ??
-                                              false; // Ensure a default value
-                                        });
-                                      },
-                                      // activeColor: Color(0xFF945985),
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        title: Text(
+                          AppLocalizations.of(context)
+                              .translate("Enter list title"),
+                          style: TextStyle(color: Color(0xFF635985)),
+                        ),
+                        content: StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  style:
+                                      Theme.of(context).textTheme.headlineSmall,
+                                  autofocus: true,
+                                  controller: new_title,
+                                  maxLength: 25,
+                                  decoration: InputDecoration(
+                                    hintText: AppLocalizations.of(context)
+                                        .translate("Title"),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).dividerColor),
                                     ),
-                                    hasDeadline
-                                        ? DatePickerWidget(
-                                            initialDate: new_deadline,
-                                            firstDate: DateTime.now(),
-                                            lastDate: DateTime.now()
-                                                .add(Duration(days: 3650)),
-                                            onDateSelected: (selectedDate) {
-                                              if (selectedDate != null)
-                                                new_deadline = selectedDate;
-                                            },
-                                          )
-                                        : FittedBox(
-                                            child: Text(
-                                              AppLocalizations.of(context)
-                                                  .translate(
-                                                      "Check for adding deadline"),
-                                            ),
-                                          ),
-                                  ],
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).dividerColor),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text(
-                            AppLocalizations.of(context).translate("Cancel"),
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
+                                FittedBox(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Checkbox(
+                                        value: hasDeadline,
+                                        onChanged: (val) {
+                                          setState(() {
+                                            hasDeadline = val ??
+                                                false; // Ensure a default value
+                                          });
+                                        },
+                                        // activeColor: Color(0xFF945985),
+                                      ),
+                                      hasDeadline
+                                          ? DatePickerWidget(
+                                              initialDate: new_deadline,
+                                              firstDate: DateTime.now(),
+                                              lastDate: DateTime.now()
+                                                  .add(Duration(days: 3650)),
+                                              onDateSelected: (selectedDate) {
+                                                if (selectedDate != null)
+                                                  new_deadline = selectedDate;
+                                              },
+                                            )
+                                          : FittedBox(
+                                              child: Text(
+                                                AppLocalizations.of(context)
+                                                    .translate(
+                                                        "Check for adding deadline"),
+                                              ),
+                                            ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
                           },
                         ),
-                        TextButton(
-                          child: Text(
-                            AppLocalizations.of(context).translate("Save"),
-                            style: Theme.of(context).textTheme.titleMedium,
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              AppLocalizations.of(context).translate("Cancel"),
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
                           ),
-                          onPressed: () {
-                            if (new_title.text != '') {
-                              add_item(
-                                  new_title.text, new_deadline, hasDeadline);
-                            }
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              screenWidth: getRelativeWidth(1),
-              screenHeight: getRelativeHeight(1),
-            ))
+                          TextButton(
+                            child: Text(
+                              AppLocalizations.of(context).translate("Save"),
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            onPressed: () {
+                              if (new_title.text != '') {
+                                add_item(
+                                    new_title.text, new_deadline, hasDeadline);
+                              }
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                screenWidth: getRelativeWidth(1),
+                screenHeight: getRelativeHeight(1),
+              ),
+            ),
           ],
         ),
       ),
