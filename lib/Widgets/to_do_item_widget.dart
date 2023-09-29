@@ -11,9 +11,10 @@ class ToDoItemWidget extends StatefulWidget {
   final int index;
   final Function checkItem;
   final Function deleteItem;
+  final Function updateSingleListScreen;
 
-  ToDoItemWidget(
-      this.item, this.editMode, this.index, this.checkItem, this.deleteItem,
+  ToDoItemWidget(this.item, this.editMode, this.index, this.checkItem,
+      this.deleteItem, this.updateSingleListScreen,
       {Key? key})
       : super(key: key);
 
@@ -47,8 +48,13 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         ),
         child: ListTile(
           onTap: () {
-            Navigator.pushNamed(context, ContentScreen.routeName);
-            print("move to" + widget.item.id + "page");
+            Navigator.of(context).pushNamed(
+              ContentScreen.routeName,
+              arguments: {
+                'id': widget.item.id,
+                'updateSingleListScreen': widget.updateSingleListScreen,
+              },
+            );
           },
           leading: widget.editMode
               ? Icon(

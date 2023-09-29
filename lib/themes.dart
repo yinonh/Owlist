@@ -43,6 +43,7 @@ final ThemeData lightTheme = ThemeData(
   checkboxTheme: CheckboxThemeData(
     fillColor: MaterialStateProperty.all<Color>(Color(0xFF635985)),
     checkColor: MaterialStateProperty.all<Color>(Colors.white),
+    side: BorderSide.none,
   ),
   switchTheme: SwitchThemeData(
     trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
@@ -136,6 +137,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   checkboxTheme: CheckboxThemeData(
     fillColor: MaterialStateProperty.all<Color>(Color(0xFF9685D9)),
     checkColor: MaterialStateProperty.all<Color>(Colors.black),
+    side: BorderSide.none,
   ),
   switchTheme: SwitchThemeData(
     trackColor: MaterialStateProperty.all<Color>(Colors.black),

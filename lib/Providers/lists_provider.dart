@@ -446,6 +446,33 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     return _activeItemsCache ?? [];
   }
 
+  Future<ToDoList?> getListById(String id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'todo_lists',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    final map = maps.first;
+    var deadline = DateTime.parse(map['deadline']);
+    if (maps.isNotEmpty) {
+      return ToDoList(
+        id: map['id'].toString(),
+        title: map['title'],
+        creationDate: DateTime.parse(map['creationDate']),
+        deadline: deadline,
+        hasDeadline: map['hasDeadline'] == 1,
+        totalItems: map['totalItems'],
+        accomplishedItems: map['accomplishedItems'],
+        userID: map['userID'],
+        notificationIndex: map['notificationIndex'],
+      );
+      //return ToDoList.fromMap(maps.first);
+    }
+
+    return null; // Return null if no matching ToDoList is found.
+  }
+
   Future<List<ToDoList>> getAchievedItems() async {
     if (_achievedItemsCache != null) {
       return _achievedItemsCache!;
@@ -719,6 +746,30 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
       );
 
       // Invalidate cache and notify listeners to reflect the changes
+      invalidateCache();
+      notifyListeners();
+    } catch (e) {
+      print('Error updating the title: $e');
+    }
+  }
+
+  Future<void> editItemTitle(String itemId, String? newTitle) async {
+    if (newTitle == null) {
+      return;
+    }
+    try {
+      final Database db = await database;
+
+      // Update the 'title' field with the new newTitle in the SQLite database
+      await db.update(
+        'todo_items',
+        {
+          'title': newTitle,
+        },
+        where: 'id = ?',
+        whereArgs: [itemId],
+      );
+
       invalidateCache();
       notifyListeners();
     } catch (e) {

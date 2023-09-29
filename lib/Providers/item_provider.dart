@@ -164,7 +164,9 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
+import 'package:provider/provider.dart';
 
+import '../Providers/lists_provider.dart';
 import '../Models/to_do_item.dart';
 import './item_abstract.dart';
 
@@ -204,6 +206,24 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
         itemIndex: maps[i]['itemIndex'],
       );
     });
+  }
+
+  Future<ToDoItem> itemById(String id) async {
+    print(id);
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'todo_items',
+      where: "id = ?",
+      whereArgs: [id],
+    );
+    return ToDoItem(
+      id: maps[0]['id'].toString(),
+      listId: maps[0]['listId'],
+      title: maps[0]['title'],
+      content: maps[0]['content'],
+      done: maps[0]['done'] == 1,
+      itemIndex: maps[0]['itemIndex'],
+    );
   }
 
   Future<ToDoItem?> addNewItem(String listId, String title) async {
@@ -291,9 +311,6 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
           }
         });
 
-        // Close the database
-        // await db.close();
-
         print('Item with ID $id deleted successfully!');
       } else {
         print('Item with ID $id not found in the database!');
@@ -358,45 +375,10 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
           notifyListeners();
         }
       }
-
-      // Close the database
-      // await db.close();
     } catch (error) {
       print("Error toggling item's done state: $error");
     }
   }
-
-  // Future<void> deleteItemById(String id) async {
-  //   final Database db = await database;
-  //   await db.delete(
-  //     'todo_items',
-  //     where: "id = ?",
-  //     whereArgs: [id],
-  //   );
-  //
-  //   notifyListeners();
-  // }
-  //
-  // Future<void> toggleItemDone(String itemId) async {
-  //   final Database db = await database;
-  //   final List<Map<String, dynamic>> maps = await db.query(
-  //     'todo_items',
-  //     where: "id = ?",
-  //     whereArgs: [itemId],
-  //   );
-  //
-  //   if (maps.isNotEmpty) {
-  //     final currentDoneValue = maps.first['done'] == 1;
-  //     await db.update(
-  //       'todo_items',
-  //       {'done': currentDoneValue ? 0 : 1},
-  //       where: "id = ?",
-  //       whereArgs: [itemId],
-  //     );
-  //
-  //     notifyListeners();
-  //   }
-  // }
 
   Future<void> editIndex(String itemId, int newIndex) async {
     final Database db = await database;

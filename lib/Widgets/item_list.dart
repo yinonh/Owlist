@@ -11,6 +11,7 @@ class ItemList extends StatefulWidget {
   final Function reorderItems;
   final Function deleteItem;
   final Function checkItem;
+  final Function updateSingleListScreen;
   final AnimatedListController controller;
 
   ItemList(
@@ -21,6 +22,7 @@ class ItemList extends StatefulWidget {
       required this.checkItem,
       required this.deleteItem,
       required this.controller,
+      required this.updateSingleListScreen,
       Key? key})
       : super(key: key);
 
@@ -52,12 +54,12 @@ class _ItemListState extends State<ItemList> {
                   ],
                 ),
                 child: ToDoItemWidget(
-                  item,
-                  true,
-                  item.itemIndex,
-                  widget.checkItem,
-                  widget.deleteItem,
-                ),
+                    item,
+                    true,
+                    item.itemIndex,
+                    widget.checkItem,
+                    widget.deleteItem,
+                    widget.updateSingleListScreen),
               );
             },
             onReorder: (oldIndex, newIndex) {
@@ -89,12 +91,12 @@ class _ItemListState extends State<ItemList> {
                     ],
                   ),
                   child: ToDoItemWidget(
-                    item,
-                    false,
-                    item.itemIndex,
-                    widget.checkItem,
-                    widget.deleteItem,
-                  ),
+                      item,
+                      false,
+                      item.itemIndex,
+                      widget.checkItem,
+                      widget.deleteItem,
+                      widget.updateSingleListScreen),
                 );
               }
             },

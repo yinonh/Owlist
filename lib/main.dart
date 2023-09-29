@@ -192,16 +192,31 @@ class _MyAppState extends State<MyApp> {
       routes: {
         HomePage.routeName: (context) => HomePage(),
         AuthScreen.routeName: (context) => AuthScreen(),
-        ContentScreen.routeName: (context) => ContentScreen(),
       },
       onGenerateRoute: (settings) {
-        if (settings.name == SingleListScreen.routeName) {
-          ToDoList arg = settings.arguments as ToDoList;
-          return MaterialPageRoute(builder: (context) {
-            return SingleListScreen(
-              list: arg,
-            );
-          });
+        switch (settings.name) {
+          case SingleListScreen.routeName:
+            {
+              return MaterialPageRoute(builder: (context) {
+                return SingleListScreen(
+                  listId: settings.arguments as String,
+                );
+              });
+            }
+          case ContentScreen.routeName:
+            {
+              // Extract the arguments map from settings
+              final Map<String, dynamic> args =
+                  settings.arguments as Map<String, dynamic>;
+
+              return MaterialPageRoute(builder: (context) {
+                return ContentScreen(
+                  id: args['id'] as String,
+                  updateSingleListScreen:
+                      args['updateSingleListScreen'] as Function,
+                );
+              });
+            }
         }
       },
       home: initialScreen,

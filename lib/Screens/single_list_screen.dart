@@ -13,10 +13,11 @@ import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
 
 class SingleListScreen extends StatefulWidget {
-  final ToDoList list;
+  final String listId;
+  //final ToDoList list;
   static const routeName = '/single_list_screen';
 
-  SingleListScreen({required this.list, Key? key}) : super(key: key);
+  SingleListScreen({required this.listId, Key? key}) : super(key: key);
 
   @override
   State<SingleListScreen> createState() => _SingleListScreenState();
@@ -27,31 +28,29 @@ class _SingleListScreenState extends State<SingleListScreen> {
   TextEditingController _titleController = TextEditingController();
   bool isLoading = false;
   late bool editMode;
+  late ToDoList? list;
   late List<ToDoItem> currentList;
   late List<ToDoItem> editList;
 
   @override
   void initState() {
     super.initState();
-    newDeadline = widget.list.deadline;
-    _titleController.text = widget.list.title;
+    initListDate();
     editMode = false;
-    getList();
+    //getList();
   }
 
-  void _toggleEditMode() {
-    if (!editMode) editList = List.from(currentList);
-    setState(() {
-      editMode = !editMode;
-    });
-  }
-
-  void getList() async {
+  void initListDate() async {
     setState(() {
       isLoading = true;
     });
+    list = await Provider.of<ListsProvider>(context, listen: false)
+        .getListById(widget.listId);
+    if (list == null) Navigator.pop;
+    newDeadline = list!.deadline;
+    _titleController.text = list!.title;
     currentList = await Provider.of<ItemProvider>(context, listen: false)
-        .itemsByListId(widget.list.id);
+        .itemsByListId(list!.id);
     currentList.sort((a, b) {
       if (a.done == b.done) {
         return a.itemIndex.compareTo(b.itemIndex);
@@ -65,17 +64,34 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
   }
 
-  @override
-  void didUpdateWidget(SingleListScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Check if the deadline has changed and update the UI accordingly
-    if (widget.list.deadline != oldWidget.list.deadline) {
-      newDeadline = widget.list.deadline;
-    }
-    if (widget.list.title != oldWidget.list.title) {
-      _titleController.text = widget.list.title;
-    }
+  void _toggleEditMode() {
+    if (!editMode) editList = List.from(currentList);
+    setState(() {
+      editMode = !editMode;
+    });
   }
+
+  // void getList() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+  // }
+
+  // @override
+  // void didUpdateWidget(SingleListScreen oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   // Check if the deadline has changed and update the UI accordingly
+  //   if (widget.list.deadline != oldWidget.list.deadline) {
+  //     newDeadline = widget.list.deadline;
+  //   }
+  //   if (widget.list.title != oldWidget.list.title) {
+  //     _titleController.text = widget.list.title;
+  //   }
+  // }
 
   void _showNewItemDialog(BuildContext context) {
     showDialog(
@@ -121,8 +137,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
 
     if (newTitle.isNotEmpty) {
-      ToDoItem? newItem =
-          await itemProvider.addNewItem(widget.list.id, newTitle);
+      ToDoItem? newItem = await itemProvider.addNewItem(list!.id, newTitle);
 
       if (newItem != null) {
         List<ToDoItem> temp = List.from(currentList);
@@ -153,13 +168,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
     setState(() {
       isLoading = true;
     });
-    if (widget.list.deadline != newDeadline) {
+    if (list!.deadline != newDeadline) {
       await Provider.of<ListsProvider>(context, listen: false)
-          .editDeadline(widget.list.id, newDeadline);
+          .editDeadline(list!.id, newDeadline);
     }
-    if (widget.list.title != _titleController.text) {
+    if (list!.title != _titleController.text) {
       await Provider.of<ListsProvider>(context, listen: false)
-          .editTitle(widget.list.id, _titleController.text);
+          .editTitle(list!.id, _titleController.text);
     }
     for (int i = 0; i < editList.length; i++) {
       if (editList[i].itemIndex != i) {
@@ -167,7 +182,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             .editIndex(editList[i].id, i);
       }
     }
-    getList();
+    initListDate();
     _toggleEditMode();
   }
 
@@ -228,8 +243,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                     color: Colors.white),
                                 onPressed: () {
                                   setState(() {
-                                    newDeadline = widget.list.deadline;
-                                    _titleController.text = widget.list.title;
+                                    newDeadline = list!.deadline;
+                                    _titleController.text = list!.title;
                                     _toggleEditMode();
                                   });
                                 },
@@ -305,6 +320,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                     checkItem: checkItem,
                                     deleteItem: deleteItem,
                                     controller: itemListController,
+                                    updateSingleListScreen: initListDate,
                                   ),
                                 ),
                                 SizedBox(
@@ -318,14 +334,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   ? DiamondButton(
                                       icon: Icon(
                                         Icons.calendar_month,
-                                        color: widget.list.hasDeadline
+                                        color: list!.hasDeadline
                                             ? Theme.of(context).primaryColor
                                             : Colors.grey,
                                         size:
                                             MediaQuery.of(context).size.width *
                                                 0.07,
                                       ),
-                                      onTap: widget.list.hasDeadline
+                                      onTap: list!.hasDeadline
                                           ? () {
                                               _showChangeDateDialog(context);
                                             }

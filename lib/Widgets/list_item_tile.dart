@@ -92,7 +92,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, SingleListScreen.routeName,
-                arguments: widget.item)
+                arguments: widget.item.id)
             .then((value) {
           setState(() {
             widget.refresh();
