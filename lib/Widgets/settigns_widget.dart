@@ -111,7 +111,7 @@ class _SettingsState extends State<Settings> {
               ),
               Expanded(
                 child: Transform.scale(
-                  scale: 1.5,
+                  scale: 1,
                   child: Switch(
                     activeThumbImage: AssetImage('Assets/darkMode.png'),
                     inactiveThumbImage: AssetImage('Assets/lightMode.png'),

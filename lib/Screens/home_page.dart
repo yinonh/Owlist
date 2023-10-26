@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:to_do/main.dart';
 
 import '../l10n/app_localizations.dart';
@@ -55,48 +55,48 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> setUpNotifications() async {
     // final fcm = FirebaseMessaging.instance;
-    AwesomeNotifications().isNotificationAllowed().then(
-      (isAllowed) {
-        if (!isAllowed) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(
-                AppLocalizations.of(context).translate("Allow Notifications"),
-              ),
-              content: Text(
-                AppLocalizations.of(context)
-                    .translate("Our app would like to send you notifications"),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    AppLocalizations.of(context).translate("Dont Allow"),
-                    style: TextStyle(color: Colors.grey, fontSize: 18),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => AwesomeNotifications()
-                      .requestPermissionToSendNotifications()
-                      .then((_) => Navigator.pop(context)),
-                  child: Text(
-                    AppLocalizations.of(context).translate("Allow"),
-                    style: TextStyle(
-                      color: Color(0xFF636995),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-      },
-    );
+    // AwesomeNotifications().isNotificationAllowed().then(
+    //   (isAllowed) {
+    //     if (!isAllowed) {
+    //       showDialog(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //           title: Text(
+    //             AppLocalizations.of(context).translate("Allow Notifications"),
+    //           ),
+    //           content: Text(
+    //             AppLocalizations.of(context)
+    //                 .translate("Our app would like to send you notifications"),
+    //           ),
+    //           actions: [
+    //             TextButton(
+    //               onPressed: () {
+    //                 Navigator.pop(context);
+    //               },
+    //               child: Text(
+    //                 AppLocalizations.of(context).translate("Dont Allow"),
+    //                 style: TextStyle(color: Colors.grey, fontSize: 18),
+    //               ),
+    //             ),
+    //             TextButton(
+    //               onPressed: () => AwesomeNotifications()
+    //                   .requestPermissionToSendNotifications()
+    //                   .then((_) => Navigator.pop(context)),
+    //               child: Text(
+    //                 AppLocalizations.of(context).translate("Allow"),
+    //                 style: TextStyle(
+    //                   color: Color(0xFF636995),
+    //                   fontSize: 18,
+    //                   fontWeight: FontWeight.bold,
+    //                 ),
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       );
+    //     }
+    //   },
+    // );
     // final _token = await fcm.getToken();
     // print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + _token.toString());
   }

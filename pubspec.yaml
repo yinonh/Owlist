@@ -44,7 +44,6 @@ dependencies:
   cloud_firestore: ^4.8.4
   animated_list_item: ^1.0.0
   great_list_view: ^0.2.3
-  awesome_notifications: ^0.6.19
   http: ^1.1.0
   google_sign_in: ^6.1.4
   flutter_localization: ^0.1.13
@@ -54,6 +53,8 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   firebase_messaging: ^14.6.7
+  flutter_linkify: ^6.0.0
+  url_launcher: ^6.2.1
 #  firebase_messaging: ^14.6.6
 #  workmanager: ^0.5.1
 

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -56,22 +56,22 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await AwesomeNotifications().initialize(
-    'resource://drawable/res_app_icon',
-    [
-      NotificationChannel(
-        channelKey: 'task_deadline_channel',
-        channelName: 'Deadline notifications ',
-        channelDescription:
-            'Notifications that the task deadline is about to end',
-        importance: NotificationImportance.High,
-        playSound: true,
-        defaultColor: Colors.deepPurple,
-        ledColor: Colors.deepPurple,
-        channelShowBadge: true,
-      ),
-    ],
-  );
+  // await AwesomeNotifications().initialize(
+  //   'resource://drawable/res_app_icon',
+  //   [
+  //     NotificationChannel(
+  //       channelKey: 'task_deadline_channel',
+  //       channelName: 'Deadline notifications ',
+  //       channelDescription:
+  //           'Notifications that the task deadline is about to end',
+  //       importance: NotificationImportance.High,
+  //       playSound: true,
+  //       defaultColor: Colors.deepPurple,
+  //       ledColor: Colors.deepPurple,
+  //       channelShowBadge: true,
+  //     ),
+  //   ],
+  // );
   // Workmanager().initialize(callbackDispatcher);
   runApp(
     MultiProvider(

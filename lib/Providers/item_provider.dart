@@ -245,7 +245,7 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
       'id': DateTime.now().toIso8601String(),
       'listId': listId,
       'title': title,
-      'content': '',
+      'content': 'enter some text...',
       'done': 0,
       'itemIndex': newIndex,
     };
@@ -390,5 +390,22 @@ class ItemProvider extends ItemsAbstract with ChangeNotifier {
     );
 
     notifyListeners();
+  }
+
+  Future<void> updateItemContent(String itemId, String newContent) async {
+    try {
+      final Database db = await database;
+
+      await db.update(
+        'todo_items',
+        {'content': newContent},
+        where: 'id = ?',
+        whereArgs: [itemId],
+      );
+
+      notifyListeners();
+    } catch (error) {
+      print("Error updating item's content: $error");
+    }
   }
 }

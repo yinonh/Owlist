@@ -314,7 +314,7 @@ import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Models/to_do_list.dart';
 import './list_abstract.dart';
@@ -546,21 +546,21 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
 
       if (newList.hasDeadline) {
         // Add local notification logic using flutter_local_notifications package.
-        await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: newList.notificationIndex,
-            channelKey: 'task_deadline_channel',
-            title: '${newList.title}',
-            body: 'Task deadline is about to end',
-            color: Color(0xFF635985),
-            // groupKey: "1",
-          ),
-          schedule: NotificationCalendar.fromDate(
-            date: DateTime.now().add(
-              Duration(seconds: 30),
-            ),
-          ),
-        );
+        // await AwesomeNotifications().createNotification(
+        //   content: NotificationContent(
+        //     id: newList.notificationIndex,
+        //     channelKey: 'task_deadline_channel',
+        //     title: '${newList.title}',
+        //     body: 'Task deadline is about to end',
+        //     color: Color(0xFF635985),
+        //     // groupKey: "1",
+        //   ),
+        //   schedule: NotificationCalendar.fromDate(
+        //     date: DateTime.now().add(
+        //       Duration(seconds: 30),
+        //     ),
+        //   ),
+        // );
       }
     } catch (e) {
       print('Error adding new list: $e');
