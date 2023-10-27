@@ -61,9 +61,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   Icons.drag_handle,
                   color: Theme.of(context).hintColor,
                 )
-              : Text(
-                  (widget.index + 1).toString(),
-                  style: Theme.of(context).textTheme.titleMedium,
+              : SizedBox(
+                  width: 10,
                 ),
           title: Text(
             widget.item.title,

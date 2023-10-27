@@ -108,7 +108,7 @@ class _ContentScreenState extends State<ContentScreen> {
       resizeToAvoidBottomInset: false,
       floatingActionButton: DiamondButton(
         icon: Icon(
-          textEditMode ? Icons.save : Icons.add,
+          textEditMode ? Icons.save : Icons.text_fields,
           color: Theme.of(context).primaryColor,
           size: MediaQuery.of(context).size.width * 0.1,
         ),

@@ -484,7 +484,7 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     SELECT *
     FROM todo_lists
     WHERE (accomplishedItems >= totalItems AND totalItems > 0)
-        OR deadline < ?
+        OR (hasDeadline = 1 AND deadline < ?)
   ''', [DateTime.now().toIso8601String()]);
 
     _achievedItemsCache = List.generate(maps.length, (i) {
@@ -517,8 +517,7 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     FROM todo_lists
     WHERE hasDeadline = 0
     AND (accomplishedItems < totalItems OR totalItems = 0)
-      AND deadline > ?
-  ''', [DateTime.now().toIso8601String()]);
+  ''');
 
     _withoutDeadlineItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
@@ -775,5 +774,45 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     } catch (e) {
       print('Error updating the title: $e');
     }
+  }
+
+  Future<Map<String, int>> updateStatistics() async {
+    final activeItems = await getActiveItems();
+    final achievedItems = await getAchievedItems();
+    final withoutDeadlineLists = await getWithoutDeadlineItems();
+
+    var totalItems =
+        activeItems.fold(0, (total, list) => total + list.totalItems);
+    totalItems = achievedItems.fold(
+        totalItems, (total, list) => total + list.totalItems);
+    totalItems = withoutDeadlineLists.fold(
+        totalItems, (total, list) => total + list.totalItems);
+
+    var itemsDone =
+        activeItems.fold(0, (total, list) => total + list.accomplishedItems);
+    itemsDone = achievedItems.fold(
+        itemsDone, (total, list) => total + list.accomplishedItems);
+    itemsDone = withoutDeadlineLists.fold(
+        itemsDone, (total, list) => total + list.accomplishedItems);
+
+    final itemsDelayed = achievedItems.fold(
+        0, (total, list) => total + list.totalItems - list.accomplishedItems);
+
+    final itemsNotDone = totalItems - itemsDone - itemsDelayed;
+
+    final statistics = {
+      'totalLists': activeItems.length +
+          achievedItems.length +
+          withoutDeadlineLists.length,
+      'listsDone': achievedItems.length,
+      'activeLists': activeItems.length,
+      'withoutDeadline': withoutDeadlineLists.length,
+      'totalItems': totalItems,
+      'itemsDone': itemsDone,
+      'itemsDelayed': itemsDelayed,
+      'itemsNotDone': itemsNotDone
+    };
+    print(statistics);
+    return statistics;
   }
 }

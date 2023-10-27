@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do/Screens/statistics_screen.dart';
 
 import '../main.dart';
 import '../l10n/app_localizations.dart';
@@ -95,7 +96,7 @@ class _SettingsState extends State<Settings> {
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 25,
           ),
           Row(
             children: [
@@ -129,6 +130,21 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
             ],
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).primaryColorLight)),
+            onPressed: () {
+              Navigator.of(context).pushNamed(StatisticsScreen.routeName);
+            },
+            child: Text(
+              AppLocalizations.of(context).translate("Statistics"),
+              style: Theme.of(context).primaryTextTheme.titleMedium,
+            ),
           ),
         ],
       ),

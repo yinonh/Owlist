@@ -276,17 +276,6 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // IconButton(
-                      //   onPressed: () async {
-                      //     await FirebaseAuth.instance.signOut();
-                      //     provider.invalidateCache();
-                      //     Navigator.pushReplacementNamed(
-                      //       context,
-                      //       AuthScreen.routeName,
-                      //     );
-                      //   },
-                      //   icon: Icon(Icons.logout),
-                      // ),
                       Center(
                         child: Text(
                           AppLocalizations.of(context).translate("To-Do"),
@@ -299,7 +288,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       currentIndex == 3
-                          ? IconButton(onPressed: () {}, icon: Icon(Icons.save))
+                          ? SizedBox(
+                              width: 10,
+                            )
                           : PopupMenuButton<FilterBy>(
                               icon: const Icon(Icons.filter_list),
                               onSelected: (value) {
