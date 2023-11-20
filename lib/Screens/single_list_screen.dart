@@ -64,7 +64,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
   }
 
-  void _toggleEditMode() {
+  void toggleEditMode() {
     if (!editMode) editList = List.from(currentList);
     setState(() {
       editMode = !editMode;
@@ -183,7 +183,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
       }
     }
     initListDate();
-    _toggleEditMode();
+    toggleEditMode();
   }
 
   void checkItem(String id, String listId, bool done) {
@@ -245,7 +245,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   setState(() {
                                     newDeadline = list!.deadline;
                                     _titleController.text = list!.title;
-                                    _toggleEditMode();
+                                    toggleEditMode();
                                   });
                                 },
                               )
@@ -295,7 +295,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               )
                             : IconButton(
                                 icon: Icon(Icons.edit, color: Colors.white),
-                                onPressed: _toggleEditMode,
+                                onPressed: toggleEditMode,
                               ),
                       ],
                     ),
@@ -313,6 +313,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                       MediaQuery.of(context).padding.top -
                                       (75 + 40),
                                   child: ItemList(
+                                    toggleEditMode: toggleEditMode,
                                     editMode: editMode,
                                     currentList: currentList,
                                     editList: editList,

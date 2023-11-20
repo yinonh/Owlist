@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
+import '../l10n/app_localizations.dart';
 
 class ToDoItemWidget extends StatefulWidget {
   final ToDoItem item;
@@ -23,6 +24,50 @@ class ToDoItemWidget extends StatefulWidget {
 }
 
 class _ToDoItemWidgetState extends State<ToDoItemWidget> {
+  Future<bool?> confirmDismiss(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          title: Text(
+            "Confirm Deletion",
+            // Replace with your localization logic
+          ),
+          content: Text(
+            "Are you sure you want to delete this item?",
+            // Replace with your localization logic
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(
+                "Cancel",
+                // Replace with your localization logic
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -34,6 +79,9 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           widget.deleteItem(widget.item.id, widget.item.done, context);
+        },
+        confirmDismiss: (DismissDirection direction) async {
+          return await confirmDismiss(context);
         },
         background: Container(
           alignment: AlignmentDirectional.centerEnd,

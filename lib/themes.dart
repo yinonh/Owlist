@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 final ThemeData lightTheme = ThemeData(
+  textSelectionTheme: const TextSelectionThemeData(
+    cursorColor: Colors.purpleAccent,
+    selectionHandleColor: Colors.purpleAccent,
+  ),
   dividerColor: Color(0xFF9685D9),
   hintColor: Colors.grey,
   primaryColorDark: Color(0xFF18122B),
@@ -94,6 +98,10 @@ final ThemeData lightTheme = ThemeData(
 );
 
 final ThemeData darkTheme = ThemeData.dark().copyWith(
+  textSelectionTheme: const TextSelectionThemeData(
+    cursorColor: Colors.purpleAccent,
+    selectionHandleColor: Colors.purpleAccent,
+  ),
   dividerColor: Color(0xFF42385E),
   hintColor: Colors.grey,
   primaryColorDark: Colors.black,

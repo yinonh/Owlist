@@ -11,6 +11,7 @@ class ItemList extends StatefulWidget {
   final Function reorderItems;
   final Function deleteItem;
   final Function checkItem;
+  final void Function() toggleEditMode;
   final Function updateSingleListScreen;
   final AnimatedListController controller;
 
@@ -21,6 +22,7 @@ class ItemList extends StatefulWidget {
       required this.reorderItems,
       required this.checkItem,
       required this.deleteItem,
+      required this.toggleEditMode,
       required this.controller,
       required this.updateSingleListScreen,
       Key? key})
@@ -66,43 +68,46 @@ class _ItemListState extends State<ItemList> {
               widget.reorderItems(oldIndex, newIndex);
             },
           )
-        : AutomaticAnimatedListView<ToDoItem>(
-            list: widget.currentList,
-            comparator: AnimatedListDiffListComparator<ToDoItem>(
-              sameItem: (a, b) => a.id == b.id,
-              sameContent: (a, b) => a.title == b.title,
+        : GestureDetector(
+            onLongPress: widget.toggleEditMode,
+            child: AutomaticAnimatedListView<ToDoItem>(
+              list: widget.currentList,
+              comparator: AnimatedListDiffListComparator<ToDoItem>(
+                sameItem: (a, b) => a.id == b.id,
+                sameContent: (a, b) => a.title == b.title,
+              ),
+              itemBuilder: (context, item, data) {
+                if (data.measuring) {
+                  return Container(margin: EdgeInsets.all(5), height: 50);
+                } else {
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).hintColor.withOpacity(0.5),
+                          spreadRadius: 0.5,
+                          blurRadius: 1.5,
+                          // offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ToDoItemWidget(
+                        item,
+                        false,
+                        item.itemIndex,
+                        widget.checkItem,
+                        widget.deleteItem,
+                        widget.updateSingleListScreen),
+                  );
+                }
+              },
+              listController: widget.controller,
+              addLongPressReorderable: false,
+              detectMoves: false,
             ),
-            itemBuilder: (context, item, data) {
-              if (data.measuring) {
-                return Container(margin: EdgeInsets.all(5), height: 50);
-              } else {
-                return Container(
-                  margin: EdgeInsets.symmetric(vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).cardColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).hintColor.withOpacity(0.5),
-                        spreadRadius: 0.5,
-                        blurRadius: 1.5,
-                        // offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: ToDoItemWidget(
-                      item,
-                      false,
-                      item.itemIndex,
-                      widget.checkItem,
-                      widget.deleteItem,
-                      widget.updateSingleListScreen),
-                );
-              }
-            },
-            listController: widget.controller,
-            addLongPressReorderable: false,
-            detectMoves: false,
           );
   }
 }

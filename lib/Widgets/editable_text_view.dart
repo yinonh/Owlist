@@ -33,9 +33,21 @@ class _EditableTextViewState extends State<EditableTextView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: TextField(
+              cursorColor: Colors.purpleAccent, // Change cursor color
+              style: TextStyle(
+                color: Colors.white,
+              ),
               controller: widget.controller,
-              maxLines: null, // Allow multiple lines of text
+              maxLines: 12,
               textAlign: TextAlign.start, // Align the text to the start (left)
+              decoration: InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.purpleAccent),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.purpleAccent),
+                ),
+              ),
             ),
           ),
         ],
@@ -46,7 +58,7 @@ class _EditableTextViewState extends State<EditableTextView> {
         child: Linkify(
           onOpen: (url) => _onOpen(url),
           text: widget.controller.text,
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, color: Colors.white),
           linkStyle: TextStyle(color: Colors.blue),
           textAlign: TextAlign.start, // Align the text to the start (left)
         ),

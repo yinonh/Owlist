@@ -92,33 +92,28 @@ class _ContentScreenState extends State<ContentScreen> {
     //   ),
     // );
 
-    childButtons.add(
-      UnicornButton(
-        currentButton: FloatingActionButton(
-            heroTag: "directions",
-            backgroundColor: Color(0xFF635985), //Colors.blueAccent,
-            mini: true,
-            onPressed: () {
-              print("link");
-            },
-            child: Icon(Icons.link)),
-      ),
-    );
+    // childButtons.add(
+    //   UnicornButton(
+    //     currentButton: FloatingActionButton(
+    //         heroTag: "directions",
+    //         backgroundColor: Color(0xFF635985), //Colors.blueAccent,
+    //         mini: true,
+    //         onPressed: () {
+    //           print("link");
+    //         },
+    //         child: Icon(Icons.link)),
+    //   ),
+    // );
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: DiamondButton(
         icon: Icon(
-          textEditMode ? Icons.save : Icons.text_fields,
-          color: Theme.of(context).primaryColor,
+          Icons.text_fields,
+          color: textEditMode ? Colors.grey : Theme.of(context).primaryColor,
           size: MediaQuery.of(context).size.width * 0.1,
         ),
-        onTap: textEditMode
-            ? () async {
-                await Provider.of<ItemProvider>(context, listen: false)
-                    .updateItemContent(_item.id, textEditingController.text);
-                toggleTextEditMode();
-              }
-            : toggleTextEditMode,
+        onTap: textEditMode ? null : toggleTextEditMode,
         screenWidth: MediaQuery.of(context).size.width,
         screenHeight: MediaQuery.of(context).size.height,
       ),
@@ -149,96 +144,113 @@ class _ContentScreenState extends State<ContentScreen> {
                   children: [
                     Column(
                       children: [
+                        Container(
+                          height: 75,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 24.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              titleEditMode || textEditMode
+                                  ? IconButton(
+                                      icon: const Icon(Icons.cancel,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (titleEditMode) {
+                                            _titleController.text = _item.title;
+                                            _toggleTitleEditMode();
+                                          }
+                                          if (textEditMode) {
+                                            textEditingController.text =
+                                                _item.content;
+                                            toggleTextEditMode();
+                                          }
+                                        });
+                                      },
+                                    )
+                                  : IconButton(
+                                      icon: const Icon(Icons.arrow_back,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                              titleEditMode
+                                  ? Expanded(
+                                      child: TextField(
+                                        controller: _titleController,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 19.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        maxLength: 25,
+                                        // Set the maximum length
+                                        decoration: const InputDecoration(
+                                          counterText:
+                                              "", // Hide the character counter
+                                          // border: InputBorder.none,
+                                        ),
+                                      ),
+                                    )
+                                  : Flexible(
+                                      child: Text(
+                                        _titleController.text,
+                                        style: const TextStyle(
+                                          fontSize: 24.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                              titleEditMode || textEditMode
+                                  ? IconButton(
+                                      icon:
+                                          Icon(Icons.save, color: Colors.white),
+                                      onPressed: () async {
+                                        if (titleEditMode) {
+                                          Provider.of<ListsProvider>(context,
+                                                  listen: false)
+                                              .editItemTitle(_item.id,
+                                                  _titleController.text);
+                                          _toggleTitleEditMode();
+                                          widget.updateSingleListScreen();
+                                        }
+                                        if (textEditMode) {
+                                          await Provider.of<ItemProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .updateItemContent(_item.id,
+                                                  textEditingController.text);
+                                          toggleTextEditMode();
+                                        }
+                                      },
+                                    )
+                                  : IconButton(
+                                      icon:
+                                          Icon(Icons.edit, color: Colors.white),
+                                      onPressed: _toggleTitleEditMode,
+                                    ),
+                            ],
+                          ),
+                        ),
                         Expanded(
                           child: ListView(
                             children: [
-                              Container(
-                                height: 75,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 24.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    titleEditMode
-                                        ? IconButton(
-                                            icon: const Icon(Icons.cancel,
-                                                color: Colors.white),
-                                            onPressed: () {
-                                              setState(() {
-                                                _titleController.text =
-                                                    _item.title;
-                                                _toggleTitleEditMode();
-                                              });
-                                            },
-                                          )
-                                        : IconButton(
-                                            icon: const Icon(Icons.arrow_back,
-                                                color: Colors.white),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                    titleEditMode
-                                        ? Expanded(
-                                            child: TextField(
-                                              controller: _titleController,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 19.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              maxLength: 25,
-                                              // Set the maximum length
-                                              decoration: InputDecoration(
-                                                counterText:
-                                                    "", // Hide the character counter
-                                                // border: InputBorder.none,
-                                              ),
-                                            ),
-                                          )
-                                        : Flexible(
-                                            child: Text(
-                                              _titleController.text,
-                                              style: TextStyle(
-                                                fontSize: 24.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                    titleEditMode
-                                        ? IconButton(
-                                            icon: Icon(Icons.save,
-                                                color: Colors.white),
-                                            onPressed: () {
-                                              Provider.of<ListsProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .editItemTitle(_item.id,
-                                                      _titleController.text);
-                                              _toggleTitleEditMode();
-                                              widget.updateSingleListScreen();
-                                            },
-                                          )
-                                        : IconButton(
-                                            icon: Icon(Icons.edit,
-                                                color: Colors.white),
-                                            onPressed: _toggleTitleEditMode,
-                                          ),
-                                  ],
-                                ),
-                              ),
                               SizedBox(
                                 height: 20,
                               ),
-                              EditableTextView(
-                                  initialText: _item.content,
-                                  isEditMode: textEditMode,
-                                  toggleEditMode: toggleTextEditMode,
-                                  controller: textEditingController)
+                              GestureDetector(
+                                onLongPress: toggleTextEditMode,
+                                child: EditableTextView(
+                                    initialText: _item.content,
+                                    isEditMode: textEditMode,
+                                    toggleEditMode: toggleTextEditMode,
+                                    controller: textEditingController),
+                              )
                             ],
                           ),
                         ),
@@ -246,7 +258,7 @@ class _ContentScreenState extends State<ContentScreen> {
                           height: (MediaQuery.of(context).size.height -
                                   MediaQuery.of(context).padding.top -
                                   MediaQuery.of(context).padding.bottom) *
-                              0.15,
+                              0.1,
                         )
                       ],
                     ),
