@@ -109,7 +109,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
       initialDate: newDeadline.isBefore(DateTime.now())
           ? DateTime.now().add(Duration(days: 7))
           : newDeadline,
-      firstDate: DateTime.now(),
+      firstDate: DateTime.now().add(
+        Duration(days: 1),
+      ),
       lastDate: DateTime.now().add(
         Duration(days: 3650),
       ),

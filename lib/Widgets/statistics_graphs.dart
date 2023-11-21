@@ -18,6 +18,8 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
 
   @override
   Widget build(BuildContext context) {
+    final listsStatisticList = showingListSections(widget.statistics);
+    final itemsStatisticList = showingItemsSections(widget.statistics);
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Column(
@@ -45,8 +47,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                         touchedListIndex = -1;
                         return;
                       }
-                      touchedListIndex =
-                          pieTouchResponse.touchedSection!.touchedSectionIndex;
+                      touchedListIndex = listsStatisticList.indexOf(
+                          pieTouchResponse.touchedSection!.props[0]
+                              as PieChartSectionData);
                     });
                   },
                 ),
@@ -55,7 +58,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                 ),
                 sectionsSpace: 0,
                 centerSpaceRadius: 40,
-                sections: showingListSections(widget.statistics),
+                sections: listsStatisticList,
               ),
             ),
           ),
@@ -81,14 +84,15 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                         touchedItemIndex = -1;
                         return;
                       }
-                      touchedItemIndex =
-                          pieTouchResponse.touchedSection!.touchedSectionIndex;
+                      touchedItemIndex = itemsStatisticList.indexOf(
+                          pieTouchResponse.touchedSection!.props[0]
+                              as PieChartSectionData);
                     });
                   },
                 ),
                 sectionsSpace: 0,
                 centerSpaceRadius: 40,
-                sections: showingItemsSections(widget.statistics),
+                sections: itemsStatisticList,
               ),
             ),
           ),
@@ -108,14 +112,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           return PieChartSectionData(
             color: Theme.of(context).highlightColor,
             value: statistics!['withoutDeadline']!.toDouble(),
-            badgeWidget:
-                Text(AppLocalizations.of(context).translate("Without Deadline"),
-                    style: TextStyle(
-                      color: Colors.white,
-                    )),
-            badgePositionPercentageOffset: 1.4,
+            // badgeWidget: Container(
+            //   padding: EdgeInsets.symmetric(horizontal: 5),
+            //   child: Text(
+            //       AppLocalizations.of(context).translate("Without Deadline"),
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //       )),
+            // ),
+            // badgePositionPercentageOffset: 1.4,
             title:
-                '${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                'Without Deadline: ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -128,12 +135,13 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           return PieChartSectionData(
             color: Theme.of(context).focusColor,
             value: (statistics!['activeLists']!).toDouble(),
-            badgeWidget: Text(
-                AppLocalizations.of(context).translate("Active Items"),
-                style: TextStyle(color: Colors.white)),
-            badgePositionPercentageOffset: 1.3,
+            // badgeWidget: Text("Active",
+            //     style: TextStyle(
+            //       color: Colors.white,
+            //     )),
+            // badgePositionPercentageOffset: 1.8,
             title:
-                '${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                'Active: ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -146,12 +154,15 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           return PieChartSectionData(
             color: Theme.of(context).primaryColorLight,
             value: statistics!['listsDone']!.toDouble(),
-            badgeWidget: Text(
-                AppLocalizations.of(context).translate("Archived Items"),
-                style: TextStyle(color: Colors.white)),
-            badgePositionPercentageOffset: 1.4,
+            // badgeWidget: Text(
+            //   "Archived",
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            // badgePositionPercentageOffset: 1.4,
             title:
-                '${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                'Archived: ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -174,15 +185,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            badgeWidget: Text(
-              AppLocalizations.of(context).translate("Items In Process"),
-              style: TextStyle(color: Colors.white),
-            ),
-            badgePositionPercentageOffset: 1.3,
+            // badgeWidget: Text(
+            //   "In Process",
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            // badgePositionPercentageOffset: 1.3,
             color: Theme.of(context).highlightColor,
-            value: widget.statistics['itemsDelayed']!.toDouble(),
+            value: widget.statistics['itemsNotDone']!.toDouble(),
             title:
-                "${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
+                "In Process: ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
@@ -193,15 +206,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           );
         case 1:
           return PieChartSectionData(
-            badgeWidget: Text(
-              AppLocalizations.of(context).translate("Delayed Items"),
-              style: TextStyle(color: Colors.white),
-            ),
-            badgePositionPercentageOffset: 1.3,
+            // badgeWidget: Text(
+            //   "Delayed",
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            // badgePositionPercentageOffset: 1.6,
             color: Theme.of(context).focusColor,
             value: widget.statistics['itemsDelayed']!.toDouble(),
             title:
-                "${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
+                "Delayed: ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
@@ -212,15 +227,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           );
         case 2:
           return PieChartSectionData(
-            badgeWidget: Text(
-              AppLocalizations.of(context).translate("Items Done"),
-              style: TextStyle(color: Colors.white),
-            ),
-            badgePositionPercentageOffset: 1.3,
+            // badgeWidget: Text(
+            //   "Done",
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            // badgePositionPercentageOffset: 1.6,
             color: Theme.of(context).primaryColorLight,
             value: widget.statistics['itemsDone']!.toDouble(),
             title:
-                "${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
+                "Done: ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,

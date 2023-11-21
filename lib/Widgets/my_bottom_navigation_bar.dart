@@ -226,7 +226,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                                       hasDeadline
                                           ? DatePickerWidget(
                                               initialDate: new_deadline,
-                                              firstDate: DateTime.now(),
+                                              firstDate: DateTime.now()
+                                                  .add(Duration(days: 1)),
                                               lastDate: DateTime.now()
                                                   .add(Duration(days: 3650)),
                                               onDateSelected: (selectedDate) {
