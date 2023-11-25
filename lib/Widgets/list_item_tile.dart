@@ -53,7 +53,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               },
               child: Text(
                 AppLocalizations.of(context).translate("Delete"),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   color: Colors.red,
                 ),
@@ -114,7 +114,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 10.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -163,9 +163,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            AppLocalizations.of(context)
-                                    .translate("Remaining Days:") +
-                                ' ${remainingDays <= 0 ? AppLocalizations.of(context).translate("Done") : remainingDays}',
+                            '${AppLocalizations.of(context).translate("Remaining Days:")} ${remainingDays <= 0 ? AppLocalizations.of(context).translate("Done") : remainingDays}',
                             // style: TextStyle(fontSize: 16.0),
                           ),
                         ],
@@ -182,14 +180,11 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppLocalizations.of(context).translate("Total Items:") +
-                        ' ${widget.item.totalItems}',
+                    '${AppLocalizations.of(context).translate("Total Items:")} ${widget.item.totalItems}',
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    AppLocalizations.of(context)
-                            .translate("Accomplished Items:") +
-                        ' ${widget.item.accomplishedItems}',
+                    '${AppLocalizations.of(context).translate("Accomplished Items:")} ${widget.item.accomplishedItems}',
                     // style: const TextStyle(fontSize: 16.0),
                   ),
                 ],
@@ -205,9 +200,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            AppLocalizations.of(context)
-                                    .translate("Progress:") +
-                                ' ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                            '${AppLocalizations.of(context).translate("Progress:")} ${(progressPercentage * 100).toStringAsFixed(0)}%',
                           ),
                         ],
                       ),

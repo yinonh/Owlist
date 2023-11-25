@@ -35,13 +35,13 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       onTap: () => _selectDate(context),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.calendar_month,
             color: Color(0xFF635985),
           ),
-          SizedBox(width: 8),
-          Text(AppLocalizations.of(context).translate("Deadline:") +
-              ' ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'),
+          const SizedBox(width: 8),
+          Text(
+              '${AppLocalizations.of(context).translate("Deadline:")} ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'),
         ],
       ),
     );

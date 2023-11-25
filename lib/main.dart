@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,35 +18,10 @@ import 'l10n/app_localizations.dart';
 import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
-import './Screens/auth_screen.dart';
 import './Screens/statistics_screen.dart';
 import './Screens/content_screen.dart';
 import './Providers/lists_provider.dart';
 import './Providers/item_provider.dart';
-
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) {
-//     if (inputData != null && inputData.containsKey('notificationDate')) {
-//       final isoFormattedDate = inputData['notificationDate'];
-//       final notificationDate = DateTime.parse(isoFormattedDate);
-//
-//       AwesomeNotifications().createNotification(
-//         content: NotificationContent(
-//           id: 1,
-//           channelKey: 'task_deadline_channel',
-//           title: 'hello',
-//           body: 'Task deadline is about to end',
-//           color: Color(0xFF635985),
-//         ),
-//         schedule: NotificationCalendar.fromDate(
-//           date: notificationDate,
-//         ),
-//       );
-//       return Future.value(true);
-//     }
-//     return Future.value(false);
-//   });
-// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,26 +29,6 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
   MobileAds.instance.initialize();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // await AwesomeNotifications().initialize(
-  //   'resource://drawable/res_app_icon',
-  //   [
-  //     NotificationChannel(
-  //       channelKey: 'task_deadline_channel',
-  //       channelName: 'Deadline notifications ',
-  //       channelDescription:
-  //           'Notifications that the task deadline is about to end',
-  //       importance: NotificationImportance.High,
-  //       playSound: true,
-  //       defaultColor: Colors.deepPurple,
-  //       ledColor: Colors.deepPurple,
-  //       channelShowBadge: true,
-  //     ),
-  //   ],
-  // );
-  // Workmanager().initialize(callbackDispatcher);
   runApp(
     MultiProvider(
       providers: [
@@ -161,17 +116,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // User? currentUser = FirebaseAuth.instance.currentUser;
     initialScreen = HomePage();
-    // if (currentUser != null) {
-    //   setState(() {
-    //     initialScreen = HomePage();
-    //   });
-    // } else {
-    //   setState(() {
-    //     initialScreen = AuthScreen();
-    //   });
-    // }
     setPreferences();
   }
 
@@ -192,7 +137,6 @@ class _MyAppState extends State<MyApp> {
       theme: currentTheme,
       routes: {
         HomePage.routeName: (context) => HomePage(),
-        AuthScreen.routeName: (context) => AuthScreen(),
         StatisticsScreen.routeName: (context) => StatisticsScreen(),
       },
       onGenerateRoute: (settings) {

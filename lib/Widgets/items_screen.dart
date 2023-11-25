@@ -142,12 +142,13 @@ class _ItemsScreenState extends State<ItemsScreen> {
         );
       },
       separatorBuilder: (BuildContext context, int index) {
-        if (index == randomNumber)
+        if (index == randomNumber) {
           return _getAdWidget();
-        else
-          return SizedBox(
+        } else {
+          return const SizedBox(
             height: 0,
           );
+        }
       },
     );
   }

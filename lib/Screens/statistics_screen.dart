@@ -51,14 +51,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                       Text(
                         AppLocalizations.of(context).translate("Statistics"),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       )
                     ],
@@ -70,7 +70,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           } else {
                             statistics = snapshot.data;
                             return StatisticsGraphs(statistics: statistics!);

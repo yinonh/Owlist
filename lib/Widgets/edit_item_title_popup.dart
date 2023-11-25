@@ -22,12 +22,6 @@ class _EditItemDialogState extends State<EditItemDialog> {
         style: Theme.of(context).textTheme.titleMedium,
       ),
       content: TextField(
-        // decoration: InputDecoration(
-        // labelText: 'Username',
-        // labelStyle: TextStyle(color: Colors.grey),
-        // enabledBorder: UnderlineInputBorder(
-        // borderSide: BorderSide(color: Colors.red),
-        // ),),
         maxLength: 35,
         autofocus: true,
         decoration: InputDecoration(

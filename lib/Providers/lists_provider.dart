@@ -795,15 +795,10 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     itemsDone = withoutDeadlineLists.fold(
         itemsDone, (total, list) => total + list.accomplishedItems);
 
-    var itemsNotDone = activeItems.fold(
-        0, (total, list) => total + list.totalItems - list.accomplishedItems);
-    itemsDone = achievedItems.fold(itemsDone,
-        (total, list) => total + list.totalItems - list.accomplishedItems);
-    itemsDone = withoutDeadlineLists.fold(itemsDone,
-        (total, list) => total + list.totalItems - list.accomplishedItems);
-
     final itemsDelayed = achievedItems.fold(
         0, (total, list) => total + list.totalItems - list.accomplishedItems);
+
+    final itemsNotDone = totalItems - itemsDone - itemsDelayed;
 
     final statistics = {
       'totalLists': activeItems.length +

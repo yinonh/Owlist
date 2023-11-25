@@ -14,7 +14,6 @@ import '../Providers/lists_provider.dart';
 
 class SingleListScreen extends StatefulWidget {
   final String listId;
-  //final ToDoList list;
   static const routeName = '/single_list_screen';
 
   SingleListScreen({required this.listId, Key? key}) : super(key: key);
@@ -37,7 +36,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
     super.initState();
     initListDate();
     editMode = false;
-    //getList();
   }
 
   void initListDate() async {
@@ -70,28 +68,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
       editMode = !editMode;
     });
   }
-
-  // void getList() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
-
-  // @override
-  // void didUpdateWidget(SingleListScreen oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   // Check if the deadline has changed and update the UI accordingly
-  //   if (widget.list.deadline != oldWidget.list.deadline) {
-  //     newDeadline = widget.list.deadline;
-  //   }
-  //   if (widget.list.title != oldWidget.list.title) {
-  //     _titleController.text = widget.list.title;
-  //   }
-  // }
 
   void _showNewItemDialog(BuildContext context) {
     showDialog(
@@ -234,8 +210,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
                 children: [
                   Container(
                     height: 75,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 24.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -263,14 +239,14 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 child: TextField(
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 19.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                   maxLength: 25,
                                   // Set the maximum length
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     counterText:
                                         "", // Hide the character counter
                                     // border: InputBorder.none,
@@ -280,7 +256,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                             : Flexible(
                                 child: Text(
                                   _titleController.text,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 24.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -290,27 +266,28 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               ),
                         editMode
                             ? IconButton(
-                                icon: Icon(Icons.save, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.save, color: Colors.white),
                                 onPressed: () {
                                   _save();
                                 },
                               )
                             : IconButton(
-                                icon: Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: toggleEditMode,
                               ),
                       ],
                     ),
                   ),
                   isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      //To DO: change the height to be calculated
+                      ? const Center(child: CircularProgressIndicator())
                       : Stack(
                           alignment: Alignment.center,
                           children: [
                             Column(
                               children: [
-                                Container(
+                                SizedBox(
                                   height: MediaQuery.of(context).size.height -
                                       MediaQuery.of(context).padding.top -
                                       (75 + 40),
@@ -326,7 +303,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                     updateSingleListScreen: initListDate,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 40,
                                 )
                               ],

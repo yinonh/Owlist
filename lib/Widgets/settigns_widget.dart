@@ -61,7 +61,7 @@ class _SettingsState extends State<Settings> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     AppLocalizations.of(context).translate("Choose language:"),
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
@@ -105,7 +105,7 @@ class _SettingsState extends State<Settings> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     "Switch to ${MyApp.isDark(context) ? "light" : "dark"} mode: ",
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
@@ -131,7 +131,7 @@ class _SettingsState extends State<Settings> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           ElevatedButton(

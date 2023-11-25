@@ -13,9 +13,6 @@ class StatisticsGraphs extends StatefulWidget {
 }
 
 class _StatisticsGraphsState extends State<StatisticsGraphs> {
-  int touchedListIndex = -1;
-  int touchedItemIndex = -1;
-
   @override
   Widget build(BuildContext context) {
     final listsStatisticList = showingListSections(widget.statistics);
@@ -38,21 +35,6 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             width: double.infinity,
             child: PieChart(
               PieChartData(
-                pieTouchData: PieTouchData(
-                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                    setState(() {
-                      if (!event.isInterestedForInteractions ||
-                          pieTouchResponse == null ||
-                          pieTouchResponse.touchedSection == null) {
-                        touchedListIndex = -1;
-                        return;
-                      }
-                      touchedListIndex = listsStatisticList.indexOf(
-                          pieTouchResponse.touchedSection!.props[0]
-                              as PieChartSectionData);
-                    });
-                  },
-                ),
                 borderData: FlBorderData(
                   show: false,
                 ),
@@ -75,21 +57,6 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             width: double.infinity,
             child: PieChart(
               PieChartData(
-                pieTouchData: PieTouchData(
-                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                    setState(() {
-                      if (!event.isInterestedForInteractions ||
-                          pieTouchResponse == null ||
-                          pieTouchResponse.touchedSection == null) {
-                        touchedItemIndex = -1;
-                        return;
-                      }
-                      touchedItemIndex = itemsStatisticList.indexOf(
-                          pieTouchResponse.touchedSection!.props[0]
-                              as PieChartSectionData);
-                    });
-                  },
-                ),
                 sectionsSpace: 0,
                 centerSpaceRadius: 40,
                 sections: itemsStatisticList,
@@ -103,29 +70,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
 
   List<PieChartSectionData> showingListSections(Map<String, int>? statistics) {
     return List.generate(3, (i) {
-      final isTouched = i == touchedListIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
+      final radius = 50.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       switch (i) {
         case 0:
           return PieChartSectionData(
             color: Theme.of(context).highlightColor,
             value: statistics!['withoutDeadline']!.toDouble(),
-            // badgeWidget: Container(
-            //   padding: EdgeInsets.symmetric(horizontal: 5),
-            //   child: Text(
-            //       AppLocalizations.of(context).translate("Without Deadline"),
-            //       style: TextStyle(
-            //         color: Colors.white,
-            //       )),
-            // ),
-            // badgePositionPercentageOffset: 1.4,
             title:
                 'Without Deadline: ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: shadows,
@@ -135,16 +90,10 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           return PieChartSectionData(
             color: Theme.of(context).focusColor,
             value: (statistics!['activeLists']!).toDouble(),
-            // badgeWidget: Text("Active",
-            //     style: TextStyle(
-            //       color: Colors.white,
-            //     )),
-            // badgePositionPercentageOffset: 1.8,
             title:
                 'Active: ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: shadows,
@@ -154,18 +103,10 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           return PieChartSectionData(
             color: Theme.of(context).primaryColorLight,
             value: statistics!['listsDone']!.toDouble(),
-            // badgeWidget: Text(
-            //   "Archived",
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // badgePositionPercentageOffset: 1.4,
             title:
                 'Archived: ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: shadows,
@@ -179,25 +120,15 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
 
   List<PieChartSectionData> showingItemsSections(Map<String, int>? statistics) {
     return List.generate(3, (i) {
-      final isTouched = i == touchedItemIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       switch (i) {
         case 0:
           return PieChartSectionData(
-            // badgeWidget: Text(
-            //   "In Process",
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // badgePositionPercentageOffset: 1.3,
             color: Theme.of(context).highlightColor,
             value: widget.statistics['itemsNotDone']!.toDouble(),
             title:
                 "In Process: ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: shadows,
@@ -206,19 +137,11 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           );
         case 1:
           return PieChartSectionData(
-            // badgeWidget: Text(
-            //   "Delayed",
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // badgePositionPercentageOffset: 1.6,
             color: Theme.of(context).focusColor,
             value: widget.statistics['itemsDelayed']!.toDouble(),
             title:
                 "Delayed: ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: [Shadow(color: Colors.black, blurRadius: 2)],
@@ -227,19 +150,11 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
           );
         case 2:
           return PieChartSectionData(
-            // badgeWidget: Text(
-            //   "Done",
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // badgePositionPercentageOffset: 1.6,
             color: Theme.of(context).primaryColorLight,
             value: widget.statistics['itemsDone']!.toDouble(),
             title:
                 "Done: ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)} %",
-            titleStyle: TextStyle(
-              fontSize: fontSize,
+            titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: [Shadow(color: Colors.black, blurRadius: 2)],

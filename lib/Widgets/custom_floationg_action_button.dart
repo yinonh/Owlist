@@ -39,7 +39,7 @@ class CustomFloatingActionButton extends StatelessWidget {
                 )
               ],
               borderRadius: const BorderRadius.all(Radius.circular(18)),
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [

@@ -13,7 +13,6 @@ import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
 import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
-import '../Screens/auth_screen.dart';
 
 enum FilterBy {
   creationLTN,
