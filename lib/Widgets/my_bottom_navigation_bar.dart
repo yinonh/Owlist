@@ -179,7 +179,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                         title: Text(
                           AppLocalizations.of(context)
                               .translate("Enter list title"),
-                          style: TextStyle(color: Color(0xFF635985)),
+                          style: TextStyle(
+                              color: Color(0xFF635985),
+                              fontWeight: FontWeight.bold),
                         ),
                         content: StatefulBuilder(
                           builder:

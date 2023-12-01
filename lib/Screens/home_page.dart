@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:to_do/main.dart';
 
+import '../Providers/notification_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
@@ -32,6 +33,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late ListsProvider provider;
+  late NotificationProvider notificationProvider;
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
@@ -53,51 +55,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> setUpNotifications() async {
-    // final fcm = FirebaseMessaging.instance;
-    // AwesomeNotifications().isNotificationAllowed().then(
-    //   (isAllowed) {
-    //     if (!isAllowed) {
-    //       showDialog(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //           title: Text(
-    //             AppLocalizations.of(context).translate("Allow Notifications"),
-    //           ),
-    //           content: Text(
-    //             AppLocalizations.of(context)
-    //                 .translate("Our app would like to send you notifications"),
-    //           ),
-    //           actions: [
-    //             TextButton(
-    //               onPressed: () {
-    //                 Navigator.pop(context);
-    //               },
-    //               child: Text(
-    //                 AppLocalizations.of(context).translate("Dont Allow"),
-    //                 style: TextStyle(color: Colors.grey, fontSize: 18),
-    //               ),
-    //             ),
-    //             TextButton(
-    //               onPressed: () => AwesomeNotifications()
-    //                   .requestPermissionToSendNotifications()
-    //                   .then((_) => Navigator.pop(context)),
-    //               child: Text(
-    //                 AppLocalizations.of(context).translate("Allow"),
-    //                 style: TextStyle(
-    //                   color: Color(0xFF636995),
-    //                   fontSize: 18,
-    //                   fontWeight: FontWeight.bold,
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       );
-    //     }
-    //   },
-    // );
-    // final _token = await fcm.getToken();
-    // print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + _token.toString());
+    notificationProvider.setUpNotifications();
+    notificationProvider.isAndroidPermissionGranted();
+    notificationProvider.requestPermissions();
   }
 
   @override
@@ -105,6 +65,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
+    notificationProvider =
+        Provider.of<NotificationProvider>(context, listen: false);
     setUpNotifications();
 
     activeItemsFuture =
@@ -195,6 +157,7 @@ class _HomePageState extends State<HomePage> {
   void addItem(String title, DateTime deadline, bool hasDeadline) {
     setState(() {
       if (hasDeadline) {
+        notificationProvider.scheduleNotification(deadline, title, context);
         onItemTapped(0);
         activeItemsFuture = activeItemsFuture.then((activeItems) {
           return provider.createNewList(title, deadline, hasDeadline).then((_) {

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
+import 'package:to_do/Providers/notification_provider.dart';
 // import 'package:workmanager/workmanager.dart';
 
 import 'themes.dart';
@@ -25,6 +25,7 @@ import './Providers/item_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
@@ -32,6 +33,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
         ChangeNotifierProvider(create: (context) => ListsProvider()),
         ChangeNotifierProvider(create: (context) => ItemProvider()),
       ],
@@ -122,50 +124,53 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: _locale,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        ...GlobalMaterialLocalizations.delegates,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('he', 'IL'),
-      ],
-      theme: currentTheme,
-      routes: {
-        HomePage.routeName: (context) => HomePage(),
-        StatisticsScreen.routeName: (context) => StatisticsScreen(),
-      },
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case SingleListScreen.routeName:
-            {
-              return MaterialPageRoute(builder: (context) {
-                return SingleListScreen(
-                  listId: settings.arguments as String,
-                );
-              });
-            }
-          case ContentScreen.routeName:
-            {
-              // Extract the arguments map from settings
-              final Map<String, dynamic> args =
-                  settings.arguments as Map<String, dynamic>;
+    return ChangeNotifierProvider(
+      create: (context) => NotificationProvider(),
+      child: MaterialApp(
+        locale: _locale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('he', 'IL'),
+        ],
+        theme: currentTheme,
+        routes: {
+          HomePage.routeName: (context) => HomePage(),
+          StatisticsScreen.routeName: (context) => StatisticsScreen(),
+        },
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case SingleListScreen.routeName:
+              {
+                return MaterialPageRoute(builder: (context) {
+                  return SingleListScreen(
+                    listId: settings.arguments as String,
+                  );
+                });
+              }
+            case ContentScreen.routeName:
+              {
+                // Extract the arguments map from settings
+                final Map<String, dynamic> args =
+                    settings.arguments as Map<String, dynamic>;
 
-              return MaterialPageRoute(builder: (context) {
-                return ContentScreen(
-                  id: args['id'] as String,
-                  updateSingleListScreen:
-                      args['updateSingleListScreen'] as Function,
-                );
-              });
-            }
-        }
-      },
-      home: initialScreen,
+                return MaterialPageRoute(builder: (context) {
+                  return ContentScreen(
+                    id: args['id'] as String,
+                    updateSingleListScreen:
+                        args['updateSingleListScreen'] as Function,
+                  );
+                });
+              }
+          }
+        },
+        home: initialScreen,
+      ),
     );
   }
 }
