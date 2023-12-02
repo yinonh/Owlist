@@ -37,7 +37,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => ListsProvider()),
         ChangeNotifierProvider(create: (context) => ItemProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }

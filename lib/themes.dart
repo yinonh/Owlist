@@ -50,6 +50,7 @@ final ThemeData lightTheme = ThemeData(
     side: BorderSide.none,
   ),
   switchTheme: SwitchThemeData(
+    trackOutlineColor: MaterialStateProperty.all<Color>(Colors.transparent),
     trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
   ),
   progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -60,6 +61,18 @@ final ThemeData lightTheme = ThemeData(
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
         foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF635985))),
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ButtonStyle(
+      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+        (Set<MaterialState> states) {
+          if (states.contains(MaterialState.disabled)) {
+            return Color(0xFF38363b);
+          }
+          return Color(0xFF635985);
+        },
+      ),
+    ),
   ),
   datePickerTheme: DatePickerThemeData(
     yearBackgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -128,6 +141,11 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     titleLarge: TextStyle(color: Colors.grey, fontSize: 17
         // fontWeight: FontWeight.bold,
         ),
+    // bodyMedium: TextStyle(
+    //   color: Color(0xFF635985),
+    //   fontSize: 18.0,
+    //   fontWeight: FontWeight.bold,
+    // ),
     headlineSmall: TextStyle(color: Colors.white, fontSize: 17),
   ),
   colorScheme: ColorScheme.fromSwatch(
@@ -148,6 +166,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     side: BorderSide.none,
   ),
   switchTheme: SwitchThemeData(
+    trackOutlineColor: MaterialStateProperty.all<Color>(Colors.transparent),
     trackColor: MaterialStateProperty.all<Color>(Colors.black),
   ),
   progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -158,6 +177,34 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
         foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF9685D9))),
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ButtonStyle(
+      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+        (Set<MaterialState> states) {
+          if (states.contains(MaterialState.disabled)) {
+            return Color(0xFF38363b);
+          }
+          return Color(0xFF635985);
+        },
+      ),
+      // textStyle: MaterialStateProperty.resolveWith<TextStyle>(
+      //   (Set<MaterialState> states) {
+      //     if (states.contains(MaterialState.disabled)) {
+      //       return TextStyle(
+      //         color: Colors.grey,
+      //         fontSize: 18.0,
+      //         fontWeight: FontWeight.bold,
+      //       );
+      //     }
+      //     return TextStyle(
+      //       color: Color(0xFF9685D9),
+      //       fontSize: 18.0,
+      //       fontWeight: FontWeight.bold,
+      //     );
+      //   },
+      // ),
+    ),
   ),
 
   datePickerTheme: DatePickerThemeData(

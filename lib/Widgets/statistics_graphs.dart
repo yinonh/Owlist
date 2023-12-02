@@ -30,20 +30,31 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               color: Colors.white,
             ),
           ),
-          Container(
-            height: 250,
-            width: double.infinity,
-            child: PieChart(
-              PieChartData(
-                borderData: FlBorderData(
-                  show: false,
+          widget.statistics['totalLists'] == 0
+              ? Container(
+                  height: 250,
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      "No Data",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 250,
+                  width: double.infinity,
+                  child: PieChart(
+                    PieChartData(
+                      borderData: FlBorderData(
+                        show: false,
+                      ),
+                      sectionsSpace: 0,
+                      centerSpaceRadius: 40,
+                      sections: listsStatisticList,
+                    ),
+                  ),
                 ),
-                sectionsSpace: 0,
-                centerSpaceRadius: 40,
-                sections: listsStatisticList,
-              ),
-            ),
-          ),
           Text(
             AppLocalizations.of(context).translate("Items Data:"),
             style: TextStyle(
@@ -52,17 +63,28 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               color: Colors.white,
             ),
           ),
-          Container(
-            height: 250,
-            width: double.infinity,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 0,
-                centerSpaceRadius: 40,
-                sections: itemsStatisticList,
-              ),
-            ),
-          ),
+          widget.statistics['totalItems'] == 0
+              ? Container(
+                  height: 250,
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      "No Data",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 250,
+                  width: double.infinity,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 0,
+                      centerSpaceRadius: 40,
+                      sections: itemsStatisticList,
+                    ),
+                  ),
+                ),
         ],
       ),
     );

@@ -6,20 +6,26 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:flutter_timezone/flutter_timezone.dart';
+// import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
+
+import '../Widgets/notification_time.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
   late SharedPreferences _prefs;
   int _notificationCounter = 0;
+  late NotificationTime _notificationTime;
+  late bool isActive;
 
   FlutterLocalNotificationsPlugin get flutterLocalNotificationsPlugin =>
       _flutterLocalNotificationsPlugin;
 
   bool get notificationsEnabled => _notificationsEnabled;
+
+  NotificationTime get notificationTime => _notificationTime;
 
   NotificationProvider() {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -29,10 +35,27 @@ class NotificationProvider with ChangeNotifier {
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
     _notificationCounter = _prefs.getInt('notification_counter') ?? 0;
+    int storedTime = _prefs.getInt('notification_time') ?? 120000;
+    _notificationTime = NotificationTime.fromInt(storedTime);
+    isActive = _prefs.getBool('notification_active') ?? true;
+    notifyListeners();
+  }
+
+  Future<void> saveNotificationTimeToPrefs(NotificationTime time) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _notificationTime = time;
+    await prefs.setInt('notification_time', time.toInt());
+    notifyListeners();
   }
 
   Future<void> _saveCounter() async {
     await _prefs.setInt('notification_counter', _notificationCounter);
+  }
+
+  Future<void> saveActive(bool isActive) async {
+    this.isActive = isActive;
+    await _prefs.setBool('notification_active', isActive);
+    notifyListeners();
   }
 
   Future<void> setUpNotifications() async {
@@ -66,19 +89,26 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> requestPermissions() async {
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    if (isActive) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
 
-    final bool? grantedNotificationPermission =
-        await androidImplementation?.requestPermission();
+      final bool? grantedNotificationPermission =
+          await androidImplementation?.requestPermission();
 
-    _notificationsEnabled = grantedNotificationPermission ?? false;
-    notifyListeners();
+      _notificationsEnabled = grantedNotificationPermission ?? false;
+      notifyListeners();
+    }
   }
 
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  Future<void> cancelAllNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   String getRandomNotification() {
@@ -101,23 +131,26 @@ class NotificationProvider with ChangeNotifier {
 
   void scheduleNotification(
       DateTime deadline, String title, BuildContext context) async {
+    if (!isActive) return;
     deadline = deadline.subtract(Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
       deadline.year,
       deadline.month,
       deadline.day,
-      12, // Hour
-      0, // Minute
-      0, // Second
+      _notificationTime.hour, // Hour
+      _notificationTime.minute, // Minute
+      _notificationTime.second, // Second
     );
+    if (scheduledTime.isBefore(DateTime.now())) return;
     _saveCounter();
-    String formattedTime = DateFormat.jm().format(scheduledTime);
+    String formattedDateTime =
+        DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
 
     // Display Snackbar with the scheduled time
     final snackBar = SnackBar(
       content: Text(
-        'Scheduled time: $formattedTime',
+        'Scheduled time: $formattedDateTime',
         style: TextStyle(color: Colors.white),
       ),
       backgroundColor:

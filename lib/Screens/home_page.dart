@@ -55,9 +55,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> setUpNotifications() async {
-    notificationProvider.setUpNotifications();
-    notificationProvider.isAndroidPermissionGranted();
-    notificationProvider.requestPermissions();
+    await notificationProvider.setUpNotifications();
   }
 
   @override
@@ -155,6 +153,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addItem(String title, DateTime deadline, bool hasDeadline) {
+    notificationProvider.isAndroidPermissionGranted();
+    notificationProvider.requestPermissions();
     setState(() {
       if (hasDeadline) {
         notificationProvider.scheduleNotification(deadline, title, context);
@@ -250,8 +250,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       currentIndex == 3
-                          ? SizedBox(
-                              width: 10,
+                          ? Text(
+                              " ",
+                              style: TextStyle(fontSize: 33),
                             )
                           : PopupMenuButton<FilterBy>(
                               icon: const Icon(Icons.filter_list),
