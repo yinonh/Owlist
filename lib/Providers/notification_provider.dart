@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 // import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do/Models/to_do_list.dart';
 import 'dart:math';
 
 import '../Widgets/notification_time.dart';
@@ -16,7 +17,6 @@ class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
   late SharedPreferences _prefs;
-  int _notificationCounter = 0;
   late NotificationTime _notificationTime;
   late bool isActive;
 
@@ -34,7 +34,6 @@ class NotificationProvider with ChangeNotifier {
 
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
-    _notificationCounter = _prefs.getInt('notification_counter') ?? 0;
     int storedTime = _prefs.getInt('notification_time') ?? 120000;
     _notificationTime = NotificationTime.fromInt(storedTime);
     isActive = _prefs.getBool('notification_active') ?? true;
@@ -46,10 +45,6 @@ class NotificationProvider with ChangeNotifier {
     _notificationTime = time;
     await prefs.setInt('notification_time', time.toInt());
     notifyListeners();
-  }
-
-  Future<void> _saveCounter() async {
-    await _prefs.setInt('notification_counter', _notificationCounter);
   }
 
   Future<void> saveActive(bool isActive) async {
@@ -129,45 +124,23 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  void scheduleNotification(
-      DateTime deadline, String title, BuildContext context) async {
-    if (!isActive) return;
-    deadline = deadline.subtract(Duration(days: 1));
+  Future<String?> scheduleNotification(ToDoList list) async {
+    if (!isActive) return null;
+    list.deadline = list.deadline.subtract(Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
-      deadline.year,
-      deadline.month,
-      deadline.day,
+      list.deadline.year,
+      list.deadline.month,
+      list.deadline.day,
       _notificationTime.hour, // Hour
       _notificationTime.minute, // Minute
       _notificationTime.second, // Second
     );
-    if (scheduledTime.isBefore(DateTime.now())) return;
-    _saveCounter();
-    String formattedDateTime =
-        DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
-
-    // Display Snackbar with the scheduled time
-    final snackBar = SnackBar(
-      content: Text(
-        'Scheduled time: $formattedDateTime',
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor:
-          Theme.of(context).highlightColor, // Change background color
-      duration: const Duration(seconds: 3), // Set duration
-      behavior: SnackBarBehavior.floating, // Change behavior to floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Add border radius
-      ),
-      elevation: 6, // Add elevation
-      margin: const EdgeInsets.all(10), // Add margin
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (scheduledTime.isBefore(DateTime.now())) return null;
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      _notificationCounter++,
-      title,
+      list.notificationIndex,
+      list.title,
       getRandomNotification(),
       scheduledTime,
       const NotificationDetails(
@@ -184,5 +157,7 @@ class NotificationProvider with ChangeNotifier {
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+
+    return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
   }
 }

@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-
-// import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:to_do/main.dart';
 
 import '../Providers/notification_provider.dart';
+import '../Widgets/notification_time.dart';
 import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
@@ -33,7 +29,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late ListsProvider provider;
-  late NotificationProvider notificationProvider;
+  // late NotificationProvider notificationProvider;
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
@@ -54,19 +50,19 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  Future<void> setUpNotifications() async {
-    await notificationProvider.setUpNotifications();
-  }
+  // Future<void> setUpNotifications() async {
+  //   await notificationProvider.setUpNotifications();
+  // }
 
   @override
   void initState() {
     super.initState();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
-    notificationProvider =
-        Provider.of<NotificationProvider>(context, listen: false);
-    setUpNotifications();
-
+    // notificationProvider =
+    //     Provider.of<NotificationProvider>(context, listen: false);
+    // setUpNotifications();
+    Provider.of<ListsProvider>(context, listen: false).initialization(context);
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -131,6 +127,27 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void showMessage(String text) {
+    // Display Snackbar with the scheduled time
+    final snackBar = SnackBar(
+      content: Text(
+        text,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor:
+          Theme.of(context).highlightColor, // Change background color
+      duration: const Duration(seconds: 2), // Set duration
+      behavior: SnackBarBehavior.floating, // Change behavior to floating
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10), // Add border radius
+      ),
+      elevation: 6, // Add elevation
+      margin: const EdgeInsets.all(10), // Add margin
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void deleteItem(ToDoList item) {
     setState(() {
       activeItemsFuture = activeItemsFuture.then((activeItems) {
@@ -150,17 +167,24 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
+    if (item.hasDeadline) {
+      Provider.of<NotificationProvider>(context, listen: false)
+          .cancelNotification(item.notificationIndex);
+      showMessage('The notification for this list was canceled');
+    }
   }
 
   void addItem(String title, DateTime deadline, bool hasDeadline) {
-    notificationProvider.isAndroidPermissionGranted();
-    notificationProvider.requestPermissions();
     setState(() {
       if (hasDeadline) {
-        notificationProvider.scheduleNotification(deadline, title, context);
         onItemTapped(0);
         activeItemsFuture = activeItemsFuture.then((activeItems) {
-          return provider.createNewList(title, deadline, hasDeadline).then((_) {
+          return provider
+              .createNewList(title, deadline, hasDeadline)
+              .then((result) {
+            if (result != null) {
+              showMessage("Schedule notification for: ${result}");
+            }
             return provider.getActiveItems();
           });
         });

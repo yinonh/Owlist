@@ -131,8 +131,8 @@ class _SettingsState extends State<Settings> {
                 child: Transform.scale(
                   scale: 1,
                   child: Switch(
-                    // activeThumbImage: AssetImage('Assets/darkMode.png'),
-                    // inactiveThumbImage: AssetImage('Assets/lightMode.png'),
+                    activeThumbImage: AssetImage('Assets/darkMode.png'),
+                    inactiveThumbImage: AssetImage('Assets/lightMode.png'),
                     onChanged: (mode) async {
                       WidgetsBinding.instance!.addPostFrameCallback((_) {
                         MyApp.setTheme(context);

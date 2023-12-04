@@ -311,21 +311,32 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 // import 'package:awesome_notifications/awesome_notifications.dart';
 
+import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import './list_abstract.dart';
 
 const VERSION = 1;
 
-class ListsProvider extends ListProviderAbstract with ChangeNotifier {
+class ListsProvider extends ChangeNotifier {
   Database? _database;
   List<ToDoList>? _activeItemsCache;
   List<ToDoList>? _achievedItemsCache;
   List<ToDoList>? _withoutDeadlineItemsCache;
+  late NotificationProvider notificationProvider;
+  late BuildContext context;
+
+  initialization(BuildContext context) async {
+    this.context = context;
+    notificationProvider =
+        Provider.of<NotificationProvider>(context, listen: false);
+    await notificationProvider.setUpNotifications();
+  }
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -386,32 +397,6 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
       print("Error printing table columns: $error");
     }
   }
-
-  // Future<Database> get database async {
-  //   if (_database != null) return _database!;
-  //   _database = await initDB();
-  //   return _database!;
-  // }
-  //
-  // initDB() async {
-  //   return await sql.openDatabase(
-  //     path.join(await sql.getDatabasesPath(), 'to_do.db'),
-  //     onCreate: (db, version) async {
-  //       await db.execute('''
-  //         CREATE TABLE todo_lists(
-  //           id TEXT PRIMARY KEY,
-  //           title TEXT,
-  //           creationDate TEXT,
-  //           deadline TEXT,
-  //           hasDeadline INTEGER,
-  //           totalItems INTEGER,
-  //           accomplishedItems INTEGER
-  //         )
-  //       ''');
-  //     },
-  //     version: 1,
-  //   );
-  // }
 
   Future<List<ToDoList>> getActiveItems() async {
     if (_activeItemsCache != null) {
@@ -542,31 +527,13 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
       final Database db = await database;
       // Insert the new list into the SQLite database
       await db.insert('todo_lists', newList.toMap());
-
-      if (newList.hasDeadline) {
-        // Add local notification logic using flutter_local_notifications package.
-        // await AwesomeNotifications().createNotification(
-        //   content: NotificationContent(
-        //     id: newList.notificationIndex,
-        //     channelKey: 'task_deadline_channel',
-        //     title: '${newList.title}',
-        //     body: 'Task deadline is about to end',
-        //     color: Color(0xFF635985),
-        //     // groupKey: "1",
-        //   ),
-        //   schedule: NotificationCalendar.fromDate(
-        //     date: DateTime.now().add(
-        //       Duration(seconds: 30),
-        //     ),
-        //   ),
-        // );
-      }
+      return null;
     } catch (e) {
       print('Error adding new list: $e');
     }
   }
 
-  Future<void> createNewList(
+  Future<String?> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
     try {
       final Database db = await database;
@@ -592,6 +559,11 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
         invalidateCache();
         notifyListeners();
       });
+      if (newList.hasDeadline) {
+        notificationProvider.isAndroidPermissionGranted();
+        notificationProvider.requestPermissions();
+        return await notificationProvider.scheduleNotification(newList);
+      }
     } catch (error) {
       print("Error adding new item: $error");
     }
@@ -620,7 +592,6 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
         where: 'id = ?',
         whereArgs: [listId],
       );
-
       // Close the database
       // await db.close();
 
@@ -686,7 +657,7 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
     }
   }
 
-  Future<void> editDeadline(String listId, DateTime? newDeadline) async {
+  Future<void> editDeadline(ToDoList list, DateTime? newDeadline) async {
     if (newDeadline == null) {
       return;
     }
@@ -699,7 +670,7 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
         'todo_lists',
         columns: ['deadline'],
         where: 'id = ?',
-        whereArgs: [listId],
+        whereArgs: [list.id],
       );
 
       if (result.isNotEmpty) {
@@ -712,14 +683,17 @@ class ListsProvider extends ListProviderAbstract with ChangeNotifier {
             'deadline': DateFormat('yyyy-MM-dd').format(newDeadline),
           },
           where: 'id = ?',
-          whereArgs: [listId],
+          whereArgs: [list.id],
         );
+
+        notificationProvider.cancelNotification(list.notificationIndex);
+        notificationProvider.scheduleNotification(list);
 
         // Invalidate cache and notify listeners to reflect the changes
         invalidateCache();
         notifyListeners();
       } else {
-        print('Item with ID $listId not found!');
+        print('Item with ID ${list.id} not found!');
       }
     } catch (e) {
       print('Error updating the deadline: $e');

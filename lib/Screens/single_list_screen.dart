@@ -148,7 +148,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
     if (list!.deadline != newDeadline) {
       await Provider.of<ListsProvider>(context, listen: false)
-          .editDeadline(list!.id, newDeadline);
+          .editDeadline(list!, newDeadline);
     }
     if (list!.title != _titleController.text) {
       await Provider.of<ListsProvider>(context, listen: false)
