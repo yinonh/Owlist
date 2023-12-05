@@ -98,8 +98,29 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+  Future<bool> cancelNotification(int id, [DateTime? deadline]) async {
+    bool notificationExists = true;
+    if (deadline != null) {
+      final pendingNotifications =
+          await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+
+      notificationExists =
+          pendingNotifications.any((notification) => notification.id == id);
+      final notificationTime = DateTime(
+          deadline.year,
+          deadline.month,
+          deadline.subtract(Duration(days: 1)).day,
+          _notificationTime.hour,
+          _notificationTime.minute,
+          0);
+      if (notificationTime.isBefore(DateTime.now())) return false;
+    }
+
+    if (notificationExists) {
+      await flutterLocalNotificationsPlugin.cancel(id);
+      return true;
+    }
+    return false;
   }
 
   Future<void> cancelAllNotifications() async {
@@ -126,12 +147,12 @@ class NotificationProvider with ChangeNotifier {
 
   Future<String?> scheduleNotification(ToDoList list) async {
     if (!isActive) return null;
-    list.deadline = list.deadline.subtract(Duration(days: 1));
+    final deadline = list.deadline.subtract(Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
-      list.deadline.year,
-      list.deadline.month,
-      list.deadline.day,
+      deadline.year,
+      deadline.month,
+      deadline.day,
       _notificationTime.hour, // Hour
       _notificationTime.minute, // Minute
       _notificationTime.second, // Second

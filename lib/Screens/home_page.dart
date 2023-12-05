@@ -148,29 +148,31 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void deleteItem(ToDoList item) {
+  Future<void> deleteItem(ToDoList item) async {
     setState(() {
       activeItemsFuture = activeItemsFuture.then((activeItems) {
-        return provider.deleteList(item.id).then((_) {
+        return provider.deleteList(item).then((_) {
           return provider.getActiveItems();
         });
       });
       achievedItemsFuture = achievedItemsFuture.then((achievedItems) {
-        return provider.deleteList(item.id).then((_) {
+        return provider.deleteList(item).then((_) {
           return provider.getAchievedItems();
         });
       });
       withoutDeadlineItemsFuture =
           withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
-        return provider.deleteList(item.id).then((_) {
+        return provider.deleteList(item).then((_) {
           return provider.getWithoutDeadlineItems();
         });
       });
     });
     if (item.hasDeadline) {
-      Provider.of<NotificationProvider>(context, listen: false)
-          .cancelNotification(item.notificationIndex);
-      showMessage('The notification for this list was canceled');
+      bool notificationExsist =
+          await Provider.of<NotificationProvider>(context, listen: false)
+              .cancelNotification(item.notificationIndex, item.deadline);
+      if (notificationExsist)
+        showMessage('The notification for this list was canceled');
     }
   }
 
