@@ -241,7 +241,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 19.0,
+                                    fontSize: 12.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),

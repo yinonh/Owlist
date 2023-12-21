@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
-import '../Providers/item_provider.dart';
-import '../l10n/app_localizations.dart';
+import 'dog_ear_list_tile.dart';
 
 class ToDoItemWidget extends StatefulWidget {
   final ToDoItem item;
@@ -75,8 +73,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       duration: const Duration(milliseconds: 100),
       // decoration: BoxDecoration(),
       child: Dismissible(
+        direction: DismissDirection.startToEnd,
         key: UniqueKey(),
-        direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           widget.deleteItem(widget.item.id, widget.item.done, context);
         },
@@ -84,17 +82,24 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
           return await confirmDismiss(context);
         },
         background: Container(
-          alignment: AlignmentDirectional.centerEnd,
-          color: Colors.red,
+          decoration: BoxDecoration(
+            borderRadius:
+                BorderRadius.circular(10.0), // Adjust the radius as needed
+            color: Colors.red,
+          ),
+          alignment: AlignmentDirectional.centerStart,
           child: const Padding(
             padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-            child: Icon(
-              Icons.delete,
-              color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
-        child: ListTile(
+        child: DogEarListTile(
           onTap: () {
             Navigator.of(context).pushNamed(
               ContentScreen.routeName,

@@ -205,6 +205,8 @@ class _SettingsState extends State<Settings> {
                           ? () {
                               Navigator.of(context).push(
                                 showPicker(
+                                  height: 350,
+                                  is24HrFormat: true,
                                   accentColor: Theme.of(context).highlightColor,
                                   context: context,
                                   showSecondSelector: false,

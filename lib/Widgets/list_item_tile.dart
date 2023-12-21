@@ -122,10 +122,13 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FittedBox(
-                    fit: BoxFit.fitWidth,
-                    child: Text(
-                      widget.item.title,
-                      style: Theme.of(context).textTheme.titleMedium,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: Text(
+                        widget.item.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   IconButton(
