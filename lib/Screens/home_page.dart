@@ -43,8 +43,8 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
 
     titles = [
-      AppLocalizations.of(context).translate("Active Items"),
-      AppLocalizations.of(context).translate("Archived Items"),
+      AppLocalizations.of(context).translate("Active Lists"),
+      AppLocalizations.of(context).translate("Archived Lists"),
       AppLocalizations.of(context).translate("Without Deadline"),
       AppLocalizations.of(context).translate("Settings")
     ];

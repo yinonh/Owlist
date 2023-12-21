@@ -179,9 +179,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                         title: Text(
                           AppLocalizations.of(context)
                               .translate("Enter list title"),
-                          style: TextStyle(
-                              color: Color(0xFF635985),
-                              fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         content: StatefulBuilder(
                           builder:
@@ -252,27 +250,37 @@ class DiamondBottomNavigation extends StatelessWidget {
                           },
                         ),
                         actions: <Widget>[
-                          TextButton(
-                            child: Text(
-                              AppLocalizations.of(context).translate("Cancel"),
-                              style: Theme.of(context).textTheme.titleLarge,
+                          SizedBox(
+                            child: Row(
+                              children: [
+                                TextButton(
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Cancel"),
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate("Save"),
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  onPressed: () {
+                                    if (new_title.text != '') {
+                                      add_item(new_title.text, new_deadline,
+                                          hasDeadline);
+                                    }
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
                             ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              AppLocalizations.of(context).translate("Save"),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            onPressed: () {
-                              if (new_title.text != '') {
-                                add_item(
-                                    new_title.text, new_deadline, hasDeadline);
-                              }
-                              Navigator.of(context).pop();
-                            },
                           ),
                         ],
                       );

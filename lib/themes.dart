@@ -26,7 +26,7 @@ final ThemeData lightTheme = ThemeData(
       fontWeight: FontWeight.bold,
     ),
     titleLarge: TextStyle(
-      color: Colors.grey,
+      color: Colors.grey, fontSize: 15.0, fontWeight: FontWeight.bold,
       // fontWeight: FontWeight.bold,
     ),
     headlineSmall: TextStyle(color: Colors.black, fontSize: 17),
@@ -138,15 +138,19 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     ),
-    titleLarge: TextStyle(color: Colors.grey, fontSize: 17
-        // fontWeight: FontWeight.bold,
-        ),
+    titleLarge: TextStyle(
+      color: Colors.grey, fontSize: 15, fontWeight: FontWeight.bold,
+      // fontWeight: FontWeight.bold,
+    ),
     // bodyMedium: TextStyle(
     //   color: Color(0xFF635985),
     //   fontSize: 18.0,
     //   fontWeight: FontWeight.bold,
     // ),
-    headlineSmall: TextStyle(color: Colors.white, fontSize: 17),
+    headlineSmall: TextStyle(
+      color: Colors.white,
+      fontSize: 17,
+    ),
   ),
   colorScheme: ColorScheme.fromSwatch(
     brightness: Brightness.dark,

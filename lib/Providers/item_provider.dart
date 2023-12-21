@@ -83,7 +83,7 @@ class ItemProvider extends ChangeNotifier {
       'id': DateTime.now().toIso8601String(),
       'listId': listId,
       'title': title,
-      'content': 'enter some text...',
+      'content': '',
       'done': 0,
       'itemIndex': newIndex,
     };

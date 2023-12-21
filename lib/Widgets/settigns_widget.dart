@@ -121,7 +121,11 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    "Switch to ${MyApp.isDark(context) ? "light" : "dark"} mode: ",
+                    MyApp.isDark(context)
+                        ? AppLocalizations.of(context)
+                            .translate("Switch to light mode")
+                        : AppLocalizations.of(context)
+                            .translate("Switch to dark mode"),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -153,12 +157,13 @@ class _SettingsState extends State<Settings> {
           ),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
-                    "Enable notifications: ",
-                    style: TextStyle(
+                    AppLocalizations.of(context)
+                        .translate("Enable notifications:"),
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
@@ -189,7 +194,8 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    "Choose default time for notification: ",
+                    AppLocalizations.of(context)
+                        .translate("Choose default time for notification:"),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -218,7 +224,7 @@ class _SettingsState extends State<Settings> {
                             }
                           : null,
                       child: Text(
-                        "Choose time",
+                        AppLocalizations.of(context).translate("Choose time"),
                         style: _notificationsActive
                             ? Theme.of(context).primaryTextTheme.titleMedium
                             : Theme.of(context)
@@ -254,7 +260,8 @@ class _SettingsState extends State<Settings> {
             height: 25,
           ),
           Text(
-            "All the changes will take effect from now on only",
+            AppLocalizations.of(context)
+                .translate("All the changes will take effect from now on only"),
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme

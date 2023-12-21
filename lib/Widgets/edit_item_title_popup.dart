@@ -40,24 +40,28 @@ class _EditItemDialogState extends State<EditItemDialog> {
         },
       ),
       actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(
-            AppLocalizations.of(context).translate("Cancel"),
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            widget.addNewItem(newTitle); // Use the passed function
-          },
-          child: Text(
-            AppLocalizations.of(context).translate("Add"),
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+        Row(
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                AppLocalizations.of(context).translate("Cancel"),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.addNewItem(newTitle); // Use the passed function
+              },
+              child: Text(
+                AppLocalizations.of(context).translate("Add"),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          ],
         ),
       ],
     );

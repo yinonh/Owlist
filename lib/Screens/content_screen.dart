@@ -163,7 +163,9 @@ class _ContentScreenState extends State<ContentScreen> {
                                           }
                                           if (textEditMode) {
                                             textEditingController.text =
-                                                _item.content;
+                                                _item.content == ''
+                                                    ? "add some content"
+                                                    : _item.content;
                                             toggleTextEditMode();
                                           }
                                         });
@@ -246,7 +248,9 @@ class _ContentScreenState extends State<ContentScreen> {
                               GestureDetector(
                                 onLongPress: toggleTextEditMode,
                                 child: EditableTextView(
-                                    initialText: _item.content,
+                                    initialText: _item.content == ''
+                                        ? "add some content"
+                                        : _item.content,
                                     isEditMode: textEditMode,
                                     toggleEditMode: toggleTextEditMode,
                                     controller: textEditingController),
