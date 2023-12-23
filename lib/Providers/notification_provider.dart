@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
@@ -103,7 +106,6 @@ class NotificationProvider with ChangeNotifier {
     if (deadline != null) {
       final pendingNotifications =
           await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-
       notificationExists =
           pendingNotifications.any((notification) => notification.id == id);
       final notificationTime = DateTime(
@@ -127,18 +129,22 @@ class NotificationProvider with ChangeNotifier {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  String getRandomNotification() {
+  Future<String> getRandomNotificationText() async {
+    String languageCode = _prefs.getString('selectedLanguage') ?? 'en';
+    String jsonString =
+        await rootBundle.loadString('Assets/languages/${languageCode}.json');
+    Map<String, dynamic> jsonMap = json.decode(jsonString);
     List<String> notificationOptions = [
-      "Hurry up! Tomorrow's Deadline!",
-      "⏰ Reminder: Tomorrow's the Deadline!",
-      "Final Call: Task Due Tomorrow!",
-      "Deadline Alert: Due Tomorrow!",
-      "Time's Running Out: Due Tomorrow!",
-      "Don't Forget: Due Tomorrow!",
-      "Last Day Reminder: Due Tomorrow!",
-      "Act Now: Tomorrow's Deadline!",
-      "Urgent Reminder: Due Tomorrow!",
-      "Just One Day Left: Deadline Tomorrow!"
+      jsonMap["Hurry up! Tomorrow's Deadline!"],
+      jsonMap["⏰ Reminder: Tomorrow's the Deadline!"],
+      jsonMap["Final Call: Task Due Tomorrow!"],
+      jsonMap["Deadline Alert: Due Tomorrow!"],
+      jsonMap["Time's Running Out: Due Tomorrow!"],
+      jsonMap["Don't Forget: Due Tomorrow!"],
+      jsonMap["Last Day Reminder: Due Tomorrow!"],
+      jsonMap["Act Now: Tomorrow's Deadline!"],
+      jsonMap["Urgent Reminder: Due Tomorrow!"],
+      jsonMap["Just One Day Left: Deadline Tomorrow!"]
     ];
     final random = Random();
     final index = random.nextInt(notificationOptions.length);
@@ -162,7 +168,7 @@ class NotificationProvider with ChangeNotifier {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       list.notificationIndex,
       list.title,
-      getRandomNotification(),
+      await getRandomNotificationText(),
       scheduledTime,
       const NotificationDetails(
         android: AndroidNotificationDetails(

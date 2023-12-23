@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import 'dog_ear_list_tile.dart';
@@ -31,11 +32,12 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           title: Text(
-            "Confirm Deletion",
+            AppLocalizations.of(context).translate("Confirm Deletion"),
             // Replace with your localization logic
           ),
           content: Text(
-            "Are you sure you want to delete this item?",
+            AppLocalizations.of(context)
+                .translate("Are you sure you want to delete this item?"),
             // Replace with your localization logic
           ),
           actions: [
@@ -44,7 +46,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 Navigator.of(context).pop(false);
               },
               child: Text(
-                "Cancel",
+                AppLocalizations.of(context).translate("Cancel"),
                 // Replace with your localization logic
               ),
             ),
@@ -53,7 +55,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 Navigator.of(context).pop(true);
               },
               child: Text(
-                "Delete",
+                AppLocalizations.of(context).translate("Delete"),
                 style: TextStyle(
                   fontSize: 17,
                   color: Colors.red,

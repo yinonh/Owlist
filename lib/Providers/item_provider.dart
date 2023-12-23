@@ -161,7 +161,8 @@ class ItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleItemDone(String itemId, String listId, bool isDone) async {
+  Future<void> toggleItemDone(
+      String itemId, String listId, bool isDone, BuildContext context) async {
     try {
       // Open or create the SQLite database
       final Database db = await database;
@@ -188,18 +189,24 @@ class ItemProvider extends ChangeNotifier {
         // Fetch the list data to update 'accomplishedItems'
         List<Map<String, dynamic>> listResult = await db.query(
           'todo_lists',
-          columns: ['accomplishedItems'],
+          columns: ['accomplishedItems', 'totalItems', 'notificationIndex'],
           where: 'id = ?',
           whereArgs: [listId],
         );
 
         if (listResult.isNotEmpty) {
           int accomplishedItems = listResult[0]['accomplishedItems'] as int;
+          int totalItems = listResult[0]['totalItems'] as int;
+          int notificationIndex = listResult[0]['notificationIndex'] as int;
 
           if (currentDoneValue) {
             accomplishedItems--;
           } else {
             accomplishedItems++;
+          }
+          if (accomplishedItems == totalItems) {
+            Provider.of<NotificationProvider>(context, listen: false)
+                .cancelNotification(notificationIndex);
           }
 
           // Update 'accomplishedItems' in the todo_lists table

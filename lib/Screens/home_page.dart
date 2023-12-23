@@ -59,9 +59,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
-    // notificationProvider =
-    //     Provider.of<NotificationProvider>(context, listen: false);
-    // setUpNotifications();
     Provider.of<ListsProvider>(context, listen: false).initialization(context);
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
@@ -79,40 +76,36 @@ class _HomePageState extends State<HomePage> {
 
     void sortFunction(List<ToDoList> lists) {
       lists.sort((a, b) {
-        if (filterBy == FilterBy.creationLTN) {
-          return a.creationDate.compareTo(b.creationDate);
-        } else if (filterBy == FilterBy.creationNTL) {
-          return b.creationDate.compareTo(a.creationDate);
-        } else if (filterBy == FilterBy.deadlineLTN) {
-          if (!a.hasDeadline && b.hasDeadline) {
-            return 1;
-          } else if (a.hasDeadline && !b.hasDeadline) {
-            return -1;
-          }
-          return b.deadline.compareTo(a.deadline);
-        } else if (filterBy == FilterBy.deadlineNTL) {
-          if (!a.hasDeadline && b.hasDeadline) {
-            return 1;
-          } else if (a.hasDeadline && !b.hasDeadline) {
-            return -1;
-          }
-          return a.deadline.compareTo(b.deadline);
-        } else if (filterBy == FilterBy.progressBTS) {
-          double progressA =
-              a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems;
-          double progressB =
-              b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems;
-          return progressB
-              .compareTo(progressA); // Sorting by progress in descending order
-        } else if (filterBy == FilterBy.progressSTB) {
-          double progressA =
-              a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems;
-          double progressB =
-              b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems;
-          return progressA
-              .compareTo(progressB); // Sorting by progress in ascending order
+        switch (filterBy) {
+          case FilterBy.creationLTN:
+            return a.creationDate.isBefore(b.creationDate) ? -1 : 1;
+          case FilterBy.creationNTL:
+            return b.creationDate.isBefore(a.creationDate) ? -1 : 1;
+          case FilterBy.deadlineLTN:
+            if (!a.hasDeadline && b.hasDeadline) {
+              return 1;
+            } else if (a.hasDeadline && !b.hasDeadline) {
+              return -1;
+            }
+            return b.deadline.isBefore(a.deadline) ? -1 : 1;
+          case FilterBy.deadlineNTL:
+            if (!a.hasDeadline && b.hasDeadline) {
+              return 1;
+            } else if (a.hasDeadline && !b.hasDeadline) {
+              return -1;
+            }
+            return a.deadline.isBefore(b.deadline) ? -1 : 1;
+          case FilterBy.progressBTS:
+            return (b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems)
+                .compareTo(
+                    a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems);
+          case FilterBy.progressSTB:
+            return (a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems)
+                .compareTo(
+                    b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems);
+          default:
+            return 0; // Default case
         }
-        return 0; // Default case
       });
     }
 

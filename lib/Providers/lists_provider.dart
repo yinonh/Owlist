@@ -175,10 +175,6 @@ class ListsProvider extends ChangeNotifier {
       );
     });
 
-    _achievedItemsCache?.map(
-        (e) => notificationProvider.cancelNotification(e.notificationIndex));
-    print("here");
-
     return _achievedItemsCache ?? [];
   }
 
