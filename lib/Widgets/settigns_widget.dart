@@ -219,6 +219,10 @@ class _SettingsState extends State<Settings> {
                                   value: _time,
                                   onChange: onTimeChanged,
                                   minuteInterval: TimePickerInterval.FIVE,
+                                  okText: AppLocalizations.of(context)
+                                      .translate("Ok"),
+                                  cancelText: AppLocalizations.of(context)
+                                      .translate("Cancel"),
                                 ),
                               );
                             }

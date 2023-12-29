@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<void> deleteItem(ToDoList item) async {
+  Future<void> deleteList(ToDoList item) async {
     setState(() {
       activeItemsFuture = activeItemsFuture.then((activeItems) {
         return provider.deleteList(item).then((_) {
@@ -165,7 +165,8 @@ class _HomePageState extends State<HomePage> {
           await Provider.of<NotificationProvider>(context, listen: false)
               .cancelNotification(item.notificationIndex, item.deadline);
       if (notificationExsist)
-        showMessage('The notification for this list was canceled');
+        showMessage(AppLocalizations.of(context)
+            .translate("The notification for this list was canceled"));
     }
   }
 
@@ -178,7 +179,8 @@ class _HomePageState extends State<HomePage> {
               .createNewList(title, deadline, hasDeadline)
               .then((result) {
             if (result != null) {
-              showMessage("Schedule notification for: ${result}");
+              showMessage(
+                  "${AppLocalizations.of(context).translate("Schedule notification for:")} ${result}");
             }
             return provider.getActiveItems();
           });
@@ -380,7 +382,7 @@ class _HomePageState extends State<HomePage> {
                             return ItemsScreen(
                               selectedIndex: 0,
                               existingItems: snapshot.data!,
-                              deleteItem: deleteItem,
+                              deleteItem: deleteList,
                               refresh: refreshLists,
                             );
                           }
@@ -418,7 +420,7 @@ class _HomePageState extends State<HomePage> {
                             return ItemsScreen(
                               selectedIndex: 1,
                               existingItems: snapshot.data!,
-                              deleteItem: deleteItem,
+                              deleteItem: deleteList,
                               refresh: refreshLists,
                             );
                           }
@@ -456,7 +458,7 @@ class _HomePageState extends State<HomePage> {
                             return ItemsScreen(
                               selectedIndex: 1,
                               existingItems: snapshot.data!,
-                              deleteItem: deleteItem,
+                              deleteItem: deleteList,
                               refresh: refreshLists,
                             );
                           }

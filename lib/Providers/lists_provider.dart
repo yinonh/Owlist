@@ -374,7 +374,6 @@ class ListsProvider extends ChangeNotifier {
           whereArgs: [list.id],
         );
 
-        notificationProvider.cancelNotification(list.notificationIndex);
         notificationProvider.scheduleNotification(list);
 
         // Invalidate cache and notify listeners to reflect the changes

@@ -14,6 +14,10 @@ class DogEarListTile extends StatelessWidget {
     this.onTap,
   }) : super(key: key);
 
+  bool isRTL(BuildContext context) {
+    return Directionality.of(context) == TextDirection.rtl;
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -25,7 +29,7 @@ class DogEarListTile extends StatelessWidget {
             width: 10.0, // Width of the dog-ear
             height: 10.0, // Height of the dog-ear
             child: ClipPath(
-              clipper: DogEarClipper(),
+              clipper: isRTL(context) ? DogEarRTLClipper() : DogEarLTRClipper(),
               child: Container(
                 color: Colors.red, // Dog-ear color
               ),
@@ -45,7 +49,21 @@ class DogEarListTile extends StatelessWidget {
   }
 }
 
-class DogEarClipper extends CustomClipper<Path> {
+class DogEarLTRClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class DogEarRTLClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();

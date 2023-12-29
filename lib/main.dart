@@ -1,21 +1,14 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'package:flutter/services.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
-// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:to_do/Providers/notification_provider.dart';
-// import 'package:workmanager/workmanager.dart';
 
 import 'themes.dart';
 import 'l10n/app_localizations.dart';
-import './Models/to_do_list.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
 import './Screens/statistics_screen.dart';

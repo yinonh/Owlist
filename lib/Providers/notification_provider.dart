@@ -153,6 +153,7 @@ class NotificationProvider with ChangeNotifier {
 
   Future<String?> scheduleNotification(ToDoList list) async {
     if (!isActive) return null;
+    cancelNotification(list.notificationIndex);
     final deadline = list.deadline.subtract(Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
@@ -179,10 +180,9 @@ class NotificationProvider with ChangeNotifier {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      // androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+      // matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );
 
     return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
