@@ -79,8 +79,8 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
 
     final int totalDays =
         widget.item.deadline.difference(widget.item.creationDate).inDays;
-    final int remainingDays =
-        widget.item.deadline.difference(currentDate).inDays;
+    final int remaining =
+        widget.item.deadline.difference(currentDate).inDays + 1;
     double progressPercentage;
     if (widget.item.totalItems != 0) {
       progressPercentage =
@@ -160,13 +160,13 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           SizedBox(height: 8.0),
                           LinearProgressIndicator(
-                            value: remainingDays <= 0
+                            value: remaining <= 0
                                 ? 1
-                                : (totalDays - remainingDays) / totalDays,
+                                : (totalDays - remaining) / totalDays,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            '${AppLocalizations.of(context).translate("Remaining Days:")} ${remainingDays <= 0 ? AppLocalizations.of(context).translate("Done") : remainingDays}',
+                            '${AppLocalizations.of(context).translate("Remaining Days:")} ${remaining <= 0 ? AppLocalizations.of(context).translate("Done") : remaining}',
                             // style: TextStyle(fontSize: 16.0),
                           ),
                         ],

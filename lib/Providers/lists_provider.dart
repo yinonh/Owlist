@@ -345,43 +345,37 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> editDeadline(ToDoList list, DateTime? newDeadline) async {
+  Future<String?> editDeadline(ToDoList list, DateTime? newDeadline) async {
     if (newDeadline == null) {
-      return;
+      return null;
     }
 
     try {
       final Database db = await database;
 
-      // Fetch the current deadline from the SQLite database
-      List<Map<String, dynamic>> result = await db.query(
+      await db.update(
         'todo_lists',
-        columns: ['deadline'],
+        {
+          'deadline': DateFormat('yyyy-MM-dd').format(newDeadline),
+        },
         where: 'id = ?',
         whereArgs: [list.id],
       );
 
-      if (result.isNotEmpty) {
-        String currentDeadline = result[0]['deadline'];
-
-        // Update the 'deadline' field with the new deadline
-        await db.update(
-          'todo_lists',
-          {
-            'deadline': DateFormat('yyyy-MM-dd').format(newDeadline),
-          },
-          where: 'id = ?',
-          whereArgs: [list.id],
-        );
-
-        notificationProvider.scheduleNotification(list);
-
-        // Invalidate cache and notify listeners to reflect the changes
-        invalidateCache();
-        notifyListeners();
-      } else {
-        print('Item with ID ${list.id} not found!');
-      }
+      invalidateCache();
+      notifyListeners();
+      String? newTime = await notificationProvider.scheduleNotification(
+          ToDoList(
+              id: list.id,
+              userID: list.userID,
+              notificationIndex: list.notificationIndex,
+              hasDeadline: list.hasDeadline,
+              title: list.title,
+              creationDate: list.creationDate,
+              deadline: newDeadline,
+              totalItems: list.totalItems,
+              accomplishedItems: list.accomplishedItems));
+      return newTime;
     } catch (e) {
       print('Error updating the deadline: $e');
     }

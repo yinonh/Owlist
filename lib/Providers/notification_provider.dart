@@ -177,12 +177,12 @@ class NotificationProvider with ChangeNotifier {
           'Deadline notifications',
           channelDescription:
               'Notification scheduled for one day before the deadline',
+          channelShowBadge: false,
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      // matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );
 
     return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);

@@ -12,6 +12,7 @@ import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../l10n/app_localizations.dart';
 
 class SingleListScreen extends StatefulWidget {
   final String listId;
@@ -143,13 +144,37 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
   }
 
+  void showMessage(String text) {
+    // Display Snackbar with the scheduled time
+    final snackBar = SnackBar(
+      content: Text(
+        text,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor:
+          Theme.of(context).highlightColor, // Change background color
+      duration: const Duration(seconds: 2), // Set duration
+      behavior: SnackBarBehavior.floating, // Change behavior to floating
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10), // Add border radius
+      ),
+      elevation: 6, // Add elevation
+      margin: const EdgeInsets.all(10), // Add margin
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void _save() async {
     setState(() {
       isLoading = true;
     });
     if (list!.deadline != newDeadline) {
-      await Provider.of<ListsProvider>(context, listen: false)
+      String? result = await Provider.of<ListsProvider>(context, listen: false)
           .editDeadline(list!, newDeadline);
+      if (result != null)
+        showMessage(
+            "${AppLocalizations.of(context).translate("Schedule notification for:")} ${result}");
     }
     if (list!.title != _titleController.text) {
       await Provider.of<ListsProvider>(context, listen: false)
