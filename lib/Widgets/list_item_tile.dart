@@ -9,7 +9,6 @@ class ToDoItemTile extends StatefulWidget {
   final ToDoList item;
   final Function(ToDoList) onDelete;
   final Function refresh;
-  // bool is_done = false;
 
   ToDoItemTile(
       {required this.item, required this.refresh, required this.onDelete});
@@ -19,6 +18,28 @@ class ToDoItemTile extends StatefulWidget {
 }
 
 class _ToDoItemTileState extends State<ToDoItemTile> {
+  late int totalHours;
+  late int remainingHours;
+  late double progressPercentage;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateProgress();
+  }
+
+  void _calculateProgress() {
+    setState(() {
+      totalHours =
+          widget.item.deadline.difference(widget.item.creationDate).inHours;
+      remainingHours =
+          widget.item.deadline.difference(DateTime.now()).inHours + 1;
+      progressPercentage = widget.item.totalItems != 0
+          ? (widget.item.accomplishedItems / widget.item.totalItems)
+          : 1;
+    });
+  }
+
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -73,22 +94,30 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
+  String getDeadlineDiff(DateTime deadline) {
+    DateTime now = DateTime.now();
+
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime deadlineDay =
+        DateTime(deadline.year, deadline.month, deadline.day);
+
+    if (deadlineDay.isBefore(today)) {
+      return AppLocalizations.of(context).translate("Done");
+    } else if (deadlineDay.isAtSameMomentAs(today)) {
+      return AppLocalizations.of(context).translate("Today");
+    } else {
+      Duration difference = deadlineDay.difference(today);
+      if (difference.inDays > 1) {
+        return '${AppLocalizations.of(context).translate("Remaining Days:")} ${difference.inDays}';
+      } else {
+        int hoursDifference = deadline.difference(now).inHours;
+        return '${AppLocalizations.of(context).translate("Remaining Hours:")} ${hoursDifference}';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final DateTime currentDate = DateTime.now();
-
-    final int totalDays =
-        widget.item.deadline.difference(widget.item.creationDate).inDays;
-    final int remaining =
-        widget.item.deadline.difference(currentDate).inDays + 1;
-    double progressPercentage;
-    if (widget.item.totalItems != 0) {
-      progressPercentage =
-          (widget.item.accomplishedItems / widget.item.totalItems);
-    } else {
-      progressPercentage = 1;
-    }
-
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, SingleListScreen.routeName,
@@ -160,13 +189,13 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                           ),
                           SizedBox(height: 8.0),
                           LinearProgressIndicator(
-                            value: remaining <= 0
+                            value: remainingHours <= 0
                                 ? 1
-                                : (totalDays - remaining) / totalDays,
+                                : (totalHours - remainingHours) / totalHours,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            '${AppLocalizations.of(context).translate("Remaining Days:")} ${remaining <= 0 ? AppLocalizations.of(context).translate("Done") : remaining}',
+                            '${getDeadlineDiff(widget.item.deadline)}',
                             // style: TextStyle(fontSize: 16.0),
                           ),
                         ],

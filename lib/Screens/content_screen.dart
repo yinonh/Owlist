@@ -162,10 +162,13 @@ class _ContentScreenState extends State<ContentScreen> {
                                             _toggleTitleEditMode();
                                           }
                                           if (textEditMode) {
-                                            textEditingController.text =
-                                                _item.content == ''
-                                                    ? "add some content"
-                                                    : _item.content;
+                                            textEditingController.text = _item
+                                                        .content ==
+                                                    ''
+                                                ? AppLocalizations.of(context)
+                                                    .translate(
+                                                        "Add some content")
+                                                : _item.content;
                                             toggleTextEditMode();
                                           }
                                         });
@@ -249,7 +252,8 @@ class _ContentScreenState extends State<ContentScreen> {
                                 onLongPress: toggleTextEditMode,
                                 child: EditableTextView(
                                     initialText: _item.content == ''
-                                        ? "add some content"
+                                        ? AppLocalizations.of(context)
+                                            .translate("Add some content")
                                         : _item.content,
                                     isEditMode: textEditMode,
                                     toggleEditMode: toggleTextEditMode,
