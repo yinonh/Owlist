@@ -67,6 +67,7 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
+    sortLists(FilterBy.creationNTL);
   }
 
   Future<void> sortLists(FilterBy filterBy) async {
@@ -257,17 +258,14 @@ class _HomePageState extends State<HomePage> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
                   child: Row(
+                    textDirection: TextDirection.ltr,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Center(
-                        child: Text(
-                          AppLocalizations.of(context).translate("To-Do"),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        child: const Image(
+                          image: AssetImage('Assets/appName.png'),
+                          fit: BoxFit.contain,
+                          width: 200,
                         ),
                       ),
                       currentIndex == 3

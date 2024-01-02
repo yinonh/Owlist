@@ -32,8 +32,14 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
     setState(() {
       totalHours =
           widget.item.deadline.difference(widget.item.creationDate).inHours;
-      remainingHours =
-          widget.item.deadline.difference(DateTime.now()).inHours + 1;
+
+      if (DateTime.now().isBefore(widget.item.deadline)) {
+        remainingHours =
+            widget.item.deadline.difference(DateTime.now()).inHours;
+      } else {
+        remainingHours = 0;
+      }
+
       progressPercentage = widget.item.totalItems != 0
           ? (widget.item.accomplishedItems / widget.item.totalItems)
           : 1;

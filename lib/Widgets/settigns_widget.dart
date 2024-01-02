@@ -24,12 +24,12 @@ class _SettingsState extends State<Settings> {
   List<Widget> languages = <Widget>[
     Image.asset(
       'Assets/english.png',
-      width: 45,
+      width: 60,
       height: 45,
     ),
     Image.asset(
-      'Assets/israel.png',
-      width: 45,
+      'Assets/hebrew.png',
+      width: 60,
       height: 45,
     )
   ];
