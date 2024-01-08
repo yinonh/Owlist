@@ -13,7 +13,7 @@ final ThemeData lightTheme = ThemeData(
   focusColor: Color(0xFF864879),
   unselectedWidgetColor: Colors.grey,
   shadowColor: Colors.black,
-  highlightColor: Color(0xFF18122B),
+  highlightColor: Color(0xFF9685D9), //Color(0xFF18122B),
   textTheme: const TextTheme(
     bodySmall: TextStyle(color: Colors.black),
     titleSmall: TextStyle(
@@ -54,7 +54,7 @@ final ThemeData lightTheme = ThemeData(
     trackColor: MaterialStateProperty.all<Color>(Color(0xFF6B5432)),
   ),
   progressIndicatorTheme: ProgressIndicatorThemeData(
-    color: Color(0xFF9685D9),
+    color: Color(0xFF635985),
     linearTrackColor: Colors.grey.shade300,
     linearMinHeight: 10.0,
   ),

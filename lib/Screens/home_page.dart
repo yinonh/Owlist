@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Widgets/notification_time.dart';
@@ -11,9 +12,9 @@ import '../Widgets/settigns_widget.dart';
 import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 
-enum FilterBy {
-  creationLTN,
+enum SortBy {
   creationNTL,
+  creationLTN,
   deadlineLTN,
   deadlineNTL,
   progressBTS,
@@ -33,7 +34,8 @@ class _HomePageState extends State<HomePage> {
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-  FilterBy selectedOption = FilterBy.creationNTL;
+  late SharedPreferences prefs;
+  SortBy selectedOption = SortBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
@@ -67,40 +69,48 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
-    sortLists(FilterBy.creationNTL);
+    _loadCheckedStatus();
+    sortLists();
   }
 
-  Future<void> sortLists(FilterBy filterBy) async {
+  void _loadCheckedStatus() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedOption = SortBy.values[prefs.getInt('sortByIndex') ?? 0];
+    });
+  }
+
+  Future<void> sortLists() async {
     List<ToDoList> activeLists = await activeItemsFuture;
     List<ToDoList> achievedLists = await achievedItemsFuture;
     List<ToDoList> withoutDeadlineLists = await withoutDeadlineItemsFuture;
 
     void sortFunction(List<ToDoList> lists) {
       lists.sort((a, b) {
-        switch (filterBy) {
-          case FilterBy.creationLTN:
+        switch (selectedOption) {
+          case SortBy.creationLTN:
             return a.creationDate.isBefore(b.creationDate) ? -1 : 1;
-          case FilterBy.creationNTL:
+          case SortBy.creationNTL:
             return b.creationDate.isBefore(a.creationDate) ? -1 : 1;
-          case FilterBy.deadlineLTN:
+          case SortBy.deadlineLTN:
             if (!a.hasDeadline && b.hasDeadline) {
               return 1;
             } else if (a.hasDeadline && !b.hasDeadline) {
               return -1;
             }
             return b.deadline.isBefore(a.deadline) ? -1 : 1;
-          case FilterBy.deadlineNTL:
+          case SortBy.deadlineNTL:
             if (!a.hasDeadline && b.hasDeadline) {
               return 1;
             } else if (a.hasDeadline && !b.hasDeadline) {
               return -1;
             }
             return a.deadline.isBefore(b.deadline) ? -1 : 1;
-          case FilterBy.progressBTS:
+          case SortBy.progressBTS:
             return (b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems)
                 .compareTo(
                     a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems);
-          case FilterBy.progressSTB:
+          case SortBy.progressSTB:
             return (a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems)
                 .compareTo(
                     b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems);
@@ -195,7 +205,7 @@ class _HomePageState extends State<HomePage> {
           });
         });
       }
-      sortLists(FilterBy.creationNTL);
+      //sortLists(SortBy.creationNTL);
     });
   }
 
@@ -203,7 +213,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       selectedIndex.animateToPage(
         index,
-        duration: const Duration(milliseconds: 50),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
       currentIndex = index;
@@ -261,79 +271,88 @@ class _HomePageState extends State<HomePage> {
                     textDirection: TextDirection.ltr,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Center(
-                        child: const Image(
+                      const Center(
+                        child: Image(
                           image: AssetImage('Assets/appName.png'),
                           fit: BoxFit.contain,
                           width: 200,
                         ),
                       ),
                       currentIndex == 3
-                          ? Text(
+                          ? const Text(
                               " ",
                               style: TextStyle(fontSize: 33),
                             )
-                          : PopupMenuButton<FilterBy>(
+                          : PopupMenuButton<SortBy>(
                               icon: const Icon(Icons.filter_list),
                               onSelected: (value) {
                                 setState(() {
-                                  sortLists(value);
+                                  selectedOption = value;
+                                  sortLists();
                                 });
+                                prefs.setInt('sortByIndex',
+                                    SortBy.values.indexOf(value));
                               },
                               itemBuilder: (BuildContext cnx) => [
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.creationNTL,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.creationNTL,
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Newest to Oldest"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.creationNTL,
                                 ),
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.creationLTN,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.creationLTN,
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Oldest to Newest"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.creationLTN,
                                 ),
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.deadlineLTN,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.deadlineLTN,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Later to Sooner"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.deadlineLTN,
                                 ),
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.deadlineNTL,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.deadlineNTL,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Sooner to Later"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.deadlineNTL,
                                 ),
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.progressBTS,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.progressBTS,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: High to Low"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.progressBTS,
                                 ),
-                                PopupMenuItem<FilterBy>(
-                                  value: FilterBy.progressSTB,
+                                CheckedPopupMenuItem<SortBy>(
+                                  value: SortBy.progressSTB,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: Low to High"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
+                                  checked: selectedOption == SortBy.progressSTB,
                                 ),
                               ],
                             ),
