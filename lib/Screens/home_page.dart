@@ -275,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                         child: Image(
                           image: AssetImage('Assets/appName.png'),
                           fit: BoxFit.contain,
-                          width: 200,
+                          width: 170,
                         ),
                       ),
                       currentIndex == 3
