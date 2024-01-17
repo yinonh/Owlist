@@ -178,7 +178,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     }
     if (list!.title != _titleController.text) {
       await Provider.of<ListsProvider>(context, listen: false)
-          .editTitle(list!.id, _titleController.text);
+          .editTitle(list!, _titleController.text);
     }
     for (int i = 0; i < editList.length; i++) {
       if (editList[i].itemIndex != i) {

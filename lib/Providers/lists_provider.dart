@@ -381,7 +381,7 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> editTitle(String listId, String? newTitle) async {
+  Future<void> editTitle(ToDoList list, String? newTitle) async {
     if (newTitle == null) {
       return;
     }
@@ -396,12 +396,22 @@ class ListsProvider extends ChangeNotifier {
           'title': newTitle,
         },
         where: 'id = ?',
-        whereArgs: [listId],
+        whereArgs: [list.id],
       );
 
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
+      await notificationProvider.scheduleNotification(ToDoList(
+          id: list.id,
+          userID: list.userID,
+          notificationIndex: list.notificationIndex,
+          hasDeadline: list.hasDeadline,
+          title: newTitle,
+          creationDate: list.creationDate,
+          deadline: list.deadline,
+          totalItems: list.totalItems,
+          accomplishedItems: list.accomplishedItems));
     } catch (e) {
       print('Error updating the title: $e');
     }
