@@ -230,7 +230,10 @@ class _SettingsState extends State<Settings> {
                       child: Text(
                         AppLocalizations.of(context).translate("Choose time"),
                         style: _notificationsActive
-                            ? Theme.of(context).primaryTextTheme.titleMedium
+                            ? Theme.of(context)
+                                .primaryTextTheme
+                                .titleMedium!
+                                .copyWith(color: Colors.white)
                             : Theme.of(context)
                                 .primaryTextTheme
                                 .titleMedium!
@@ -255,7 +258,10 @@ class _SettingsState extends State<Settings> {
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
                   AppLocalizations.of(context).translate("Statistics"),
-                  style: Theme.of(context).primaryTextTheme.titleMedium,
+                  style: Theme.of(context)
+                      .primaryTextTheme
+                      .titleMedium!
+                      .copyWith(color: Colors.white),
                 ),
               ),
             ),
