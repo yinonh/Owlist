@@ -22,7 +22,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
         style: Theme.of(context).textTheme.titleMedium,
       ),
       content: TextField(
-        maxLength: 35,
+        textCapitalization: TextCapitalization.sentences,
+        maxLength: 25,
         autofocus: true,
         decoration: InputDecoration(
           hintText: AppLocalizations.of(context).translate("Title"),
@@ -54,7 +55,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                widget.addNewItem(newTitle); // Use the passed function
+                widget.addNewItem(newTitle.trim()); // Use the passed function
               },
               child: Text(
                 AppLocalizations.of(context).translate("Add"),

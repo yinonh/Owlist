@@ -96,7 +96,6 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
               padding: EdgeInsets.symmetric(horizontal: 5.0),
               child: Icon(
                 Icons.delete,
-                color: Colors.white,
               ),
             ),
           ),

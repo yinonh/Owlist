@@ -1,9 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
-import 'package:to_do/Providers/notification_provider.dart';
 
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
@@ -28,6 +25,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   late DateTime newDeadline;
   TextEditingController _titleController = TextEditingController();
   bool isLoading = false;
+  bool newTextEmpty = false;
   late bool editMode;
   late ToDoList? list;
   late List<ToDoItem> currentList;
@@ -116,8 +114,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
   void addNewItem(String newTitle) async {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
 
-    if (newTitle.isNotEmpty) {
-      ToDoItem? newItem = await itemProvider.addNewItem(list!.id, newTitle);
+    if (newTitle.trim().isNotEmpty) {
+      ToDoItem? newItem =
+          await itemProvider.addNewItem(list!.id, newTitle.trim());
 
       if (newItem != null) {
         List<ToDoItem> temp = List.from(currentList);
@@ -166,6 +165,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void _save() async {
+    String newTitle = _titleController.text.trim();
     setState(() {
       isLoading = true;
     });
@@ -176,9 +176,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
         showMessage(
             "${AppLocalizations.of(context).translate("Schedule notification for:")} ${result}");
     }
-    if (list!.title != _titleController.text) {
+    if (list!.title != newTitle) {
       await Provider.of<ListsProvider>(context, listen: false)
-          .editTitle(list!, _titleController.text);
+          .editTitle(list!, newTitle);
     }
     for (int i = 0; i < editList.length; i++) {
       if (editList[i].itemIndex != i) {
@@ -235,16 +235,15 @@ class _SingleListScreenState extends State<SingleListScreen> {
               child: Column(
                 children: [
                   Container(
-                    height: 75,
+                    height: 80,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 24.0),
+                        horizontal: 10.0, vertical: 24.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         editMode
                             ? IconButton(
-                                icon: const Icon(Icons.cancel,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.cancel),
                                 onPressed: () {
                                   setState(() {
                                     newDeadline = list!.deadline;
@@ -254,8 +253,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 },
                               )
                             : IconButton(
-                                icon: const Icon(Icons.arrow_back,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.arrow_back),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
@@ -263,6 +261,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
                         editMode
                             ? Expanded(
                                 child: TextField(
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  onChanged: (txt) {
+                                    setState(() {
+                                      newTextEmpty = txt.trim().isEmpty;
+                                    });
+                                  },
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
@@ -279,28 +284,30 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   ),
                                 ),
                               )
-                            : Flexible(
-                                child: Text(
-                                  _titleController.text,
-                                  style: const TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                            : Expanded(
+                                child: Container(
+                                  child: Text(
+                                    _titleController.text,
+                                    style: const TextStyle(
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                         editMode
                             ? IconButton(
-                                icon:
-                                    const Icon(Icons.save, color: Colors.white),
-                                onPressed: () {
-                                  _save();
-                                },
+                                icon: Icon(Icons.save),
+                                onPressed: newTextEmpty
+                                    ? null
+                                    : () {
+                                        _save();
+                                      },
                               )
                             : IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
+                                icon: const Icon(Icons.edit),
                                 onPressed: toggleEditMode,
                               ),
                       ],

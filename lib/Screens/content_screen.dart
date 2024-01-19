@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/Models/to_do_item.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../Models/to_do_item.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
+import '../Widgets/uicorn_button.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/item_provider.dart';
-import '../Widgets/uicorn_button.dart';
 
 class ContentScreen extends StatefulWidget {
   static const routeName = '/content';
@@ -28,8 +26,9 @@ class _ContentScreenState extends State<ContentScreen> {
   TextEditingController _titleController = TextEditingController();
   late ToDoItem _item;
   bool _isLoading = false;
-  TextEditingController textEditingController = TextEditingController();
   bool textEditMode = false;
+  bool newTextEmpty = false;
+  TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _ContentScreenState extends State<ContentScreen> {
     });
     _item = await Provider.of<ItemProvider>(context, listen: false)
         .itemById(widget.id);
-    _titleController.text = _item.title;
+    _titleController.text = _item.title.trim();
     setState(() {
       _isLoading = false;
     });
@@ -60,6 +59,20 @@ class _ContentScreenState extends State<ContentScreen> {
     setState(() {
       textEditMode = !textEditMode;
     });
+  }
+
+  void _save() async {
+    if (titleEditMode) {
+      Provider.of<ListsProvider>(context, listen: false)
+          .editItemTitle(_item.id, _titleController.text.trim());
+      _toggleTitleEditMode();
+      widget.updateSingleListScreen();
+    }
+    if (textEditMode) {
+      await Provider.of<ItemProvider>(context, listen: false)
+          .updateItemContent(_item.id, textEditingController.text.trim());
+      toggleTextEditMode();
+    }
   }
 
   @override
@@ -140,43 +153,42 @@ class _ContentScreenState extends State<ContentScreen> {
             ? Center(child: CircularProgressIndicator())
             : SafeArea(
                 child: Stack(
-                  // alignment: Alignment.center,
                   children: [
                     Column(
                       children: [
                         Container(
-                          height: 75,
+                          height: 80,
                           padding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 24.0),
+                              horizontal: 10.0, vertical: 24.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               titleEditMode || textEditMode
                                   ? IconButton(
-                                      icon: const Icon(Icons.cancel,
-                                          color: Colors.white),
+                                      icon: const Icon(Icons.cancel),
                                       onPressed: () {
                                         setState(() {
                                           if (titleEditMode) {
-                                            _titleController.text = _item.title;
+                                            _titleController.text =
+                                                _item.title.trim();
                                             _toggleTitleEditMode();
                                           }
                                           if (textEditMode) {
                                             textEditingController.text = _item
-                                                        .content ==
-                                                    ''
+                                                    .content
+                                                    .trim()
+                                                    .isEmpty
                                                 ? AppLocalizations.of(context)
                                                     .translate(
                                                         "Add some content")
-                                                : _item.content;
+                                                : _item.content.trim();
                                             toggleTextEditMode();
                                           }
                                         });
                                       },
                                     )
                                   : IconButton(
-                                      icon: const Icon(Icons.arrow_back,
-                                          color: Colors.white),
+                                      icon: const Icon(Icons.arrow_back),
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
@@ -184,10 +196,17 @@ class _ContentScreenState extends State<ContentScreen> {
                               titleEditMode
                                   ? Expanded(
                                       child: TextField(
+                                        textCapitalization:
+                                            TextCapitalization.sentences,
+                                        onChanged: (txt) {
+                                          setState(() {
+                                            newTextEmpty = txt.trim().isEmpty;
+                                          });
+                                        },
                                         controller: _titleController,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
-                                          fontSize: 19.0,
+                                          fontSize: 12.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
@@ -202,7 +221,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                     )
                                   : Flexible(
                                       child: Text(
-                                        _titleController.text,
+                                        _titleController.text.trim(),
                                         style: const TextStyle(
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.bold,
@@ -213,30 +232,11 @@ class _ContentScreenState extends State<ContentScreen> {
                                     ),
                               titleEditMode || textEditMode
                                   ? IconButton(
-                                      icon:
-                                          Icon(Icons.save, color: Colors.white),
-                                      onPressed: () async {
-                                        if (titleEditMode) {
-                                          Provider.of<ListsProvider>(context,
-                                                  listen: false)
-                                              .editItemTitle(_item.id,
-                                                  _titleController.text);
-                                          _toggleTitleEditMode();
-                                          widget.updateSingleListScreen();
-                                        }
-                                        if (textEditMode) {
-                                          await Provider.of<ItemProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .updateItemContent(_item.id,
-                                                  textEditingController.text);
-                                          toggleTextEditMode();
-                                        }
-                                      },
+                                      icon: Icon(Icons.save),
+                                      onPressed: newTextEmpty ? null : _save,
                                     )
                                   : IconButton(
-                                      icon:
-                                          Icon(Icons.edit, color: Colors.white),
+                                      icon: Icon(Icons.edit),
                                       onPressed: _toggleTitleEditMode,
                                     ),
                             ],
@@ -251,10 +251,10 @@ class _ContentScreenState extends State<ContentScreen> {
                               GestureDetector(
                                 onLongPress: toggleTextEditMode,
                                 child: EditableTextView(
-                                    initialText: _item.content == ''
+                                    initialText: _item.content.trim().isEmpty
                                         ? AppLocalizations.of(context)
                                             .translate("Add some content")
-                                        : _item.content,
+                                        : _item.content.trim(),
                                     isEditMode: textEditMode,
                                     toggleEditMode: toggleTextEditMode,
                                     controller: textEditingController),

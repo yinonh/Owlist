@@ -272,9 +272,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
                                   onPressed: () {
-                                    if (new_title.text != '') {
-                                      add_item(new_title.text, new_deadline,
-                                          hasDeadline);
+                                    if (new_title.text.trim().isNotEmpty) {
+                                      add_item(new_title.text.trim(),
+                                          new_deadline, hasDeadline);
                                     }
                                     Navigator.of(context).pop();
                                   },
