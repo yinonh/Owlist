@@ -2,8 +2,6 @@
 
 Owlist is your personal goal tracker and progress manager, helping you stay organized and motivated!
 
-https://youtu.be/EV7poyW58cg?si=wcWjlEpd-skzizKc
-
 [![Owlist](https://img.youtube.com/vi/EV7poyW58cg/0.jpg)](https://www.youtube.com/watch?v=EV7poyW58cg "Owlist")
 
 ## Table of Contents
