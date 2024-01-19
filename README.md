@@ -1,6 +1,9 @@
-# Owlist 🦉
+![Image Alt Text](ReadmeAssets/appCover.png)
 
 Owlist is your personal goal tracker and progress manager, helping you stay organized and motivated!
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/EV7poyW58cg" frameborder="0" allowfullscreen></iframe>
+
 
 ## Table of Contents
 - [Introduction](#introduction)
