@@ -1,12 +1,12 @@
 ![Image Alt Text](ReadmeAssets/appCover.png)
 
 ## Table of Contents
-- [Introduction](#-introduction)
-- [Features](#-features)
-- [🎥 Video](#-video)
-- [Upcoming Release on Google Play](#-upcoming-release-on-google-play)
-- [Contributing](#-contributing)
-- [Feedback](#-feedback)
+- Introduction
+- Features
+- 🎥 Video
+- Upcoming Release on Google Play
+- Contributing
+- Feedback
 
 ## Introduction
 Owlist is a user-friendly app designed to assist you in setting and achieving your goals. With its intuitive interface, it allows you to create lists of goals or tasks effortlessly.
