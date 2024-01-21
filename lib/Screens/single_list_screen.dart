@@ -235,7 +235,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
               child: Column(
                 children: [
                   Container(
-                    height: 80,
+                    // height: 80,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 24.0),
                     child: Row(
@@ -288,6 +288,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 child: Container(
                                   child: Text(
                                     _titleController.text,
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 24.0,
                                       fontWeight: FontWeight.bold,

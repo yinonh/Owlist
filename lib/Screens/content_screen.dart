@@ -157,7 +157,7 @@ class _ContentScreenState extends State<ContentScreen> {
                     Column(
                       children: [
                         Container(
-                          height: 80,
+                          // height: 80,
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 24.0),
                           child: Row(
@@ -221,6 +221,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                     )
                                   : Flexible(
                                       child: Text(
+                                        textAlign: TextAlign.center,
                                         _titleController.text.trim(),
                                         style: const TextStyle(
                                           fontSize: 24.0,
