@@ -120,6 +120,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 ),
           title: Text(
             widget.item.title,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           trailing: Checkbox(

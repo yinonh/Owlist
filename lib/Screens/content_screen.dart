@@ -157,7 +157,7 @@ class _ContentScreenState extends State<ContentScreen> {
                     Column(
                       children: [
                         Container(
-                          // height: 80,
+                          height: 110,
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 24.0),
                           child: Row(

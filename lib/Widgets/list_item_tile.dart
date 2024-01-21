@@ -217,13 +217,17 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '${AppLocalizations.of(context).translate("Total Items:")} ${widget.item.totalItems}',
+                  Expanded(
+                    child: Text(
+                      '${AppLocalizations.of(context).translate("Total Items:")} ${widget.item.totalItems}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    '${AppLocalizations.of(context).translate("Accomplished Items:")} ${widget.item.accomplishedItems}',
-                    // style: const TextStyle(fontSize: 16.0),
+                  Expanded(
+                    child: Text(
+                      '${AppLocalizations.of(context).translate("Accomplished Items:")} ${widget.item.accomplishedItems}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

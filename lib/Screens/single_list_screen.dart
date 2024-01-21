@@ -235,7 +235,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
               child: Column(
                 children: [
                   Container(
-                    // height: 80,
+                    height: 110,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 24.0),
                     child: Row(
@@ -324,7 +324,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 SizedBox(
                                   height: MediaQuery.of(context).size.height -
                                       MediaQuery.of(context).padding.top -
-                                      (75 + 40),
+                                      (105 + 40),
                                   child: ItemList(
                                     toggleEditMode: toggleEditMode,
                                     editMode: editMode,
