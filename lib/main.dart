@@ -58,42 +58,42 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('en', '');
-  late ThemeData currentTheme = lightTheme;
+  Locale? _locale;
+  late ThemeData currentTheme =
+      MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? darkTheme
+          : lightTheme;
   late Widget initialScreen;
 
-  Future<void> setPreferences() async {
+  Future<void> setPreferences(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? language = prefs.getString('selectedLanguage');
-
-    Locale newLocale;
     switch (language) {
       case 'en':
-        newLocale = const Locale('en', '');
+        setLocale(const Locale('en', 'IL'));
         break;
       case 'he':
-        newLocale = const Locale('he', '');
+        setLocale(const Locale('he', 'US'));
         break;
       default:
-        newLocale = const Locale('en', '');
+        Localizations.localeOf(context).languageCode == 'he'
+            ? setLocale(const Locale('he', 'IL'))
+            : setLocale(const Locale('en', 'US'));
     }
-    setLocale(newLocale);
 
     String? themePref = prefs.getString('selectedTheme');
-    ThemeData newTheme;
     switch (themePref) {
       case 'dark':
-        newTheme = darkTheme;
+        setTheme(darkTheme);
         break;
       case 'light':
-        newTheme = lightTheme;
+        setTheme(lightTheme);
         break;
       default:
-        newTheme = MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? darkTheme
-            : lightTheme;
+        MediaQuery.of(context).platformBrightness == Brightness.dark
+            ? setTheme(darkTheme)
+            : setTheme(lightTheme);
     }
-    setTheme(newTheme);
   }
 
   void setLocale(Locale newLocale) {
@@ -112,7 +112,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initialScreen = HomePage();
-    setPreferences();
+    setPreferences(context);
+  }
+
+  @override
+  void didChangeDependencies() {
+    setPreferences(context);
+    super.didChangeDependencies();
   }
 
   @override

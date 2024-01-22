@@ -324,7 +324,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 SizedBox(
                                   height: MediaQuery.of(context).size.height -
                                       MediaQuery.of(context).padding.top -
-                                      (105 + 40),
+                                      (110 + 40),
                                   child: ItemList(
                                     toggleEditMode: toggleEditMode,
                                     editMode: editMode,

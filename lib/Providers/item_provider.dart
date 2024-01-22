@@ -47,7 +47,6 @@ class ItemProvider extends ChangeNotifier {
   }
 
   Future<ToDoItem> itemById(String id) async {
-    print(id);
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'todo_items',

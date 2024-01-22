@@ -227,6 +227,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                     child: Text(
                       '${AppLocalizations.of(context).translate("Accomplished Items:")} ${widget.item.accomplishedItems}',
                       overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
                     ),
                   ),
                 ],

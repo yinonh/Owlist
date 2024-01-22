@@ -477,7 +477,6 @@ class ListsProvider extends ChangeNotifier {
       'itemsDelayed': itemsDelayed,
       'itemsNotDone': itemsNotDone
     };
-    print(statistics);
     return statistics;
   }
 }

@@ -45,11 +45,12 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _loadSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String selectedLanguage = prefs.getString('selectedLanguage') ?? 'en';
+    String selectedLanguage = prefs.getString('selectedLanguage') ??
+        Localizations.localeOf(context).languageCode;
 
     setState(() {
       _selectedLanguages =
-          selectedLanguage == 'en' ? [true, false] : [false, true];
+          selectedLanguage == 'he' ? [false, true] : [true, false];
     });
   }
 
