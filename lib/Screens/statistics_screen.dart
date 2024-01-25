@@ -8,13 +8,15 @@ import '../Widgets/statistics_graphs.dart';
 class StatisticsScreen extends StatefulWidget {
   static const routeName = '/statistics';
 
+  const StatisticsScreen({super.key});
+
   @override
   State<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   int touchedIndex = -1;
-  Map<String, int>? statistics = null;
+  Map<String, int>? statistics;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +40,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 24.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

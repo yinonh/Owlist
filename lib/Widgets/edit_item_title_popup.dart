@@ -5,7 +5,7 @@ import '../l10n/app_localizations.dart';
 class EditItemDialog extends StatefulWidget {
   final Function(String) addNewItem; // Function parameter
 
-  EditItemDialog({required this.addNewItem});
+  const EditItemDialog({super.key, required this.addNewItem});
 
   @override
   _EditItemDialogState createState() => _EditItemDialogState();

@@ -25,7 +25,7 @@ class DogEarListTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: 10.0, // Width of the dog-ear
             height: 10.0, // Height of the dog-ear
             child: ClipPath(

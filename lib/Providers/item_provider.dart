@@ -4,7 +4,6 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
-import '../Providers/lists_provider.dart';
 import '../Models/to_do_item.dart';
 import 'notification_provider.dart';
 

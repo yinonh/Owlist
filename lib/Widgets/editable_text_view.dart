@@ -8,8 +8,9 @@ class EditableTextView extends StatefulWidget {
   final Function toggleEditMode;
   final TextEditingController controller;
 
-  EditableTextView(
-      {required this.initialText,
+  const EditableTextView(
+      {super.key,
+      required this.initialText,
       required this.isEditMode,
       required this.toggleEditMode,
       required this.controller});

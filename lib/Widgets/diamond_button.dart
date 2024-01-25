@@ -31,7 +31,7 @@ class DiamondButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            customBorder: CircleBorder(),
+            customBorder: const CircleBorder(),
             onTap: onTap != null
                 ? () {
                     onTap!();
@@ -44,7 +44,7 @@ class DiamondButton extends StatelessWidget {
                   BoxShadow(
                     blurRadius: 25,
                     offset: const Offset(0, 5),
-                    color: Color(0xFF635985).withOpacity(0.5),
+                    color: const Color(0xFF635985).withOpacity(0.5),
                   )
                 ],
                 borderRadius: const BorderRadius.all(Radius.circular(18)),

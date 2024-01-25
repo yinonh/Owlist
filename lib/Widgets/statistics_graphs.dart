@@ -18,20 +18,20 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
     final listsStatisticList = showingListSections(widget.statistics);
     final itemsStatisticList = showingItemsSections(widget.statistics);
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppLocalizations.of(context).translate("List Data:"),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           widget.statistics['totalLists'] == 0
-              ? Container(
+              ? SizedBox(
                   height: 250,
                   width: double.infinity,
                   child: Center(
@@ -41,7 +41,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                     ),
                   ),
                 )
-              : Container(
+              : SizedBox(
                   height: 250,
                   width: double.infinity,
                   child: PieChart(
@@ -57,14 +57,14 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                 ),
           Text(
             AppLocalizations.of(context).translate("Items Data:"),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           widget.statistics['totalItems'] == 0
-              ? Container(
+              ? SizedBox(
                   height: 250,
                   width: double.infinity,
                   child: Center(
@@ -74,7 +74,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                     ),
                   ),
                 )
-              : Container(
+              : SizedBox(
                   height: 250,
                   width: double.infinity,
                   child: PieChart(
@@ -92,7 +92,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
 
   List<PieChartSectionData> showingListSections(Map<String, int>? statistics) {
     return List.generate(3, (i) {
-      final radius = 50.0;
+      const radius = 50.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       switch (i) {
         case 0:

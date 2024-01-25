@@ -23,7 +23,7 @@ class ContentScreen extends StatefulWidget {
 
 class _ContentScreenState extends State<ContentScreen> {
   late bool titleEditMode;
-  TextEditingController _titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   late ToDoItem _item;
   bool _isLoading = false;
   bool textEditMode = false;
@@ -83,12 +83,12 @@ class _ContentScreenState extends State<ContentScreen> {
       UnicornButton(
         currentButton: FloatingActionButton(
             heroTag: "Text",
-            backgroundColor: Color(0xFF635985), //Colors.red,
+            backgroundColor: const Color(0xFF635985), //Colors.red,
             mini: true,
             onPressed: () {
               print("text");
             },
-            child: Icon(Icons.text_fields)),
+            child: const Icon(Icons.text_fields)),
       ),
     );
 
@@ -150,7 +150,7 @@ class _ContentScreenState extends State<ContentScreen> {
           ),
         ),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : SafeArea(
                 child: Stack(
                   children: [
@@ -158,7 +158,7 @@ class _ContentScreenState extends State<ContentScreen> {
                       children: [
                         Container(
                           height: 110,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 24.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -233,11 +233,11 @@ class _ContentScreenState extends State<ContentScreen> {
                                     ),
                               titleEditMode || textEditMode
                                   ? IconButton(
-                                      icon: Icon(Icons.save),
+                                      icon: const Icon(Icons.save),
                                       onPressed: newTextEmpty ? null : _save,
                                     )
                                   : IconButton(
-                                      icon: Icon(Icons.edit),
+                                      icon: const Icon(Icons.edit),
                                       onPressed: _toggleTitleEditMode,
                                     ),
                             ],
@@ -246,7 +246,7 @@ class _ContentScreenState extends State<ContentScreen> {
                         Expanded(
                           child: ListView(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
                               GestureDetector(

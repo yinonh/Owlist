@@ -36,7 +36,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
   @override
   void initState() {
     super.initState();
-    randomNumber = widget.existingItems.length > 0
+    randomNumber = widget.existingItems.isNotEmpty
         ? Random().nextInt(widget.existingItems.length)
         : 0;
   }
@@ -63,7 +63,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
       // TODO: replace this test ad unit with your own ad unit.
       adUnitId: 'ca-app-pub-3940256099942544/9214589741',
       size: size,
-      request: AdRequest(),
+      request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) async {
           print('Inline adaptive banner loaded: ${ad.responseInfo}');
@@ -101,7 +101,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             _isLoaded &&
             _adSize != null) {
           return Align(
-              child: Container(
+              child: SizedBox(
             width: _adWidth,
             height: _adSize!.height.toDouble(),
             child: AdWidget(

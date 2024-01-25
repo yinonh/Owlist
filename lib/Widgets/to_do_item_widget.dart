@@ -13,7 +13,7 @@ class ToDoItemWidget extends StatefulWidget {
   final Function deleteItem;
   final Function updateSingleListScreen;
 
-  ToDoItemWidget(this.item, this.editMode, this.index, this.checkItem,
+  const ToDoItemWidget(this.item, this.editMode, this.index, this.checkItem,
       this.deleteItem, this.updateSingleListScreen,
       {Key? key})
       : super(key: key);
@@ -56,7 +56,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
               },
               child: Text(
                 AppLocalizations.of(context).translate("Delete"),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   color: Colors.red,
                 ),
@@ -115,7 +115,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   Icons.drag_handle,
                   color: Theme.of(context).hintColor,
                 )
-              : SizedBox(
+              : const SizedBox(
                   width: 10,
                 ),
           title: Text(

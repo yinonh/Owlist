@@ -61,7 +61,7 @@ class NotificationProvider with ChangeNotifier {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
     );
@@ -71,8 +71,8 @@ class NotificationProvider with ChangeNotifier {
 
   Future<void> _configureLocalTimeZone() async {
     tz.initializeTimeZones();
-    final String? timeZoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName!));
+    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
   }
 
   Future<void> isAndroidPermissionGranted() async {
@@ -111,7 +111,7 @@ class NotificationProvider with ChangeNotifier {
       final notificationTime = DateTime(
           deadline.year,
           deadline.month,
-          deadline.subtract(Duration(days: 1)).day,
+          deadline.subtract(const Duration(days: 1)).day,
           _notificationTime.hour,
           _notificationTime.minute,
           0);
@@ -132,7 +132,7 @@ class NotificationProvider with ChangeNotifier {
   Future<String> getRandomNotificationText() async {
     String languageCode = _prefs.getString('selectedLanguage') ?? 'en';
     String jsonString =
-        await rootBundle.loadString('Assets/languages/${languageCode}.json');
+        await rootBundle.loadString('Assets/languages/$languageCode.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
     List<String> notificationOptions = [
       jsonMap["Hurry up! Tomorrow's Deadline!"],
@@ -154,7 +154,7 @@ class NotificationProvider with ChangeNotifier {
   Future<String?> scheduleNotification(ToDoList list) async {
     if (!isActive) return null;
     cancelNotification(list.notificationIndex);
-    final deadline = list.deadline.subtract(Duration(days: 1));
+    final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
       deadline.year,

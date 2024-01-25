@@ -15,7 +15,7 @@ class SingleListScreen extends StatefulWidget {
   final String listId;
   static const routeName = '/single_list_screen';
 
-  SingleListScreen({required this.listId, Key? key}) : super(key: key);
+  const SingleListScreen({required this.listId, Key? key}) : super(key: key);
 
   @override
   State<SingleListScreen> createState() => _SingleListScreenState();
@@ -23,7 +23,7 @@ class SingleListScreen extends StatefulWidget {
 
 class _SingleListScreenState extends State<SingleListScreen> {
   late DateTime newDeadline;
-  TextEditingController _titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   bool isLoading = false;
   bool newTextEmpty = false;
   late bool editMode;
@@ -83,13 +83,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
     showDatePicker(
       context: context,
       initialDate: newDeadline.isBefore(DateTime.now())
-          ? DateTime.now().add(Duration(days: 7))
+          ? DateTime.now().add(const Duration(days: 7))
           : newDeadline,
       firstDate: DateTime.now().add(
-        Duration(days: 1),
+        const Duration(days: 1),
       ),
       lastDate: DateTime.now().add(
-        Duration(days: 3650),
+        const Duration(days: 3650),
       ),
     ).then((selectedDate) {
       if (selectedDate != null) {
@@ -148,7 +148,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     final snackBar = SnackBar(
       content: Text(
         text,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor:
           Theme.of(context).highlightColor, // Change background color
@@ -172,9 +172,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
     if (list!.deadline != newDeadline) {
       String? result = await Provider.of<ListsProvider>(context, listen: false)
           .editDeadline(list!, newDeadline);
-      if (result != null)
+      if (result != null) {
         showMessage(
-            "${AppLocalizations.of(context).translate("Schedule notification for:")} ${result}");
+            "${AppLocalizations.of(context).translate("Schedule notification for:")} $result");
+      }
     }
     if (list!.title != newTitle) {
       await Provider.of<ListsProvider>(context, listen: false)
@@ -228,7 +229,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
           ),
         ),
         child: SafeArea(
-          child: Container(
+          child: SizedBox(
             height: MediaQuery.of(context).size.height -
                 MediaQuery.of(context).padding.top,
             child: SingleChildScrollView(
@@ -285,22 +286,20 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 ),
                               )
                             : Expanded(
-                                child: Container(
-                                  child: Text(
-                                    _titleController.text,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                child: Text(
+                                  _titleController.text,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                         editMode
                             ? IconButton(
-                                icon: Icon(Icons.save),
+                                icon: const Icon(Icons.save),
                                 onPressed: newTextEmpty
                                     ? null
                                     : () {

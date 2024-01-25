@@ -11,7 +11,7 @@ class UnicornButton {
   }) : assert(currentButton != null);
 
   Widget build(BuildContext context) {
-    return this.currentButton;
+    return currentButton;
   }
 }
 
@@ -28,8 +28,9 @@ class UnicornDialer extends StatefulWidget {
   final Object parentHeroTag;
   final bool hasNotch;
 
-  UnicornDialer(
-      {required this.parentButton,
+  const UnicornDialer(
+      {super.key,
+      required this.parentButton,
       required this.childButtons,
       required this.onMainButtonPressed,
       this.hasBackground = true,
@@ -42,6 +43,7 @@ class UnicornDialer extends StatefulWidget {
       this.hasNotch = false})
       : assert(parentButton != null);
 
+  @override
   _UnicornDialer createState() => _UnicornDialer();
 }
 
@@ -54,11 +56,11 @@ class _UnicornDialer extends State<UnicornDialer>
 
   @override
   void initState() {
-    this._animationController = AnimationController(
+    _animationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.animationDuration));
 
-    this._parentController = AnimationController(
+    _parentController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.mainAnimationDuration));
 
@@ -67,43 +69,43 @@ class _UnicornDialer extends State<UnicornDialer>
 
   @override
   dispose() {
-    this._animationController.dispose();
-    this._parentController.dispose();
+    _animationController.dispose();
+    _parentController.dispose();
     super.dispose();
   }
 
   void mainActionButtonOnPressed() {
-    if (this._animationController.isDismissed) {
-      this._animationController.forward();
+    if (_animationController.isDismissed) {
+      _animationController.forward();
     } else {
-      this._animationController.reverse();
+      _animationController.reverse();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    this._animationController.reverse();
+    _animationController.reverse();
 
     var hasChildButtons =
         widget.childButtons != null && widget.childButtons.length > 0;
 
-    if (!this._parentController.isAnimating) {
-      if (this._parentController.isCompleted) {
-        this._parentController.forward().then((s) {
-          this._parentController.reverse().then((e) {
-            this._parentController.forward();
+    if (!_parentController.isAnimating) {
+      if (_parentController.isCompleted) {
+        _parentController.forward().then((s) {
+          _parentController.reverse().then((e) {
+            _parentController.forward();
           });
         });
       }
-      if (this._parentController.isDismissed) {
-        this._parentController.reverse().then((s) {
-          this._parentController.forward();
+      if (_parentController.isDismissed) {
+        _parentController.reverse().then((s) {
+          _parentController.forward();
         });
       }
     }
 
     var mainFAB = AnimatedBuilder(
-      animation: this._parentController,
+      animation: _parentController,
       builder: (BuildContext context, Widget? child) {
         return Transform(
           transform: Matrix4.diagonal3(
@@ -128,14 +130,14 @@ class _UnicornDialer extends State<UnicornDialer>
             child: !hasChildButtons
                 ? widget.parentButton
                 : AnimatedBuilder(
-                    animation: this._animationController,
+                    animation: _animationController,
                     builder: (BuildContext context, Widget? child) {
                       return Transform(
-                        transform: Matrix4.rotationZ(
-                            this._animationController.value * 0.8),
+                        transform:
+                            Matrix4.rotationZ(_animationController.value * 0.8),
                         alignment: FractionalOffset.center,
                         child: Icon(
-                          this._animationController.isDismissed
+                          _animationController.isDismissed
                               ? widget.parentButton.icon
                               : widget.finalButtonIcon == null
                                   ? Icons.close
@@ -151,18 +153,18 @@ class _UnicornDialer extends State<UnicornDialer>
 
     if (hasChildButtons) {
       var mainFloatingButton = AnimatedBuilder(
-        animation: this._animationController,
+        animation: _animationController,
         builder: (BuildContext context, Widget? child) {
           // Change Widget to Widget?
           return Transform.rotate(
-            angle: this._animationController.value * 0.8,
+            angle: _animationController.value * 0.8,
             child: mainFAB,
           );
         },
       );
 
       var childButtonsList = widget.childButtons == null ||
-              widget.childButtons.length == 0
+              widget.childButtons.isEmpty
           ? []
           : List.generate(widget.childButtons.length, (index) {
               var intervalValue = index == 0
@@ -181,9 +183,8 @@ class _UnicornDialer extends State<UnicornDialer>
                       widget.childButtons[index].currentButton.onPressed!();
                     }
 
-                    this._animationController.reverse();
+                    _animationController.reverse();
                   },
-                  child: widget.childButtons[index].currentButton.child,
                   heroTag: widget.childButtons[index].currentButton.heroTag,
                   backgroundColor:
                       widget.childButtons[index].currentButton.backgroundColor,
@@ -197,7 +198,8 @@ class _UnicornDialer extends State<UnicornDialer>
                       .childButtons[index].currentButton.highlightElevation,
                   isExtended:
                       widget.childButtons[index].currentButton.isExtended,
-                  shape: widget.childButtons[index].currentButton.shape);
+                  shape: widget.childButtons[index].currentButton.shape,
+                  child: widget.childButtons[index].currentButton.child);
 
               return Positioned(
                 right:
@@ -207,7 +209,7 @@ class _UnicornDialer extends State<UnicornDialer>
                   children: [
                     ScaleTransition(
                         scale: CurvedAnimation(
-                          parent: this._animationController,
+                          parent: _animationController,
                           curve: Interval(intervalValue, 1.0,
                               curve: Curves.linear),
                         ),
@@ -215,7 +217,7 @@ class _UnicornDialer extends State<UnicornDialer>
                         child: Container()),
                     ScaleTransition(
                         scale: CurvedAnimation(
-                          parent: this._animationController,
+                          parent: _animationController,
                           curve: Interval(intervalValue, 1.0,
                               curve: Curves.linear),
                         ),
@@ -241,8 +243,8 @@ class _UnicornDialer extends State<UnicornDialer>
       );
       var modal = ScaleTransition(
         scale: CurvedAnimation(
-          parent: this._animationController,
-          curve: Interval(1.0, 1.0, curve: Curves.linear),
+          parent: _animationController,
+          curve: const Interval(1.0, 1.0, curve: Curves.linear),
         ),
         alignment: FractionalOffset.center,
         child: InkWell(
@@ -251,14 +253,12 @@ class _UnicornDialer extends State<UnicornDialer>
         ),
       );
       return widget.hasBackground
-          ? Container(
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  Positioned(right: 1.0, bottom: 1.0, child: modal),
-                  unicornDialWidget
-                ],
-              ),
+          ? Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Positioned(right: 1.0, bottom: 1.0, child: modal),
+                unicornDialWidget
+              ],
             )
           : unicornDialWidget;
     }

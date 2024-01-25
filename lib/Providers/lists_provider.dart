@@ -215,7 +215,7 @@ class ListsProvider extends ChangeNotifier {
       final Database db = await database;
       // Insert the new list into the SQLite database
       await db.insert('todo_lists', newList.toMap());
-      return null;
+      return;
     } catch (e) {
       print('Error adding new list: $e');
     }

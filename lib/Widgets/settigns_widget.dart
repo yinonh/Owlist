@@ -96,8 +96,8 @@ class _SettingsState extends State<Settings> {
                     await _saveSelectedLanguage(newLanguageCode);
 
                     Locale newLocale = Locale(newLanguageCode);
-                    WidgetsBinding.instance!.addPostFrameCallback((_) {
-                      MyApp.setLocale(context, newLocale);
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      OwlistApp.setLocale(context, newLocale);
                     });
                   },
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -113,7 +113,7 @@ class _SettingsState extends State<Settings> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Row(
@@ -122,7 +122,7 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    MyApp.isDark(context)
+                    OwlistApp.isDark(context)
                         ? AppLocalizations.of(context)
                             .translate("Switch to light mode")
                         : AppLocalizations.of(context)
@@ -136,31 +136,32 @@ class _SettingsState extends State<Settings> {
                 child: Transform.scale(
                   scale: 1,
                   child: Switch(
-                    activeThumbImage: AssetImage('Assets/darkMode.png'),
-                    inactiveThumbImage: AssetImage('Assets/lightMode.png'),
+                    activeThumbImage: const AssetImage('Assets/darkMode.png'),
+                    inactiveThumbImage:
+                        const AssetImage('Assets/lightMode.png'),
                     onChanged: (mode) async {
-                      WidgetsBinding.instance!.addPostFrameCallback((_) {
-                        MyApp.setTheme(context);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        OwlistApp.setTheme(context);
                       });
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();
                       await prefs.setString(
                           'selectedTheme', mode ? "dark" : "light");
                     },
-                    value: MyApp.isDark(context),
+                    value: OwlistApp.isDark(context),
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Row(
             children: [
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Text(
                     AppLocalizations.of(context)
                         .translate("Enable notifications:"),
@@ -267,7 +268,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Text(

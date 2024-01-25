@@ -8,7 +8,7 @@ class CustomFloatingActionButton extends StatelessWidget {
   final double screenWidth;
   final double screenHeight;
 
-  CustomFloatingActionButton({
+  const CustomFloatingActionButton({
     Key? key,
     this.onPressed,
     this.child,
@@ -20,8 +20,6 @@ class CustomFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double buttonSize =
-        math.min(getRelativeWidth(0.15), getRelativeHeight(0.15));
     return GestureDetector(
       onTap: onPressed,
       child: Transform.rotate(
@@ -35,7 +33,7 @@ class CustomFloatingActionButton extends StatelessWidget {
                 BoxShadow(
                   blurRadius: 25,
                   offset: const Offset(0, 5),
-                  color: Color(0xFF635985).withOpacity(0.5),
+                  color: const Color(0xFF635985).withOpacity(0.5),
                 )
               ],
               borderRadius: const BorderRadius.all(Radius.circular(18)),

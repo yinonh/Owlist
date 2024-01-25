@@ -10,8 +10,11 @@ class ToDoItemTile extends StatefulWidget {
   final Function(ToDoList) onDelete;
   final Function refresh;
 
-  ToDoItemTile(
-      {required this.item, required this.refresh, required this.onDelete});
+  const ToDoItemTile(
+      {super.key,
+      required this.item,
+      required this.refresh,
+      required this.onDelete});
 
   @override
   State<ToDoItemTile> createState() => _ToDoItemTileState();
@@ -117,7 +120,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
         return '${AppLocalizations.of(context).translate("Remaining Days:")} ${difference.inDays}';
       } else {
         int hoursDifference = deadline.difference(now).inHours;
-        return '${AppLocalizations.of(context).translate("Remaining Hours:")} ${hoursDifference}';
+        return '${AppLocalizations.of(context).translate("Remaining Hours:")} $hoursDifference';
       }
     }
   }
@@ -176,36 +179,34 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 ],
               ),
               widget.item.hasDeadline
-                  ? Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                formatDate(widget
-                                    .item.creationDate), // Format creationDate
-                              ),
-                              Text(
-                                formatDate(
-                                    widget.item.deadline), // Format deadline
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8.0),
-                          LinearProgressIndicator(
-                            value: remainingHours <= 0
-                                ? 1
-                                : (totalHours - remainingHours) / totalHours,
-                          ),
-                          const SizedBox(height: 8.0),
-                          Text(
-                            '${getDeadlineDiff(widget.item.deadline)}',
-                            // style: TextStyle(fontSize: 16.0),
-                          ),
-                        ],
-                      ),
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              formatDate(widget
+                                  .item.creationDate), // Format creationDate
+                            ),
+                            Text(
+                              formatDate(
+                                  widget.item.deadline), // Format deadline
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8.0),
+                        LinearProgressIndicator(
+                          value: remainingHours <= 0
+                              ? 1
+                              : (totalHours - remainingHours) / totalHours,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          getDeadlineDiff(widget.item.deadline),
+                          // style: TextStyle(fontSize: 16.0),
+                        ),
+                      ],
                     )
                   : Text(
                       AppLocalizations.of(context)
@@ -234,19 +235,17 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               ),
               const SizedBox(height: 8.0),
               widget.item.totalItems > 0
-                  ? Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          LinearProgressIndicator(
-                            value: progressPercentage,
-                          ),
-                          const SizedBox(height: 8.0),
-                          Text(
-                            '${AppLocalizations.of(context).translate("Progress:")} ${(progressPercentage * 100).toStringAsFixed(0)}%',
-                          ),
-                        ],
-                      ),
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LinearProgressIndicator(
+                          value: progressPercentage,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          '${AppLocalizations.of(context).translate("Progress:")} ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                        ),
+                      ],
                     )
                   : const SizedBox(height: 0),
             ],

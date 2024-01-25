@@ -1,11 +1,8 @@
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 
-import '../themes.dart';
 import '../l10n/app_localizations.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/date_picker.dart';
-import '../Providers/lists_provider.dart';
 
 class DiamondBottomNavigation extends StatelessWidget {
   final List<IconData> itemIcons;
@@ -16,7 +13,7 @@ class DiamondBottomNavigation extends StatelessWidget {
   final Color selectedLightColor;
   final Color unselectedColor;
   final Color bgColor;
-  final Function add_item;
+  final Function addItem;
   bool hasDeadline = true;
 
   DiamondBottomNavigation({
@@ -24,7 +21,7 @@ class DiamondBottomNavigation extends StatelessWidget {
     required this.itemIcons,
     required this.selectedIndex,
     required this.onItemPressed,
-    required this.add_item,
+    required this.addItem,
     this.height,
     this.selectedColor = const Color(0xFF635985),
     this.unselectedColor = Colors.grey,
@@ -164,8 +161,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                   size: getRelativeWidth(0.1),
                 ),
                 onTap: () async {
-                  TextEditingController new_title = TextEditingController();
-                  DateTime new_deadline = DateTime.now().add(Duration(days: 7));
+                  TextEditingController newTitle = TextEditingController();
+                  DateTime newDeadline =
+                      DateTime.now().add(const Duration(days: 7));
                   showDialog<void>(
                     context: context,
                     barrierDismissible: true,
@@ -191,7 +189,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                   style:
                                       Theme.of(context).textTheme.headlineSmall,
                                   autofocus: true,
-                                  controller: new_title,
+                                  controller: newTitle,
                                   maxLength: 25,
                                   decoration: InputDecoration(
                                     hintText: AppLocalizations.of(context)
@@ -225,14 +223,15 @@ class DiamondBottomNavigation extends StatelessWidget {
                                       ),
                                       hasDeadline
                                           ? DatePickerWidget(
-                                              initialDate: new_deadline,
+                                              initialDate: newDeadline,
                                               firstDate: DateTime.now()
-                                                  .add(Duration(days: 1)),
-                                              lastDate: DateTime.now()
-                                                  .add(Duration(days: 3650)),
+                                                  .add(const Duration(days: 1)),
+                                              lastDate: DateTime.now().add(
+                                                  const Duration(days: 3650)),
                                               onDateSelected: (selectedDate) {
-                                                if (selectedDate != null)
-                                                  new_deadline = selectedDate;
+                                                if (selectedDate != null) {
+                                                  newDeadline = selectedDate;
+                                                }
                                               },
                                             )
                                           : FittedBox(
@@ -272,9 +271,9 @@ class DiamondBottomNavigation extends StatelessWidget {
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
                                   onPressed: () {
-                                    if (new_title.text.trim().isNotEmpty) {
-                                      add_item(new_title.text.trim(),
-                                          new_deadline, hasDeadline);
+                                    if (newTitle.text.trim().isNotEmpty) {
+                                      addItem(newTitle.text.trim(), newDeadline,
+                                          hasDeadline);
                                     }
                                     Navigator.of(context).pop();
                                   },

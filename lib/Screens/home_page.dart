@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Providers/notification_provider.dart';
-import '../Widgets/notification_time.dart';
 import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
@@ -23,6 +22,8 @@ enum SortBy {
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
+
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> {
     final snackBar = SnackBar(
       content: Text(
         text,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor:
           Theme.of(context).highlightColor, // Change background color
@@ -175,9 +176,10 @@ class _HomePageState extends State<HomePage> {
       bool notificationExsist =
           await Provider.of<NotificationProvider>(context, listen: false)
               .cancelNotification(item.notificationIndex, item.deadline);
-      if (notificationExsist)
+      if (notificationExsist) {
         showMessage(AppLocalizations.of(context)
             .translate("The notification for this list was canceled"));
+      }
     }
   }
 
@@ -191,7 +193,7 @@ class _HomePageState extends State<HomePage> {
               .then((result) {
             if (result != null) {
               showMessage(
-                  "${AppLocalizations.of(context).translate("Schedule notification for:")} ${result}");
+                  "${AppLocalizations.of(context).translate("Schedule notification for:")} $result");
             }
             return provider.getActiveItems();
           });
@@ -240,7 +242,7 @@ class _HomePageState extends State<HomePage> {
           Icons.notifications_off_rounded,
           Icons.settings,
         ],
-        add_item: addItem,
+        addItem: addItem,
         selectedIndex: currentIndex,
         onItemPressed: onItemTapped,
         bgColor: Theme.of(context).primaryColor,
@@ -265,8 +267,8 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 24.0),
                   child: Row(
                     textDirection: TextDirection.ltr,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -296,63 +298,63 @@ class _HomePageState extends State<HomePage> {
                               itemBuilder: (BuildContext cnx) => [
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.creationNTL,
+                                  checked: selectedOption == SortBy.creationNTL,
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Newest to Oldest"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.creationNTL,
                                 ),
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.creationLTN,
+                                  checked: selectedOption == SortBy.creationLTN,
                                   child: Text(
                                     AppLocalizations.of(context).translate(
                                         "Creation Date: Oldest to Newest"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.creationLTN,
                                 ),
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.deadlineLTN,
+                                  checked: selectedOption == SortBy.deadlineLTN,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Later to Sooner"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.deadlineLTN,
                                 ),
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.deadlineNTL,
+                                  checked: selectedOption == SortBy.deadlineNTL,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Deadline: Sooner to Later"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.deadlineNTL,
                                 ),
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.progressBTS,
+                                  checked: selectedOption == SortBy.progressBTS,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: High to Low"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.progressBTS,
                                 ),
                                 CheckedPopupMenuItem<SortBy>(
                                   value: SortBy.progressSTB,
+                                  checked: selectedOption == SortBy.progressSTB,
                                   child: Text(
                                     AppLocalizations.of(context)
                                         .translate("Progress: Low to High"),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  checked: selectedOption == SortBy.progressSTB,
                                 ),
                               ],
                             ),
@@ -381,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                     controller: selectedIndex,
                     children: [
                       FutureBuilder<List<ToDoList>>(
-                        key: PageStorageKey(1),
+                        key: const PageStorageKey(1),
                         future: activeItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -393,7 +395,7 @@ class _HomePageState extends State<HomePage> {
                             return Text(
                               AppLocalizations.of(context)
                                   .translate("Error has occurred"),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             );
                           } else {
                             return ItemsScreen(
@@ -406,22 +408,22 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       FutureBuilder<List<ToDoList>>(
-                        key: PageStorageKey(2),
+                        key: const PageStorageKey(2),
                         future: achievedItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                duration: Duration(seconds: 2),
+                                duration: const Duration(seconds: 2),
                                 content: Text(
                                   AppLocalizations.of(context)
                                       .translate("Error has occurred"),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -431,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                             return Text(
                               AppLocalizations.of(context)
                                   .translate("Error has occurred"),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             );
                           } else {
                             return ItemsScreen(
@@ -444,22 +446,22 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       FutureBuilder<List<ToDoList>>(
-                        key: PageStorageKey(3),
+                        key: const PageStorageKey(3),
                         future: withoutDeadlineItemsFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                duration: Duration(seconds: 2),
+                                duration: const Duration(seconds: 2),
                                 content: Text(
                                   AppLocalizations.of(context)
                                       .translate("Error has occurred"),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -469,7 +471,7 @@ class _HomePageState extends State<HomePage> {
                             return Text(
                               AppLocalizations.of(context)
                                   .translate("Error has occurred"),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             );
                           } else {
                             return ItemsScreen(
@@ -481,7 +483,7 @@ class _HomePageState extends State<HomePage> {
                           }
                         },
                       ),
-                      Settings(),
+                      const Settings(),
                     ],
                   ),
                 ),

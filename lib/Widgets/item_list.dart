@@ -15,7 +15,7 @@ class ItemList extends StatefulWidget {
   final Function updateSingleListScreen;
   final AnimatedListController controller;
 
-  ItemList(
+  const ItemList(
       {required this.editMode,
       required this.currentList,
       required this.editList,
@@ -42,7 +42,7 @@ class _ItemListState extends State<ItemList> {
               final item = widget.editList[index];
               return Container(
                 key: Key(item.id), // Key for reordering
-                margin: EdgeInsets.symmetric(vertical: 5),
+                margin: const EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Theme.of(context).cardColor,
@@ -78,10 +78,10 @@ class _ItemListState extends State<ItemList> {
               ),
               itemBuilder: (context, item, data) {
                 if (data.measuring) {
-                  return Container(margin: EdgeInsets.all(5), height: 50);
+                  return Container(margin: const EdgeInsets.all(5), height: 50);
                 } else {
                   return Container(
-                    margin: EdgeInsets.symmetric(vertical: 5),
+                    margin: const EdgeInsets.symmetric(vertical: 5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Theme.of(context).cardColor,
