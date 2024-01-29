@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'main.dart';
+
 final ThemeData lightTheme = ThemeData(
   textSelectionTheme: const TextSelectionThemeData(
     cursorColor: Colors.purpleAccent,
@@ -234,6 +236,16 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   ),
 );
 
-ThemeData toggleTheme(ThemeData currentTheme) {
-  return currentTheme == lightTheme ? darkTheme : lightTheme;
+ThemeData? getThemeData(ThemeMode currentTheme) {
+  switch (currentTheme) {
+    case ThemeMode.light:
+      return lightTheme;
+    case ThemeMode.dark:
+      return darkTheme;
+    default:
+      if (ThemeMode.system == ThemeMode.dark) {
+        return darkTheme;
+      }
+      return lightTheme;
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EditableTextView extends StatefulWidget {
@@ -24,6 +25,14 @@ class _EditableTextViewState extends State<EditableTextView> {
   void initState() {
     super.initState();
     widget.controller.text = widget.initialText;
+  }
+
+  @override
+  void didUpdateWidget(EditableTextView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialText != widget.initialText) {
+      widget.controller.text = widget.initialText;
+    }
   }
 
   @override
@@ -63,6 +72,11 @@ class _EditableTextViewState extends State<EditableTextView> {
           style: const TextStyle(color: Colors.white),
           linkStyle: const TextStyle(color: Colors.blue),
           textAlign: TextAlign.start, // Align the text to the start (left)
+          linkifiers: const [
+            PhoneNumberLinkifier(),
+            UrlLinkifier(),
+            EmailLinkifier()
+          ],
         ),
       );
     }

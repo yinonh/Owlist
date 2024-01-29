@@ -9,7 +9,6 @@ class ItemList extends StatefulWidget {
   final List<ToDoItem> currentList;
   final List<ToDoItem> editList;
   final Function reorderItems;
-  final Function deleteItem;
   final Function checkItem;
   final void Function() toggleEditMode;
   final Function updateSingleListScreen;
@@ -21,7 +20,6 @@ class ItemList extends StatefulWidget {
       required this.editList,
       required this.reorderItems,
       required this.checkItem,
-      required this.deleteItem,
       required this.toggleEditMode,
       required this.controller,
       required this.updateSingleListScreen,
@@ -40,28 +38,11 @@ class _ItemListState extends State<ItemList> {
             itemCount: widget.editList.length,
             itemBuilder: (context, index) {
               final item = widget.editList[index];
-              return Container(
-                key: Key(item.id), // Key for reordering
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).cardColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      // offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: ToDoItemWidget(
-                    item,
-                    true,
-                    item.itemIndex,
-                    widget.checkItem,
-                    widget.deleteItem,
-                    widget.updateSingleListScreen),
+              return ToDoItemWidget(
+                item,
+                true,
+                widget.checkItem,
+                widget.updateSingleListScreen,
               );
             },
             onReorder: (oldIndex, newIndex) {
@@ -80,27 +61,11 @@ class _ItemListState extends State<ItemList> {
                 if (data.measuring) {
                   return Container(margin: const EdgeInsets.all(5), height: 50);
                 } else {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).hintColor.withOpacity(0.5),
-                          spreadRadius: 0.5,
-                          blurRadius: 1.5,
-                          // offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: ToDoItemWidget(
-                        item,
-                        false,
-                        item.itemIndex,
-                        widget.checkItem,
-                        widget.deleteItem,
-                        widget.updateSingleListScreen),
+                  return ToDoItemWidget(
+                    item,
+                    false,
+                    widget.checkItem,
+                    widget.updateSingleListScreen,
                   );
                 }
               },

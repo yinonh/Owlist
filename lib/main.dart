@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared'
+    '_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 
@@ -30,70 +31,78 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => ListsProvider()),
         ChangeNotifierProvider(create: (context) => ItemProvider()),
       ],
-      child: const MyApp(),
+      child: const OwlistApp(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class OwlistApp extends StatefulWidget {
+  const OwlistApp({super.key});
 
   static void setLocale(BuildContext context, Locale newLocale) {
-    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    final _OwlistAppState state =
+        context.findAncestorStateOfType<_OwlistAppState>()!;
     state.setLocale(newLocale);
   }
 
-  static void setTheme(BuildContext context) {
-    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
-    state.setTheme(toggleTheme(state.currentTheme));
+  static void setTheme(BuildContext context, bool mode) {
+    final _OwlistAppState state =
+        context.findAncestorStateOfType<_OwlistAppState>()!;
+    state.setTheme(mode ? ThemeMode.dark : ThemeMode.light);
   }
 
   static bool isDark(BuildContext context) {
-    final _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
-    return state.currentTheme == darkTheme;
+    final _OwlistAppState state =
+        context.findAncestorStateOfType<_OwlistAppState>()!;
+    if (state.currentThemeMode != null) {
+      return state.currentThemeMode == ThemeMode.dark;
+    }
+    return MediaQuery.of(context).platformBrightness == Brightness.dark;
   }
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<OwlistApp> createState() => _OwlistAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _OwlistAppState extends State<OwlistApp> {
   Locale? _locale;
-  late ThemeData currentTheme =
-      MediaQuery.of(context).platformBrightness == Brightness.dark
-          ? darkTheme
-          : lightTheme;
+  ThemeMode? currentThemeMode;
   late Widget initialScreen;
 
   Future<void> setPreferences(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? language = prefs.getString('selectedLanguage');
+    String? themePref = prefs.getString('selectedTheme');
+
+    print("Selected language from SharedPreferences: $language");
+    print("Selected theme from SharedPreferences: $themePref");
+
+    // Set locale
     switch (language) {
       case 'en':
-        setLocale(const Locale('en', 'IL'));
+        _locale = const Locale('en', 'IL');
         break;
       case 'he':
-        setLocale(const Locale('he', 'US'));
+        _locale = const Locale('he', 'US');
         break;
       default:
-        Localizations.localeOf(context).languageCode == 'he'
-            ? setLocale(const Locale('he', 'IL'))
-            : setLocale(const Locale('en', 'US'));
+        _locale = Localizations.localeOf(context);
     }
 
-    String? themePref = prefs.getString('selectedTheme');
+    // Set theme
     switch (themePref) {
       case 'dark':
-        setTheme(darkTheme);
+        currentThemeMode = ThemeMode.dark;
         break;
       case 'light':
-        setTheme(lightTheme);
+        currentThemeMode = ThemeMode.light;
         break;
       default:
-        MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? setTheme(darkTheme)
-            : setTheme(lightTheme);
+        currentThemeMode = ThemeMode.system;
     }
+
+    print("Locale set to: $_locale");
+    print("Theme mode set to: $currentThemeMode");
   }
 
   void setLocale(Locale newLocale) {
@@ -102,17 +111,18 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void setTheme(ThemeData newTheme) {
+  void setTheme(ThemeMode newTheme) {
     setState(() {
-      currentTheme = newTheme;
+      currentThemeMode = newTheme;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    initialScreen = HomePage();
-    setPreferences(context);
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      setPreferences(context);
+    });
   }
 
   @override
@@ -137,7 +147,9 @@ class _MyAppState extends State<MyApp> {
           Locale('en', 'US'),
           Locale('he', 'IL'),
         ],
-        theme: currentTheme,
+        themeMode: currentThemeMode,
+        theme: lightTheme,
+        darkTheme: darkTheme,
         routes: {
           HomePage.routeName: (context) => HomePage(),
           StatisticsScreen.routeName: (context) => StatisticsScreen(),
@@ -168,7 +180,7 @@ class _MyAppState extends State<MyApp> {
               }
           }
         },
-        home: initialScreen,
+        home: HomePage(),
       ),
     );
   }

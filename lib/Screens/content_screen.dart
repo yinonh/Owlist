@@ -24,11 +24,11 @@ class ContentScreen extends StatefulWidget {
 class _ContentScreenState extends State<ContentScreen> {
   late bool titleEditMode;
   final TextEditingController _titleController = TextEditingController();
+  TextEditingController textEditingController = TextEditingController();
   late ToDoItem _item;
   bool _isLoading = false;
   bool textEditMode = false;
   bool newTextEmpty = false;
-  TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -73,6 +73,22 @@ class _ContentScreenState extends State<ContentScreen> {
           .updateItemContent(_item.id, textEditingController.text.trim());
       toggleTextEditMode();
     }
+    _getItem();
+  }
+
+  void _discard() {
+    setState(() {
+      if (titleEditMode) {
+        _titleController.text = _item.title.trim();
+        _toggleTitleEditMode();
+      }
+      if (textEditMode) {
+        textEditingController.text = _item.content.trim().isEmpty
+            ? AppLocalizations.of(context).translate("Add some content")
+            : _item.content.trim();
+        toggleTextEditMode();
+      }
+    });
   }
 
   @override
@@ -166,26 +182,7 @@ class _ContentScreenState extends State<ContentScreen> {
                               titleEditMode || textEditMode
                                   ? IconButton(
                                       icon: const Icon(Icons.cancel),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (titleEditMode) {
-                                            _titleController.text =
-                                                _item.title.trim();
-                                            _toggleTitleEditMode();
-                                          }
-                                          if (textEditMode) {
-                                            textEditingController.text = _item
-                                                    .content
-                                                    .trim()
-                                                    .isEmpty
-                                                ? AppLocalizations.of(context)
-                                                    .translate(
-                                                        "Add some content")
-                                                : _item.content.trim();
-                                            toggleTextEditMode();
-                                          }
-                                        });
-                                      },
+                                      onPressed: _discard,
                                     )
                                   : IconButton(
                                       icon: const Icon(Icons.arrow_back),
@@ -251,6 +248,7 @@ class _ContentScreenState extends State<ContentScreen> {
                               ),
                               GestureDetector(
                                 onLongPress: toggleTextEditMode,
+                                onDoubleTap: toggleTextEditMode,
                                 child: EditableTextView(
                                     initialText: _item.content.trim().isEmpty
                                         ? AppLocalizations.of(context)

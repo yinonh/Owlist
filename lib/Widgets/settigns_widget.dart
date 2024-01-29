@@ -47,6 +47,7 @@ class _SettingsState extends State<Settings> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String selectedLanguage = prefs.getString('selectedLanguage') ??
         Localizations.localeOf(context).languageCode;
+    String? selectedTheme = prefs.getString('selectedTheme');
 
     setState(() {
       _selectedLanguages =
@@ -57,6 +58,11 @@ class _SettingsState extends State<Settings> {
   Future<void> _saveSelectedLanguage(String languageCode) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('selectedLanguage', languageCode);
+  }
+
+  Future<void> _saveSelectedTheme(bool themeMode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedTheme', themeMode ? "dark" : "light");
   }
 
   void onTimeChanged(Time originalTime) {
@@ -140,13 +146,10 @@ class _SettingsState extends State<Settings> {
                     inactiveThumbImage:
                         const AssetImage('Assets/lightMode.png'),
                     onChanged: (mode) async {
+                      await _saveSelectedTheme(mode);
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        OwlistApp.setTheme(context);
+                        OwlistApp.setTheme(context, mode);
                       });
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setString(
-                          'selectedTheme', mode ? "dark" : "light");
                     },
                     value: OwlistApp.isDark(context),
                   ),

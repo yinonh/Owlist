@@ -112,6 +112,36 @@ class ItemProvider extends ChangeNotifier {
     return newItem;
   }
 
+  Future<void> addExistingItem(ToDoItem item) async {
+    final Database db = await database;
+
+    final Map<String, dynamic> itemData = {
+      'id': item.id,
+      'listId': item.listId,
+      'title': item.title,
+      'content': item.content,
+      'done': item.done ? 1 : 0,
+      'itemIndex': item.itemIndex,
+    };
+
+    await db.insert(
+      'todo_items',
+      itemData,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    await db.transaction((txn) async {
+      final String updateQuery = item.done
+          ? 'UPDATE todo_lists SET totalItems = totalItems + 1, accomplishedItems = accomplishedItems + 1 WHERE id = ?'
+          : 'UPDATE todo_lists SET totalItems = totalItems + 1 WHERE id = ?';
+
+      await txn.rawUpdate(
+        updateQuery,
+        [item.listId],
+      );
+    });
+  }
+
   Future<void> deleteItemById(String id, bool isDone) async {
     try {
       final Database db = await database;

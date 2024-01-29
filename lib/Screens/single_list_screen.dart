@@ -38,6 +38,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
     editMode = false;
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initListDate();
+  }
+
   void initListDate() async {
     setState(() {
       isLoading = true;
@@ -100,16 +106,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
   }
 
-  void deleteItem(String id, bool done, context) {
-    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-    itemProvider.deleteItemById(id, done);
-
-    List<ToDoItem> temp = List.from(currentList);
-    temp.removeWhere((element) => element.id == id);
-    setState(() {
-      currentList = temp;
-    });
-  }
+  // void deleteItem(String id, bool done, context) {
+  //   final itemProvider = Provider.of<ItemProvider>(context, listen: false);
+  //   itemProvider.deleteItemById(id, done);
+  //
+  //   List<ToDoItem> temp = List.from(currentList);
+  //   temp.removeWhere((element) => element.id == id);
+  //   setState(() {
+  //     currentList = temp;
+  //   });
+  // }
 
   void addNewItem(String newTitle) async {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
@@ -331,7 +337,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                     editList: editList,
                                     reorderItems: reorderItems,
                                     checkItem: checkItem,
-                                    deleteItem: deleteItem,
                                     controller: itemListController,
                                     updateSingleListScreen: initListDate,
                                   ),
