@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 
 import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
+import '../Utils/shared_preferences_helper.dart';
 
 const VERSION = 1;
 
@@ -250,7 +251,10 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
-        return await notificationProvider.scheduleNotification(newList);
+        return await notificationProvider.scheduleNotification(
+            newList,
+            SharedPreferencesHelper.instance.selectedLanguage ??
+                Localizations.localeOf(context).languageCode);
       }
     } catch (error) {
       print("Error adding new item: $error");
@@ -374,7 +378,9 @@ class ListsProvider extends ChangeNotifier {
               creationDate: list.creationDate,
               deadline: newDeadline,
               totalItems: list.totalItems,
-              accomplishedItems: list.accomplishedItems));
+              accomplishedItems: list.accomplishedItems),
+          SharedPreferencesHelper.instance.selectedLanguage ??
+              Localizations.localeOf(context).languageCode);
       return newTime;
     } catch (e) {
       print('Error updating the deadline: $e');
@@ -402,16 +408,19 @@ class ListsProvider extends ChangeNotifier {
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
-      await notificationProvider.scheduleNotification(ToDoList(
-          id: list.id,
-          userID: list.userID,
-          notificationIndex: list.notificationIndex,
-          hasDeadline: list.hasDeadline,
-          title: newTitle,
-          creationDate: list.creationDate,
-          deadline: list.deadline,
-          totalItems: list.totalItems,
-          accomplishedItems: list.accomplishedItems));
+      await notificationProvider.scheduleNotification(
+          ToDoList(
+              id: list.id,
+              userID: list.userID,
+              notificationIndex: list.notificationIndex,
+              hasDeadline: list.hasDeadline,
+              title: newTitle,
+              creationDate: list.creationDate,
+              deadline: list.deadline,
+              totalItems: list.totalItems,
+              accomplishedItems: list.accomplishedItems),
+          SharedPreferencesHelper.instance.selectedLanguage ??
+              Localizations.localeOf(context).languageCode);
     } catch (e) {
       print('Error updating the title: $e');
     }

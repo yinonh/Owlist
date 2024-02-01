@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/statistics_screen.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 
+import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
 import '../l10n/app_localizations.dart';
 import '../Widgets/notification_time.dart';
@@ -44,25 +44,14 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _loadSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String selectedLanguage = prefs.getString('selectedLanguage') ??
-        Localizations.localeOf(context).languageCode;
-    String? selectedTheme = prefs.getString('selectedTheme');
+    String selectedLanguage =
+        SharedPreferencesHelper.instance.selectedLanguage ??
+            Localizations.localeOf(context).languageCode;
 
     setState(() {
       _selectedLanguages =
           selectedLanguage == 'he' ? [false, true] : [true, false];
     });
-  }
-
-  Future<void> _saveSelectedLanguage(String languageCode) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedLanguage', languageCode);
-  }
-
-  Future<void> _saveSelectedTheme(bool themeMode) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedTheme', themeMode ? "dark" : "light");
   }
 
   void onTimeChanged(Time originalTime) {
@@ -99,7 +88,8 @@ class _SettingsState extends State<Settings> {
                     });
 
                     String newLanguageCode = index == 0 ? 'en' : 'he';
-                    await _saveSelectedLanguage(newLanguageCode);
+                    SharedPreferencesHelper.instance.selectedLanguage =
+                        newLanguageCode;
 
                     Locale newLocale = Locale(newLanguageCode);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -146,7 +136,8 @@ class _SettingsState extends State<Settings> {
                     inactiveThumbImage:
                         const AssetImage('Assets/lightMode.png'),
                     onChanged: (mode) async {
-                      await _saveSelectedTheme(mode);
+                      SharedPreferencesHelper.instance.selectedTheme =
+                          mode ? "dark" : "light";
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         OwlistApp.setTheme(context, mode);
                       });

@@ -3,13 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared'
-    '_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 
 import 'themes.dart';
 import 'l10n/app_localizations.dart';
+import './Utils/shared_preferences_helper.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
 import './Screens/statistics_screen.dart';
@@ -19,6 +18,7 @@ import './Providers/item_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferencesHelper.instance.initialise();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -57,7 +57,7 @@ class OwlistApp extends StatefulWidget {
     if (state.currentThemeMode != null) {
       return state.currentThemeMode == ThemeMode.dark;
     }
-    return MediaQuery.of(context).platformBrightness == Brightness.dark;
+    return MediaQuery.of(context).platformBrightness == Brightness.light;
   }
 
   @override
@@ -70,12 +70,9 @@ class _OwlistAppState extends State<OwlistApp> {
   late Widget initialScreen;
 
   Future<void> setPreferences(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? language = prefs.getString('selectedLanguage');
-    String? themePref = prefs.getString('selectedTheme');
-
-    print("Selected language from SharedPreferences: $language");
-    print("Selected theme from SharedPreferences: $themePref");
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? language = SharedPreferencesHelper.instance.selectedLanguage;
+    String? themePref = SharedPreferencesHelper.instance.selectedTheme;
 
     // Set locale
     switch (language) {
@@ -86,7 +83,7 @@ class _OwlistAppState extends State<OwlistApp> {
         _locale = const Locale('he', 'US');
         break;
       default:
-        _locale = Localizations.localeOf(context);
+        _locale = null;
     }
 
     // Set theme
@@ -100,9 +97,6 @@ class _OwlistAppState extends State<OwlistApp> {
       default:
         currentThemeMode = ThemeMode.system;
     }
-
-    print("Locale set to: $_locale");
-    print("Theme mode set to: $currentThemeMode");
   }
 
   void setLocale(Locale newLocale) {
@@ -114,14 +108,6 @@ class _OwlistAppState extends State<OwlistApp> {
   void setTheme(ThemeMode newTheme) {
     setState(() {
       currentThemeMode = newTheme;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      setPreferences(context);
     });
   }
 

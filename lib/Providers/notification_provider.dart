@@ -9,17 +9,16 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
-// import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:to_do/Models/to_do_list.dart';
 import 'dart:math';
 
+import '../Utils/shared_preferences_helper.dart';
 import '../Widgets/notification_time.dart';
+import '../Models/to_do_list.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
-  late SharedPreferences _prefs;
+  // late SharedPreferences _prefs;
   late NotificationTime _notificationTime;
   late bool isActive;
 
@@ -36,23 +35,24 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> _initSharedPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-    int storedTime = _prefs.getInt('notification_time') ?? 120000;
+    int storedTime =
+        await SharedPreferencesHelper.instance.getNotificationTime();
     _notificationTime = NotificationTime.fromInt(storedTime);
-    isActive = _prefs.getBool('notification_active') ?? true;
+    isActive = await SharedPreferencesHelper.instance.isNotificationActive();
+
     notifyListeners();
   }
 
   Future<void> saveNotificationTimeToPrefs(NotificationTime time) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
     _notificationTime = time;
-    await prefs.setInt('notification_time', time.toInt());
+    await SharedPreferencesHelper.instance.setNotificationTime(time.toInt());
     notifyListeners();
   }
 
   Future<void> saveActive(bool isActive) async {
     this.isActive = isActive;
-    await _prefs.setBool('notification_active', isActive);
+    await SharedPreferencesHelper.instance.setNotificationStatus(isActive);
     notifyListeners();
   }
 
@@ -129,8 +129,8 @@ class NotificationProvider with ChangeNotifier {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  Future<String> getRandomNotificationText() async {
-    String languageCode = _prefs.getString('selectedLanguage') ?? 'en';
+  Future<String> getRandomNotificationText(String languageCode) async {
+    languageCode = languageCode != 'he' ? 'en' : 'he';
     String jsonString =
         await rootBundle.loadString('Assets/languages/$languageCode.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
@@ -151,7 +151,8 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  Future<String?> scheduleNotification(ToDoList list) async {
+  Future<String?> scheduleNotification(
+      ToDoList list, String languageCode) async {
     if (!isActive) return null;
     cancelNotification(list.notificationIndex);
     final deadline = list.deadline.subtract(const Duration(days: 1));
@@ -169,7 +170,7 @@ class NotificationProvider with ChangeNotifier {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       list.notificationIndex,
       list.title,
-      await getRandomNotificationText(),
+      await getRandomNotificationText(languageCode),
       scheduledTime,
       const NotificationDetails(
         android: AndroidNotificationDetails(

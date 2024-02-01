@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Providers/notification_provider.dart';
+import '../Utils/shared_preferences_helper.dart';
 import '../l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-  late SharedPreferences prefs;
+  // late SharedPreferences prefs;
   SortBy selectedOption = SortBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
@@ -75,9 +75,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadCheckedStatus() async {
-    prefs = await SharedPreferences.getInstance();
+    int index = await SharedPreferencesHelper.instance.sortByIndex();
     setState(() {
-      selectedOption = SortBy.values[prefs.getInt('sortByIndex') ?? 0];
+      selectedOption = SortBy.values[index];
     });
   }
 
@@ -287,13 +287,14 @@ class _HomePageState extends State<HomePage> {
                             )
                           : PopupMenuButton<SortBy>(
                               icon: const Icon(Icons.filter_list),
-                              onSelected: (value) {
+                              onSelected: (value) async {
                                 setState(() {
                                   selectedOption = value;
                                   sortLists();
                                 });
-                                prefs.setInt('sortByIndex',
-                                    SortBy.values.indexOf(value));
+                                await SharedPreferencesHelper.instance
+                                    .setSortByIndex(
+                                        SortBy.values.indexOf(value));
                               },
                               itemBuilder: (BuildContext cnx) => [
                                 CheckedPopupMenuItem<SortBy>(
