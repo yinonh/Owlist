@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Screens/single_list_screen.dart';
 

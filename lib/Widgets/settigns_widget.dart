@@ -7,7 +7,7 @@ import 'package:toggle_switch/toggle_switch.dart';
 
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Widgets/notification_time.dart';
 
 class Settings extends StatefulWidget {

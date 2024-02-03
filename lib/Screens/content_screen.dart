@@ -5,7 +5,7 @@ import '../Models/to_do_item.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
 import '../Widgets/uicorn_button.dart';
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/item_provider.dart';
 
@@ -203,7 +203,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                         controller: _titleController,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
-                                          fontSize: 12.0,
+                                          // fontSize: 12.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),

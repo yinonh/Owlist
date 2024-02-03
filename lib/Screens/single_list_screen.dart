@@ -9,7 +9,7 @@ import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 
 class SingleListScreen extends StatefulWidget {
   final String listId;
@@ -105,17 +105,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
       }
     });
   }
-
-  // void deleteItem(String id, bool done, context) {
-  //   final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-  //   itemProvider.deleteItemById(id, done);
-  //
-  //   List<ToDoItem> temp = List.from(currentList);
-  //   temp.removeWhere((element) => element.id == id);
-  //   setState(() {
-  //     currentList = temp;
-  //   });
-  // }
 
   void addNewItem(String newTitle) async {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);

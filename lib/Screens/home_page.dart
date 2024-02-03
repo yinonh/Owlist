@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Utils/shared_preferences_helper.dart';
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
@@ -31,11 +31,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late ListsProvider provider;
-  // late NotificationProvider notificationProvider;
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-  // late SharedPreferences prefs;
   SortBy selectedOption = SortBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
@@ -52,10 +50,6 @@ class _HomePageState extends State<HomePage> {
       AppLocalizations.of(context).translate("Settings")
     ];
   }
-
-  // Future<void> setUpNotifications() async {
-  //   await notificationProvider.setUpNotifications();
-  // }
 
   @override
   void initState() {

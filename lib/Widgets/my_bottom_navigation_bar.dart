@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/date_picker.dart';
 

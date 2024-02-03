@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/Providers/item_provider.dart';
 
-import '../l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import 'dog_ear_list_tile.dart';

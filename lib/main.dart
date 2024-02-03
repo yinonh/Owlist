@@ -6,8 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 
-import 'themes.dart';
-import 'l10n/app_localizations.dart';
+import './Utils/l10n/app_localizations.dart';
+import './Utils/themes.dart';
 import './Utils/shared_preferences_helper.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
