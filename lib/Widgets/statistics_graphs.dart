@@ -56,7 +56,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
                   ),
                 ),
           Text(
-            AppLocalizations.of(context).translate("Items Data:"),
+            AppLocalizations.of(context).translate("Items Data"),
             style: const TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).highlightColor,
             value: statistics!['withoutDeadline']!.toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Without Deadline")} ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${AppLocalizations.of(context).translate("Without Deadline")}\n ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -113,7 +113,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).focusColor,
             value: (statistics!['activeLists']!).toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Active Lists")}: ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${AppLocalizations.of(context).translate("Active Lists")}\n ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -126,7 +126,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).primaryColorLight,
             value: statistics!['listsDone']!.toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Archived Lists")}: ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${AppLocalizations.of(context).translate("Archived Lists")}\n ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -149,7 +149,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).highlightColor,
             value: widget.statistics['itemsNotDone']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items in process:")} ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${AppLocalizations.of(context).translate("Items in process")}\n ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -162,7 +162,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).focusColor,
             value: widget.statistics['itemsDelayed']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items delayed:")} ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${AppLocalizations.of(context).translate("Items delayed")}\n ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -175,7 +175,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
             color: Theme.of(context).primaryColorLight,
             value: widget.statistics['itemsDone']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items done:")} ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${AppLocalizations.of(context).translate("Items done")}\n ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,

@@ -45,19 +45,32 @@ class OwlistApp extends StatefulWidget {
     state.setLocale(newLocale);
   }
 
-  static void setTheme(BuildContext context, bool mode) {
+  static void setTheme(BuildContext context, String? mode) {
     final _OwlistAppState state =
         context.findAncestorStateOfType<_OwlistAppState>()!;
-    state.setTheme(mode ? ThemeMode.dark : ThemeMode.light);
+    switch (mode) {
+      case "dark":
+        state.setTheme(ThemeMode.dark);
+        break;
+      case "light":
+        state.setTheme(ThemeMode.light);
+        break;
+      default:
+        state.setTheme(ThemeMode.system);
+    }
   }
 
-  static bool isDark(BuildContext context) {
+  static int themeMode(BuildContext context) {
     final _OwlistAppState state =
         context.findAncestorStateOfType<_OwlistAppState>()!;
     if (state.currentThemeMode != null) {
-      return state.currentThemeMode == ThemeMode.dark;
+      if (state.currentThemeMode == ThemeMode.dark) {
+        return 0;
+      } else if (state.currentThemeMode == ThemeMode.light) {
+        return 2;
+      }
     }
-    return MediaQuery.of(context).platformBrightness == Brightness.light;
+    return 1;
   }
 
   @override

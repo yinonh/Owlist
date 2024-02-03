@@ -29,6 +29,10 @@ class SharedPreferencesHelper {
     prefs.setString('selectedTheme', value ?? '');
   }
 
+  Future<void> removeSelectedTheme() async {
+    await prefs.remove('selectedTheme');
+  }
+
   Future<int> getNotificationTime() async {
     return prefs.getInt('notification_time') ?? 120000;
   }

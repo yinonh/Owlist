@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/statistics_screen.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
@@ -110,44 +111,87 @@ class _SettingsState extends State<Settings> {
             ],
           ),
           const SizedBox(
-            height: 25,
+            height: 10,
           ),
-          Row(
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              AppLocalizations.of(context).translate("Switch theme mode:"),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+          Column(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    OwlistApp.isDark(context)
-                        ? AppLocalizations.of(context)
-                            .translate("Switch to light mode")
-                        : AppLocalizations.of(context)
-                            .translate("Switch to dark mode"),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Transform.scale(
-                  scale: 1,
-                  child: Switch(
-                    activeThumbImage: const AssetImage('Assets/darkMode.png'),
-                    inactiveThumbImage:
-                        const AssetImage('Assets/lightMode.png'),
-                    onChanged: (mode) async {
-                      SharedPreferencesHelper.instance.selectedTheme =
-                          mode ? "dark" : "light";
+              ToggleSwitch(
+                initialLabelIndex: OwlistApp.themeMode(context),
+                minWidth: MediaQuery.of(context).size.width - 20,
+                totalSwitches: 3,
+                customIcons: [
+                  Icon(Icons.dark_mode),
+                  Icon(Icons.autorenew),
+                  Icon(Icons.light_mode)
+                ],
+                customTextStyles: [TextStyle(color: Colors.white)],
+                activeBgColors: const [
+                  [Color(0xFF38305B)],
+                  [Color(0xFF635985)],
+                  [Color(0xFF9685D9)]
+                ],
+                inactiveBgColor: Theme.of(context).primaryColorDark,
+                animate: true,
+                curve: Curves.easeInQuad,
+                centerText: true,
+                onToggle: (index) {
+                  switch (index) {
+                    case 0:
+                      SharedPreferencesHelper.instance.selectedTheme = "dark";
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        OwlistApp.setTheme(context, mode);
+                        OwlistApp.setTheme(context, "dark");
                       });
-                    },
-                    value: OwlistApp.isDark(context),
-                  ),
-                ),
+                      break;
+                    case 1:
+                      SharedPreferencesHelper.instance.removeSelectedTheme();
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        OwlistApp.setTheme(context, null);
+                      });
+                      break;
+                    case 2:
+                      SharedPreferencesHelper.instance.selectedTheme = "light";
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        OwlistApp.setTheme(context, "light");
+                      });
+                      break;
+                  }
+                },
               ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 56),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate("Dark"),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    Text(
+                      AppLocalizations.of(context).translate("Automatic"),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    Text(
+                      AppLocalizations.of(context).translate("Light"),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
+          //   ],
+          // ),
           const SizedBox(
             height: 25,
           ),

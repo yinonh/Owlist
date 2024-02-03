@@ -51,10 +51,6 @@ final ThemeData lightTheme = ThemeData(
     checkColor: MaterialStateProperty.all<Color>(Colors.white),
     side: BorderSide.none,
   ),
-  switchTheme: SwitchThemeData(
-    trackOutlineColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    trackColor: MaterialStateProperty.all<Color>(const Color(0xFF6B5432)),
-  ),
   progressIndicatorTheme: ProgressIndicatorThemeData(
     color: const Color(0xFF635985),
     linearTrackColor: Colors.grey.shade300,
@@ -169,10 +165,6 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     fillColor: MaterialStateProperty.all<Color>(const Color(0xFF9685D9)),
     checkColor: MaterialStateProperty.all<Color>(Colors.black),
     side: BorderSide.none,
-  ),
-  switchTheme: SwitchThemeData(
-    trackOutlineColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    trackColor: MaterialStateProperty.all<Color>(Colors.black),
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
     color: Color(0xFF635985),
