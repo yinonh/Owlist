@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:to_do/main.dart';
 
 import '../Utils/l10n/app_localizations.dart';
 
@@ -12,7 +13,31 @@ class StatisticsGraphs extends StatefulWidget {
   State<StatisticsGraphs> createState() => _StatisticsGraphsState();
 }
 
-class _StatisticsGraphsState extends State<StatisticsGraphs> {
+class _StatisticsGraphsState extends State<StatisticsGraphs>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final listsStatisticList = showingListSections(widget.statistics);
@@ -30,6 +55,40 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               color: Colors.white,
             ),
           ),
+          widget.statistics['totalLists'] != 0
+              ? FadeTransition(
+                  opacity: _animation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: FittedBox(
+                      fit: BoxFit.fill,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Archived Lists"),
+                              value: widget.statistics['listsDone']!.toInt(),
+                              total: widget.statistics['totalLists']!),
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Active Lists"),
+                              value: widget.statistics['activeLists']!.toInt(),
+                              total: widget.statistics['totalLists']!),
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Without Deadline"),
+                              value:
+                                  widget.statistics['withoutDeadline']!.toInt(),
+                              total: widget.statistics['totalLists']!),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: 0,
+                ),
           widget.statistics['totalLists'] == 0
               ? SizedBox(
                   height: 250,
@@ -44,14 +103,17 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               : SizedBox(
                   height: 250,
                   width: double.infinity,
-                  child: PieChart(
-                    PieChartData(
-                      borderData: FlBorderData(
-                        show: false,
+                  child: FadeTransition(
+                    opacity: _animation,
+                    child: PieChart(
+                      PieChartData(
+                        borderData: FlBorderData(
+                          show: false,
+                        ),
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 40,
+                        sections: listsStatisticList,
                       ),
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 40,
-                      sections: listsStatisticList,
                     ),
                   ),
                 ),
@@ -63,6 +125,39 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               color: Colors.white,
             ),
           ),
+          widget.statistics['totalItems'] != 0
+              ? FadeTransition(
+                  opacity: _animation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: FittedBox(
+                      fit: BoxFit.fill,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Items done"),
+                              value: widget.statistics['itemsDone']!.toInt(),
+                              total: widget.statistics['totalItems']!),
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Items delayed"),
+                              value: widget.statistics['itemsDelayed']!.toInt(),
+                              total: widget.statistics['totalItems']!),
+                          _buildProgressBar(
+                              title: AppLocalizations.of(context)
+                                  .translate("Items in process"),
+                              value: widget.statistics['itemsNotDone']!.toInt(),
+                              total: widget.statistics['totalItems']!),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: 0,
+                ),
           widget.statistics['totalItems'] == 0
               ? SizedBox(
                   height: 250,
@@ -77,14 +172,60 @@ class _StatisticsGraphsState extends State<StatisticsGraphs> {
               : SizedBox(
                   height: 250,
                   width: double.infinity,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 40,
-                      sections: itemsStatisticList,
+                  child: FadeTransition(
+                    opacity: _animation,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 40,
+                        sections: itemsStatisticList,
+                      ),
                     ),
                   ),
                 ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressBar(
+      {required String title, required int value, required int total}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            maxLines: 2,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 10.0),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              RotationTransition(
+                turns: _animation,
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    value: value / total,
+                    strokeWidth: 10,
+                    backgroundColor: Color(0xFF18122B),
+                  ),
+                ),
+              ),
+              Text(
+                value.toString(),
+                style: const TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ],
+          ),
         ],
       ),
     );

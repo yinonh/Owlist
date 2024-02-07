@@ -56,6 +56,23 @@ class _SettingsState extends State<Settings> {
   }
 
   void onTimeChanged(Time originalTime) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)
+              .translate("All the changes will take effect from now on only"),
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Theme.of(context).highlightColor,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 6,
+        margin: const EdgeInsets.all(10),
+      ),
+    );
     NotificationTime newTime = NotificationTime(
         hour: originalTime.hour, minute: originalTime.minute, second: 0);
     Provider.of<NotificationProvider>(context, listen: false)
@@ -309,15 +326,15 @@ class _SettingsState extends State<Settings> {
           const SizedBox(
             height: 25,
           ),
-          Text(
-            AppLocalizations.of(context)
-                .translate("All the changes will take effect from now on only"),
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall!
-                .copyWith(color: Colors.white),
-          ),
+          // Text(
+          //   AppLocalizations.of(context)
+          //       .translate("All the changes will take effect from now on only"),
+          //   textAlign: TextAlign.center,
+          //   style: Theme.of(context)
+          //       .textTheme
+          //       .titleSmall!
+          //       .copyWith(color: Colors.white),
+          // ),
         ],
       ),
     );

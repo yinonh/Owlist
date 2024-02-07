@@ -38,12 +38,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
     editMode = false;
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    initListDate();
-  }
-
   void initListDate() async {
     setState(() {
       isLoading = true;
