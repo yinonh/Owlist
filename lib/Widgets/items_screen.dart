@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import './list_item_tile.dart';
 import '../Models/to_do_list.dart';
@@ -60,8 +61,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
         _adWidth.truncate());
 
     _inlineAdaptiveAd = BannerAd(
-      // TODO: replace this test ad unit with your own ad unit.
-      adUnitId: 'ca-app-pub-3940256099942544/9214589741',
+      adUnitId: dotenv.env['UNIT_ID']!,
       size: size,
       request: const AdRequest(),
       listener: BannerAdListener(

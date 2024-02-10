@@ -93,6 +93,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                     color: selectedIndex == 1
                                         ? selectedColor
                                         : unselectedColor,
+                                    size: getRelativeWidth(0.07),
                                   ),
                                 ),
                               ),
@@ -141,6 +142,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                     color: selectedIndex == 3
                                         ? selectedColor
                                         : unselectedColor,
+                                    size: getRelativeWidth(0.07),
                                   ),
                                 ),
                               ),
