@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/Utils/strings.dart';
 
-import '../Utils/l10n/app_localizations.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/date_picker.dart';
 
@@ -177,8 +177,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         title: Text(
-                          AppLocalizations.of(context)
-                              .translate("Enter list title"),
+                          context.translate(Strings.enterListTitle),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         content: StatefulBuilder(
@@ -194,8 +193,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                   controller: newTitle,
                                   maxLength: 25,
                                   decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)
-                                        .translate("Title"),
+                                    hintText: context.translate(Strings.title),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
                                           color:
@@ -238,9 +236,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                                             )
                                           : FittedBox(
                                               child: Text(
-                                                AppLocalizations.of(context)
-                                                    .translate(
-                                                        "Check for adding deadline"),
+                                                context.translate(Strings
+                                                    .checkForAddingDeadline),
                                               ),
                                             ),
                                     ],
@@ -256,8 +253,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                               children: [
                                 TextButton(
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Cancel"),
+                                    context.translate(Strings.cancel),
                                     style:
                                         Theme.of(context).textTheme.titleLarge,
                                   ),
@@ -267,8 +263,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                                 ),
                                 TextButton(
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Save"),
+                                    context.translate(Strings.save),
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),

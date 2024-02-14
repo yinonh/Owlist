@@ -3,6 +3,8 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Utils/strings.dart';
+
 class EditableTextView extends StatefulWidget {
   final String initialText;
   final bool isEditMode;
@@ -84,7 +86,8 @@ class _EditableTextViewState extends State<EditableTextView> {
 
   Future<void> _onOpen(LinkableElement link) async {
     if (!await launchUrl(Uri.parse(link.url))) {
-      throw Exception('Could not launch ${link.url}');
+      throw Exception(
+          '${context.translate(Strings.couldNotLaunch)} ${link.url}');
     }
   }
 }

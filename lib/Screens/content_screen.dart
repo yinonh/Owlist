@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Utils/strings.dart';
 
 import '../Models/to_do_item.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
 import '../Widgets/uicorn_button.dart';
-import '../Utils/l10n/app_localizations.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/item_provider.dart';
 
@@ -84,7 +84,7 @@ class _ContentScreenState extends State<ContentScreen> {
       }
       if (textEditMode) {
         textEditingController.text = _item.content.trim().isEmpty
-            ? AppLocalizations.of(context).translate("Add some content")
+            ? context.translate(Strings.addSomeContent)
             : _item.content.trim();
         toggleTextEditMode();
       }
@@ -251,8 +251,8 @@ class _ContentScreenState extends State<ContentScreen> {
                                 onDoubleTap: toggleTextEditMode,
                                 child: EditableTextView(
                                     initialText: _item.content.trim().isEmpty
-                                        ? AppLocalizations.of(context)
-                                            .translate("Add some content")
+                                        ? context
+                                            .translate(Strings.addSomeContent)
                                         : _item.content.trim(),
                                     isEditMode: textEditMode,
                                     toggleEditMode: toggleTextEditMode,

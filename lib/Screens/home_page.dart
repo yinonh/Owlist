@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Utils/strings.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Utils/shared_preferences_helper.dart';
-import '../Utils/l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
@@ -44,10 +44,10 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
 
     titles = [
-      AppLocalizations.of(context).translate("Active Lists"),
-      AppLocalizations.of(context).translate("Archived Lists"),
-      AppLocalizations.of(context).translate("Without Deadline"),
-      AppLocalizations.of(context).translate("Settings")
+      context.translate(Strings.activeLists),
+      context.translate(Strings.archivedLists),
+      context.translate(Strings.withoutDeadline),
+      context.translate(Strings.settings),
     ];
   }
 
@@ -171,8 +171,8 @@ class _HomePageState extends State<HomePage> {
           await Provider.of<NotificationProvider>(context, listen: false)
               .cancelNotification(item.notificationIndex, item.deadline);
       if (notificationExsist) {
-        showMessage(AppLocalizations.of(context)
-            .translate("The notification for this list was canceled"));
+        showMessage(
+            context.translate(Strings.theNotificationForThisListWasCanceled));
       }
     }
   }
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
               .then((result) {
             if (result != null) {
               showMessage(
-                  "${AppLocalizations.of(context).translate("Schedule notification for:")} $result");
+                  "${context.translate(Strings.scheduleNotificationFor)} $result");
             }
             return provider.getActiveItems();
           });
@@ -295,8 +295,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.creationNTL,
                                   checked: selectedOption == SortBy.creationNTL,
                                   child: Text(
-                                    AppLocalizations.of(context).translate(
-                                        "Creation Date: Newest to Oldest"),
+                                    context.translate(
+                                        Strings.creationDateNewestToOldest),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -305,8 +305,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.creationLTN,
                                   checked: selectedOption == SortBy.creationLTN,
                                   child: Text(
-                                    AppLocalizations.of(context).translate(
-                                        "Creation Date: Oldest to Newest"),
+                                    context.translate(
+                                        Strings.creationDateOldestToNewest),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -315,8 +315,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.deadlineLTN,
                                   checked: selectedOption == SortBy.deadlineLTN,
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Deadline: Later to Sooner"),
+                                    context.translate(
+                                        Strings.deadlineLaterToSooner),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -325,8 +325,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.deadlineNTL,
                                   checked: selectedOption == SortBy.deadlineNTL,
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Deadline: Sooner to Later"),
+                                    context.translate(
+                                        Strings.deadlineSoonerToLater),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -335,8 +335,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.progressBTS,
                                   checked: selectedOption == SortBy.progressBTS,
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Progress: High to Low"),
+                                    context
+                                        .translate(Strings.progressHighToLow),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -345,8 +345,8 @@ class _HomePageState extends State<HomePage> {
                                   value: SortBy.progressSTB,
                                   checked: selectedOption == SortBy.progressSTB,
                                   child: Text(
-                                    AppLocalizations.of(context)
-                                        .translate("Progress: Low to High"),
+                                    context
+                                        .translate(Strings.progressLowToHigh),
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -388,8 +388,7 @@ class _HomePageState extends State<HomePage> {
                             );
                           } else if (snapshot.hasError) {
                             return Text(
-                              AppLocalizations.of(context)
-                                  .translate("Error has occurred"),
+                              context.translate(Strings.errorHasOccurred),
                               style: const TextStyle(color: Colors.white),
                             );
                           } else {
@@ -416,8 +415,7 @@ class _HomePageState extends State<HomePage> {
                               SnackBar(
                                 duration: const Duration(seconds: 2),
                                 content: Text(
-                                  AppLocalizations.of(context)
-                                      .translate("Error has occurred"),
+                                  context.translate(Strings.errorHasOccurred),
                                   style: const TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
@@ -426,8 +424,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                             return Text(
-                              AppLocalizations.of(context)
-                                  .translate("Error has occurred"),
+                              context.translate(Strings.errorHasOccurred),
                               style: const TextStyle(color: Colors.white),
                             );
                           } else {
@@ -454,8 +451,7 @@ class _HomePageState extends State<HomePage> {
                               SnackBar(
                                 duration: const Duration(seconds: 2),
                                 content: Text(
-                                  AppLocalizations.of(context)
-                                      .translate("Error has occurred"),
+                                  context.translate(Strings.errorHasOccurred),
                                   style: const TextStyle(
                                     color: Colors.deepOrange,
                                     fontWeight: FontWeight.bold,
@@ -464,8 +460,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                             return Text(
-                              AppLocalizations.of(context)
-                                  .translate("Error has occurred"),
+                              context.translate(Strings.errorHasOccurred),
                               style: const TextStyle(color: Colors.white),
                             );
                           } else {

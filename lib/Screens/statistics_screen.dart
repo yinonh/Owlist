@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Utils/strings.dart';
 
-import '../Utils/l10n/app_localizations.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/statistics_graphs.dart';
 
@@ -52,7 +52,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         },
                       ),
                       Text(
-                        AppLocalizations.of(context).translate("Statistics"),
+                        context.translate(Strings.statistics),
                         style: const TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,

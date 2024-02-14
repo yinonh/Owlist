@@ -12,6 +12,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'dart:math';
 
 import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 import '../Widgets/notification_time.dart';
 import '../Models/to_do_list.dart';
 
@@ -135,16 +136,16 @@ class NotificationProvider with ChangeNotifier {
         await rootBundle.loadString('Assets/languages/$languageCode.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
     List<String> notificationOptions = [
-      jsonMap["Hurry up! Tomorrow's Deadline!"],
-      jsonMap["⏰ Reminder: Tomorrow's the Deadline!"],
-      jsonMap["Final Call: Task Due Tomorrow!"],
-      jsonMap["Deadline Alert: Due Tomorrow!"],
-      jsonMap["Time's Running Out: Due Tomorrow!"],
-      jsonMap["Don't Forget: Due Tomorrow!"],
-      jsonMap["Last Day Reminder: Due Tomorrow!"],
-      jsonMap["Act Now: Tomorrow's Deadline!"],
-      jsonMap["Urgent Reminder: Due Tomorrow!"],
-      jsonMap["Just One Day Left: Deadline Tomorrow!"]
+      jsonMap[Strings.hurryUpTomorrowsDeadline],
+      jsonMap[Strings.reminderTomorrowsTheDeadline],
+      jsonMap[Strings.finalCallTaskDueTomorrow],
+      jsonMap[Strings.deadlineAlertDueTomorrow],
+      jsonMap[Strings.timesRunningOutDueTomorrow],
+      jsonMap[Strings.dontForgetDueTomorrow],
+      jsonMap[Strings.lastDayReminderDueTomorrow],
+      jsonMap[Strings.actNowTomorrowsDeadline],
+      jsonMap[Strings.urgentReminderDueTomorrow],
+      jsonMap[Strings.justOneDayLeftDeadlineTomorrow]
     ];
     final random = Random();
     final index = random.nextInt(notificationOptions.length);

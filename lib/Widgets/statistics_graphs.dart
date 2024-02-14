@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:to_do/main.dart';
-
-import '../Utils/l10n/app_localizations.dart';
+import 'package:to_do/Utils/strings.dart';
 
 class StatisticsGraphs extends StatefulWidget {
   final Map<String, int> statistics;
@@ -48,7 +46,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context).translate("List Data:"),
+            context.translate(Strings.listData),
             style: const TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
@@ -66,18 +64,15 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Archived Lists"),
+                              title: context.translate(Strings.archivedLists),
                               value: widget.statistics['listsDone']!.toInt(),
                               total: widget.statistics['totalLists']!),
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Active Lists"),
+                              title: context.translate(Strings.activeLists),
                               value: widget.statistics['activeLists']!.toInt(),
                               total: widget.statistics['totalLists']!),
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Without Deadline"),
+                              title: context.translate(Strings.withoutDeadline),
                               value:
                                   widget.statistics['withoutDeadline']!.toInt(),
                               total: widget.statistics['totalLists']!),
@@ -95,7 +90,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                   width: double.infinity,
                   child: Center(
                     child: Text(
-                      AppLocalizations.of(context).translate("No Data"),
+                      context.translate(Strings.noData),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -118,7 +113,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                   ),
                 ),
           Text(
-            AppLocalizations.of(context).translate("Items Data"),
+            context.translate(Strings.itemsData),
             style: const TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
@@ -136,18 +131,15 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Items done"),
+                              title: context.translate(Strings.itemsDone),
                               value: widget.statistics['itemsDone']!.toInt(),
                               total: widget.statistics['totalItems']!),
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Items delayed"),
+                              title: context.translate(Strings.itemsDelayed),
                               value: widget.statistics['itemsDelayed']!.toInt(),
                               total: widget.statistics['totalItems']!),
                           _buildProgressBar(
-                              title: AppLocalizations.of(context)
-                                  .translate("Items in process"),
+                              title: context.translate(Strings.itemsInProcess),
                               value: widget.statistics['itemsNotDone']!.toInt(),
                               total: widget.statistics['totalItems']!),
                         ],
@@ -164,7 +156,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                   width: double.infinity,
                   child: Center(
                     child: Text(
-                      AppLocalizations.of(context).translate("No Data"),
+                      context.translate(Strings.noData),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -241,7 +233,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).highlightColor,
             value: statistics!['withoutDeadline']!.toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Without Deadline")}\n ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.withoutDeadline)}\n ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -254,7 +246,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).focusColor,
             value: (statistics!['activeLists']!).toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Active Lists")}\n ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.activeLists)}\n ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -267,7 +259,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).primaryColorLight,
             value: statistics!['listsDone']!.toDouble(),
             title:
-                '${AppLocalizations.of(context).translate("Archived Lists")}\n ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.archivedLists)}\n ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -290,7 +282,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).highlightColor,
             value: widget.statistics['itemsNotDone']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items in process")}\n ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsInProcess)}\n ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -303,7 +295,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).focusColor,
             value: widget.statistics['itemsDelayed']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items delayed")}\n ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsDelayed)}\n ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -316,7 +308,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
             color: Theme.of(context).primaryColorLight,
             value: widget.statistics['itemsDone']!.toDouble(),
             title:
-                "${AppLocalizations.of(context).translate("Items done")}\n ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsDone)}\n ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,

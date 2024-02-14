@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/Providers/item_provider.dart';
+import 'package:to_do/Utils/strings.dart';
 
-import '../Utils/l10n/app_localizations.dart';
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import 'dog_ear_list_tile.dart';
@@ -40,7 +40,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          AppLocalizations.of(context).translate("Item deleted"),
+          context.translate(Strings.itemDeleted),
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Theme.of(context).highlightColor,
@@ -52,7 +52,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         elevation: 6,
         margin: const EdgeInsets.all(10),
         action: SnackBarAction(
-          label: AppLocalizations.of(context).translate("Undo"),
+          label: context.translate(Strings.undo),
           onPressed: () {
             Provider.of<ItemProvider>(context, listen: false)
                 .addExistingItem(widget.item);

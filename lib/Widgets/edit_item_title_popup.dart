@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/Utils/strings.dart';
 
 import '../Utils/l10n/app_localizations.dart';
 
@@ -18,7 +19,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        AppLocalizations.of(context).translate("Enter New Item Title"),
+        context.translate(Strings.enterNewItemTitle),
         style: Theme.of(context).textTheme.titleMedium,
       ),
       content: TextField(
@@ -26,7 +27,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
         maxLength: 25,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: AppLocalizations.of(context).translate("Title"),
+          hintText: context.translate(Strings.title),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).dividerColor),
           ),
@@ -48,7 +49,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
                 Navigator.of(context).pop();
               },
               child: Text(
-                AppLocalizations.of(context).translate("Cancel"),
+                context.translate(Strings.cancel),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -58,7 +59,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
                 widget.addNewItem(newTitle.trim()); // Use the passed function
               },
               child: Text(
-                AppLocalizations.of(context).translate("Add"),
+                context.translate(Strings.add),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

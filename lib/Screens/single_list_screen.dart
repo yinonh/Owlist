@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
+import 'package:to_do/Utils/strings.dart';
 
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
@@ -163,7 +164,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
           .editDeadline(list!, newDeadline);
       if (result != null) {
         showMessage(
-            "${AppLocalizations.of(context).translate("Schedule notification for:")} $result");
+            "${context.translate(Strings.scheduleNotificationFor)} $result");
       }
     }
     if (list!.title != newTitle) {

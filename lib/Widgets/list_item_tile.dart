@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:to_do/Utils/strings.dart';
 
-import '../Utils/l10n/app_localizations.dart';
 import '../Models/to_do_list.dart';
 import '../Screens/single_list_screen.dart';
 
@@ -59,12 +59,10 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
               10.0,
             ),
           ),
-          title: Text(
-              AppLocalizations.of(context).translate("Confirm Deletion"),
+          title: Text(context.translate(Strings.confirmDeletion),
               style: Theme.of(context).textTheme.titleMedium),
           content: Text(
-            AppLocalizations.of(context)
-                .translate("Are you sure you want to delete this item?"),
+            context.translate(Strings.areYouSureYouWantToDeleteThisItem),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           actions: [
@@ -73,7 +71,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 Navigator.of(context).pop(false);
               },
               child: Text(
-                AppLocalizations.of(context).translate("Cancel"),
+                context.translate(Strings.cancel),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -82,7 +80,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 Navigator.of(context).pop(true);
               },
               child: Text(
-                AppLocalizations.of(context).translate("Delete"),
+                context.translate(Strings.delete),
                 style: const TextStyle(
                   fontSize: 17,
                   color: Colors.red,
@@ -111,16 +109,16 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
         DateTime(deadline.year, deadline.month, deadline.day);
 
     if (deadlineDay.isBefore(today)) {
-      return AppLocalizations.of(context).translate("Done");
+      return context.translate(Strings.done);
     } else if (deadlineDay.isAtSameMomentAs(today)) {
-      return AppLocalizations.of(context).translate("Today");
+      return context.translate(Strings.today);
     } else {
       Duration difference = deadlineDay.difference(today);
       if (difference.inDays > 1) {
-        return '${AppLocalizations.of(context).translate("Remaining Days:")} ${difference.inDays}';
+        return '${context.translate(Strings.remainingDays)} ${difference.inDays}';
       } else {
         int hoursDifference = deadline.difference(now).inHours;
-        return '${AppLocalizations.of(context).translate("Remaining Hours:")} $hoursDifference';
+        return '${context.translate(Strings.remainingHours)} $hoursDifference';
       }
     }
   }
@@ -209,8 +207,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                       ],
                     )
                   : Text(
-                      AppLocalizations.of(context)
-                              .translate("Creation Date: ") +
+                      context.translate(Strings.creationDate) +
                           formatDate(
                               widget.item.creationDate), // Format creationDate
                     ),
@@ -220,13 +217,13 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 children: [
                   Expanded(
                     child: Text(
-                      '${AppLocalizations.of(context).translate("Total Items:")} ${widget.item.totalItems}',
+                      '${context.translate(Strings.totalItems)} ${widget.item.totalItems}',
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      '${AppLocalizations.of(context).translate("Accomplished Items:")} ${widget.item.accomplishedItems}',
+                      '${context.translate(Strings.accomplishedItems)} ${widget.item.accomplishedItems}',
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                     ),
@@ -243,7 +240,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                         ),
                         const SizedBox(height: 8.0),
                         Text(
-                          '${AppLocalizations.of(context).translate("Progress:")} ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                          '${context.translate(Strings.progress)} ${(progressPercentage * 100).toStringAsFixed(0)}%',
                         ),
                       ],
                     )

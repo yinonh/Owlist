@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/statistics_screen.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
+import 'package:to_do/Utils/strings.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
-import '../Utils/l10n/app_localizations.dart';
 import '../Widgets/notification_time.dart';
 
 class Settings extends StatefulWidget {
@@ -59,8 +59,7 @@ class _SettingsState extends State<Settings> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          AppLocalizations.of(context)
-              .translate("All the changes will take effect from now on only"),
+          context.translate(Strings.allTheChangesWillTakeEffectFromNowOnOnly),
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Theme.of(context).highlightColor,
@@ -91,7 +90,7 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    AppLocalizations.of(context).translate("Choose language:"),
+                    context.translate(Strings.chooseLanguage),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -133,7 +132,7 @@ class _SettingsState extends State<Settings> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              AppLocalizations.of(context).translate("Switch theme mode:"),
+              context.translate(Strings.switchThemeMode),
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.white),
             ),
@@ -188,17 +187,17 @@ class _SettingsState extends State<Settings> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      AppLocalizations.of(context).translate("Dark"),
+                      context.translate(Strings.dark),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
-                      AppLocalizations.of(context).translate("Automatic"),
+                      context.translate(Strings.automatic),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
-                      AppLocalizations.of(context).translate("Light"),
+                      context.translate(Strings.light),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     )
@@ -218,8 +217,7 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    AppLocalizations.of(context)
-                        .translate("Enable notifications:"),
+                    context.translate(Strings.enableNotifications),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -251,8 +249,7 @@ class _SettingsState extends State<Settings> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    AppLocalizations.of(context)
-                        .translate("Choose default time for notification:"),
+                    context.translate(Strings.chooseDefaultTimeForNotification),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -276,16 +273,14 @@ class _SettingsState extends State<Settings> {
                                   value: _time,
                                   onChange: onTimeChanged,
                                   minuteInterval: TimePickerInterval.FIVE,
-                                  okText: AppLocalizations.of(context)
-                                      .translate("Ok"),
-                                  cancelText: AppLocalizations.of(context)
-                                      .translate("Cancel"),
+                                  okText: context.translate(Strings.ok),
+                                  cancelText: context.translate(Strings.cancel),
                                 ),
                               );
                             }
                           : null,
                       child: Text(
-                        AppLocalizations.of(context).translate("Choose time"),
+                        context.translate(Strings.chooseTime),
                         style: _notificationsActive
                             ? Theme.of(context)
                                 .primaryTextTheme
@@ -314,7 +309,7 @@ class _SettingsState extends State<Settings> {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
-                  AppLocalizations.of(context).translate("Statistics"),
+                  context.translate(Strings.statistics),
                   style: Theme.of(context)
                       .primaryTextTheme
                       .titleMedium!
@@ -326,15 +321,6 @@ class _SettingsState extends State<Settings> {
           const SizedBox(
             height: 25,
           ),
-          // Text(
-          //   AppLocalizations.of(context)
-          //       .translate("All the changes will take effect from now on only"),
-          //   textAlign: TextAlign.center,
-          //   style: Theme.of(context)
-          //       .textTheme
-          //       .titleSmall!
-          //       .copyWith(color: Colors.white),
-          // ),
         ],
       ),
     );
