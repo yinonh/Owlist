@@ -9,6 +9,8 @@ import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import 'dog_ear_list_tile.dart';
 
+// TODO: fix the problem when the user change the content and press on the undo
+
 class ToDoItemWidget extends StatefulWidget {
   final ToDoItem item;
   final bool editMode;
