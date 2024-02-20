@@ -4,7 +4,7 @@
 - Introduction
 - Features
 - 🎥 Video
-- Upcoming Release on Google Play
+- Now Available: Owlist on Google Play
 - Contributing
 - Feedback
 
@@ -28,8 +28,14 @@ With Owlist, effortlessly organize your aspirations, set deadlines, and track yo
 
 [![Owlist](https://img.youtube.com/vi/EV7poyW58cg/0.jpg)](https://www.youtube.com/watch?v=EV7poyW58cg "Owlist")
 
-## Upcoming Release on Google Play
-I'm thrilled to share that Owlist is currently in the final stages of closed testing. Soon, the app will be available on Google Play for a broader audience. If you're eager to get early access and contribute to the testing phase, feel free to send me a message, and I'll add you to the testing group. Your feedback will be invaluable as we prepare to launch Owlist to the wider community. Stay tuned for updates and be part of shaping the future of goal-tracking with Owlist!
+### Now Available: Owlist on Google Play
+
+We're pleased to announce that Owlist is now accessible on the Google Play Store. You can download the app [here](https://play.google.com/store/apps/details?id=com.yinonhdev.owlist&pcampaignid=web_share) to start tracking your goals.
+
+We invite you to join our community and provide feedback to help us improve Owlist. If you're interested in contributing, please reach out to be added to our testing group.
+
+Thank you for your support as we continue to enhance Owlist for our users.
+
 
 ## Contributing
 Your contributions are welcome! Fork the repository, make improvements, and submit a pull request.
