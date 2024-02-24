@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/statistics_screen.dart';
@@ -23,15 +24,15 @@ class _SettingsState extends State<Settings> {
   late NotificationTime _time;
   late bool _notificationsActive;
   List<Widget> languages = <Widget>[
-    Image.asset(
-      'Assets/english.png',
+    SvgPicture.asset(
+      'Assets/english.svg',
       width: 60,
-      height: 45,
+      // height: 45,
     ),
-    Image.asset(
-      'Assets/hebrew.png',
+    SvgPicture.asset(
+      'Assets/hebrew.svg',
       width: 60,
-      height: 45,
+      // height: 45,
     )
   ];
 

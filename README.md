@@ -29,7 +29,6 @@ With Owlist, effortlessly organize your aspirations, set deadlines, and track yo
 [![Owlist](https://img.youtube.com/vi/EV7poyW58cg/0.jpg)](https://www.youtube.com/watch?v=EV7poyW58cg "Owlist")
 
 ### Now Available: Owlist on Google Play
-
 We're pleased to announce that Owlist is now accessible on the Google Play Store. You can download the app [here](https://play.google.com/store/apps/details?id=com.yinonhdev.owlist&pcampaignid=web_share) to start tracking your goals.
 
 We invite you to join our community and provide feedback to help us improve Owlist. If you're interested in contributing, please reach out to be added to our testing group.

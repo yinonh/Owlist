@@ -170,11 +170,7 @@ class _OwlistAppState extends State<OwlistApp> {
                     settings.arguments as Map<String, dynamic>;
 
                 return MaterialPageRoute(builder: (context) {
-                  return ContentScreen(
-                    id: args['id'] as String,
-                    updateSingleListScreen:
-                        args['updateSingleListScreen'] as Function,
-                  );
+                  return ContentScreen(id: args['id'] as String);
                 });
               }
           }
