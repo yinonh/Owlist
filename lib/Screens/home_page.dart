@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/Utils/strings.dart';
 
@@ -267,9 +268,9 @@ class _HomePageState extends State<HomePage> {
                     textDirection: TextDirection.ltr,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Center(
-                        child: Image(
-                          image: AssetImage('Assets/appName.png'),
+                      Center(
+                        child: SvgPicture.asset(
+                          'Assets/appName.svg',
                           fit: BoxFit.contain,
                           width: 170,
                         ),

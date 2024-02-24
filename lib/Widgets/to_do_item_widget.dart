@@ -29,9 +29,8 @@ class ToDoItemWidget extends StatefulWidget {
 class _ToDoItemWidgetState extends State<ToDoItemWidget> {
   bool _itemVisible = true;
 
-  void dismiss() {
-    Provider.of<ItemProvider>(context, listen: false)
-        .deleteItemById(widget.item.id, widget.item.done);
+  void dismiss(ItemProvider provider) {
+    provider.deleteItemById(widget.item.id, widget.item.done);
     // Create a Completer to control the flow
     Completer<bool> completer = Completer<bool>();
 
@@ -56,8 +55,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         action: SnackBarAction(
           label: context.translate(Strings.undo),
           onPressed: () {
-            Provider.of<ItemProvider>(context, listen: false)
-                .addExistingItem(widget.item);
+            provider.addExistingItem(widget.item);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             setState(() {
               _itemVisible = true;
@@ -70,6 +68,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     return Visibility(
       maintainAnimation: true,
       maintainState: true,
@@ -109,7 +108,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             direction: DismissDirection.startToEnd,
             key: UniqueKey(),
             onDismissed: (DismissDirection direction) {
-              dismiss();
+              dismiss(itemProvider);
             },
             background: Container(
               decoration: BoxDecoration(
@@ -118,7 +117,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 color: Colors.red,
               ),
               alignment: AlignmentDirectional.centerStart,
-              child: Padding(
+              child: const Padding(
                 padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -134,9 +133,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   ContentScreen.routeName,
                   arguments: {
                     'id': widget.item.id,
-                    'updateSingleListScreen': widget.updateSingleListScreen,
                   },
-                );
+                ).then((value) => widget.updateSingleListScreen());
               },
               leading: widget.editMode
                   ? Icon(

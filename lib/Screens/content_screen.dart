@@ -12,10 +12,7 @@ import '../Providers/item_provider.dart';
 class ContentScreen extends StatefulWidget {
   static const routeName = '/content';
   final String id;
-  final Function updateSingleListScreen;
-  const ContentScreen(
-      {Key? key, required this.id, required this.updateSingleListScreen})
-      : super(key: key);
+  const ContentScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   State<ContentScreen> createState() => _ContentScreenState();
@@ -66,7 +63,6 @@ class _ContentScreenState extends State<ContentScreen> {
       Provider.of<ListsProvider>(context, listen: false)
           .editItemTitle(_item.id, _titleController.text.trim());
       _toggleTitleEditMode();
-      widget.updateSingleListScreen();
     }
     if (textEditMode) {
       await Provider.of<ItemProvider>(context, listen: false)
