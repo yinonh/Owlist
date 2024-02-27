@@ -11,6 +11,7 @@ import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../Widgets/notification_bottom_sheet.dart';
 import '../Widgets/uicorn_button.dart';
 
 class SingleListScreen extends StatefulWidget {
@@ -201,6 +202,15 @@ class _SingleListScreenState extends State<SingleListScreen> {
     });
   }
 
+  void _openBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return NotificationBottomSheet();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<UnicornButton> childButtons = [];
@@ -225,7 +235,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             backgroundColor: Color(0xFF634999),
             mini: true,
             onPressed: () {
-              print("notification");
+              _openBottomSheet(context);
             },
             child: const Icon(Icons.notification_add)),
       ),

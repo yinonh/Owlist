@@ -45,6 +45,7 @@ class _EditableTextViewState extends State<EditableTextView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: TextField(
+              autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               cursorColor: Colors.purpleAccent, // Change cursor color
               style: const TextStyle(

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Utils/strings.dart';
 
+import '../Utils/strings.dart';
 import '../Models/to_do_item.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
-import '../Widgets/uicorn_button.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/item_provider.dart';
 
@@ -54,6 +53,9 @@ class _ContentScreenState extends State<ContentScreen> {
 
   void toggleTextEditMode() {
     setState(() {
+      if (_item.content.trim().isEmpty) {
+        textEditingController.text = '';
+      }
       textEditMode = !textEditMode;
     });
   }
@@ -89,47 +91,6 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<UnicornButton> childButtons = [];
-
-    childButtons.add(
-      UnicornButton(
-        currentButton: FloatingActionButton(
-            heroTag: "Text",
-            backgroundColor: const Color(0xFF635985), //Colors.red,
-            mini: true,
-            onPressed: () {
-              print("text");
-            },
-            child: const Icon(Icons.text_fields)),
-      ),
-    );
-
-    // childButtons.add(
-    //   UnicornButton(
-    //     currentButton: FloatingActionButton(
-    //         heroTag: "airplane",
-    //         backgroundColor: Color(0xFF634999), // Colors.greenAccent,
-    //         mini: true,
-    //         onPressed: () {
-    //           print("location");
-    //         },
-    //         child: Icon(Icons.image)),
-    //   ),
-    // );
-
-    // childButtons.add(
-    //   UnicornButton(
-    //     currentButton: FloatingActionButton(
-    //         heroTag: "directions",
-    //         backgroundColor: Color(0xFF635985), //Colors.blueAccent,
-    //         mini: true,
-    //         onPressed: () {
-    //           print("link");
-    //         },
-    //         child: Icon(Icons.link)),
-    //   ),
-    // );
-
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       resizeToAvoidBottomInset: false,
@@ -143,13 +104,6 @@ class _ContentScreenState extends State<ContentScreen> {
         screenWidth: MediaQuery.of(context).size.width,
         screenHeight: MediaQuery.of(context).size.height,
       ),
-      // floatingActionButton: UnicornDialer(
-      //   backgroundColor: Colors.transparent,
-      //   parentButton: Icon(Icons.add),
-      //   childButtons: childButtons,
-      //   onMainButtonPressed: () {},
-      //   finalButtonIcon: Icon(Icons.close),
-      // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Container(
         decoration: BoxDecoration(
@@ -247,13 +201,14 @@ class _ContentScreenState extends State<ContentScreen> {
                                 onLongPress: toggleTextEditMode,
                                 onDoubleTap: toggleTextEditMode,
                                 child: EditableTextView(
-                                    initialText: _item.content.trim().isEmpty
-                                        ? context
-                                            .translate(Strings.addSomeContent)
-                                        : _item.content.trim(),
-                                    isEditMode: textEditMode,
-                                    toggleEditMode: toggleTextEditMode,
-                                    controller: textEditingController),
+                                  initialText: _item.content.trim().isEmpty
+                                      ? context
+                                          .translate(Strings.addSomeContent)
+                                      : _item.content.trim(),
+                                  isEditMode: textEditMode,
+                                  toggleEditMode: toggleTextEditMode,
+                                  controller: textEditingController,
+                                ),
                               )
                             ],
                           ),
