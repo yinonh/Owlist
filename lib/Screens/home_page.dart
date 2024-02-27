@@ -244,242 +244,230 @@ class _HomePageState extends State<HomePage> {
         selectedColor: Theme.of(context).focusColor,
         unselectedColor: Theme.of(context).unselectedWidgetColor,
       ),
-      body: RefreshIndicator(
-        onRefresh: refreshLists,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).primaryColorLight,
-                Theme.of(context).primaryColorDark
-              ],
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).primaryColorLight,
+              Theme.of(context).primaryColorDark
+            ],
           ),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 24.0),
-                  child: Row(
-                    textDirection: TextDirection.ltr,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(
-                        child: SvgPicture.asset(
-                          'Assets/appName.svg',
-                          fit: BoxFit.contain,
-                          width: 170,
-                        ),
+        ),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 24.0),
+                child: Row(
+                  textDirection: TextDirection.ltr,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Center(
+                      child: SvgPicture.asset(
+                        'Assets/appName.svg',
+                        fit: BoxFit.contain,
+                        width: 170,
                       ),
-                      currentIndex == 3
-                          ? const Text(
-                              " ",
-                              style: TextStyle(fontSize: 33),
-                            )
-                          : PopupMenuButton<SortBy>(
-                              icon: const Icon(Icons.filter_list),
-                              onSelected: (value) async {
-                                setState(() {
-                                  selectedOption = value;
-                                  sortLists();
-                                });
-                                await SharedPreferencesHelper.instance
-                                    .setSortByIndex(
-                                        SortBy.values.indexOf(value));
-                              },
-                              itemBuilder: (BuildContext cnx) => [
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.creationNTL,
-                                  checked: selectedOption == SortBy.creationNTL,
-                                  child: Text(
-                                    context.translate(
-                                        Strings.creationDateNewestToOldest),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.creationLTN,
-                                  checked: selectedOption == SortBy.creationLTN,
-                                  child: Text(
-                                    context.translate(
-                                        Strings.creationDateOldestToNewest),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.deadlineLTN,
-                                  checked: selectedOption == SortBy.deadlineLTN,
-                                  child: Text(
-                                    context.translate(
-                                        Strings.deadlineLaterToSooner),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.deadlineNTL,
-                                  checked: selectedOption == SortBy.deadlineNTL,
-                                  child: Text(
-                                    context.translate(
-                                        Strings.deadlineSoonerToLater),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.progressBTS,
-                                  checked: selectedOption == SortBy.progressBTS,
-                                  child: Text(
-                                    context
-                                        .translate(Strings.progressHighToLow),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                                CheckedPopupMenuItem<SortBy>(
-                                  value: SortBy.progressSTB,
-                                  checked: selectedOption == SortBy.progressSTB,
-                                  child: Text(
-                                    context
-                                        .translate(Strings.progressLowToHigh),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    titles[currentIndex],
-                    style: const TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Expanded(
-                  child: PageView(
-                    onPageChanged: (index) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                    controller: selectedIndex,
-                    children: [
-                      FutureBuilder<List<ToDoList>>(
-                        key: const PageStorageKey(1),
-                        future: activeItemsFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Text(
-                              context.translate(Strings.errorHasOccurred),
-                              style: const TextStyle(color: Colors.white),
-                            );
-                          } else {
-                            return ItemsScreen(
-                              selectedIndex: 0,
-                              existingItems: snapshot.data!,
-                              deleteItem: deleteList,
-                              refresh: refreshLists,
-                            );
-                          }
-                        },
-                      ),
-                      FutureBuilder<List<ToDoList>>(
-                        key: const PageStorageKey(2),
-                        future: achievedItemsFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                duration: const Duration(seconds: 2),
-                                content: Text(
-                                  context.translate(Strings.errorHasOccurred),
-                                  style: const TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    currentIndex == 3
+                        ? const Text(
+                            " ",
+                            style: TextStyle(fontSize: 33),
+                          )
+                        : PopupMenuButton<SortBy>(
+                            icon: const Icon(Icons.filter_list),
+                            onSelected: (value) async {
+                              setState(() {
+                                selectedOption = value;
+                                sortLists();
+                              });
+                              await SharedPreferencesHelper.instance
+                                  .setSortByIndex(SortBy.values.indexOf(value));
+                            },
+                            itemBuilder: (BuildContext cnx) => [
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.creationNTL,
+                                checked: selectedOption == SortBy.creationNTL,
+                                child: Text(
+                                  context.translate(
+                                      Strings.creationDateNewestToOldest),
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
-                            );
-                            return Text(
-                              context.translate(Strings.errorHasOccurred),
-                              style: const TextStyle(color: Colors.white),
-                            );
-                          } else {
-                            return ItemsScreen(
-                              selectedIndex: 1,
-                              existingItems: snapshot.data!,
-                              deleteItem: deleteList,
-                              refresh: refreshLists,
-                            );
-                          }
-                        },
-                      ),
-                      FutureBuilder<List<ToDoList>>(
-                        key: const PageStorageKey(3),
-                        future: withoutDeadlineItemsFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                duration: const Duration(seconds: 2),
-                                content: Text(
-                                  context.translate(Strings.errorHasOccurred),
-                                  style: const TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.creationLTN,
+                                checked: selectedOption == SortBy.creationLTN,
+                                child: Text(
+                                  context.translate(
+                                      Strings.creationDateOldestToNewest),
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
-                            );
-                            return Text(
-                              context.translate(Strings.errorHasOccurred),
-                              style: const TextStyle(color: Colors.white),
-                            );
-                          } else {
-                            return ItemsScreen(
-                              selectedIndex: 1,
-                              existingItems: snapshot.data!,
-                              deleteItem: deleteList,
-                              refresh: refreshLists,
-                            );
-                          }
-                        },
-                      ),
-                      const Settings(),
-                    ],
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.deadlineLTN,
+                                checked: selectedOption == SortBy.deadlineLTN,
+                                child: Text(
+                                  context
+                                      .translate(Strings.deadlineLaterToSooner),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.deadlineNTL,
+                                checked: selectedOption == SortBy.deadlineNTL,
+                                child: Text(
+                                  context
+                                      .translate(Strings.deadlineSoonerToLater),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.progressBTS,
+                                checked: selectedOption == SortBy.progressBTS,
+                                child: Text(
+                                  context.translate(Strings.progressHighToLow),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                              CheckedPopupMenuItem<SortBy>(
+                                value: SortBy.progressSTB,
+                                checked: selectedOption == SortBy.progressSTB,
+                                child: Text(
+                                  context.translate(Strings.progressLowToHigh),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  titles[currentIndex],
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16.0),
+              Expanded(
+                child: PageView(
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                  controller: selectedIndex,
+                  children: [
+                    FutureBuilder<List<ToDoList>>(
+                      key: const PageStorageKey(1),
+                      future: activeItemsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text(
+                            context.translate(Strings.errorHasOccurred),
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return ItemsScreen(
+                            selectedIndex: 0,
+                            existingItems: snapshot.data!,
+                            deleteItem: deleteList,
+                            refresh: refreshLists,
+                          );
+                        }
+                      },
+                    ),
+                    FutureBuilder<List<ToDoList>>(
+                      key: const PageStorageKey(2),
+                      future: achievedItemsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(seconds: 2),
+                              content: Text(
+                                context.translate(Strings.errorHasOccurred),
+                                style: const TextStyle(
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                          return Text(
+                            context.translate(Strings.errorHasOccurred),
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return ItemsScreen(
+                            selectedIndex: 1,
+                            existingItems: snapshot.data!,
+                            deleteItem: deleteList,
+                            refresh: refreshLists,
+                          );
+                        }
+                      },
+                    ),
+                    FutureBuilder<List<ToDoList>>(
+                      key: const PageStorageKey(3),
+                      future: withoutDeadlineItemsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(seconds: 2),
+                              content: Text(
+                                context.translate(Strings.errorHasOccurred),
+                                style: const TextStyle(
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                          return Text(
+                            context.translate(Strings.errorHasOccurred),
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        } else {
+                          return ItemsScreen(
+                            selectedIndex: 1,
+                            existingItems: snapshot.data!,
+                            deleteItem: deleteList,
+                            refresh: refreshLists,
+                          );
+                        }
+                      },
+                    ),
+                    const Settings(),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

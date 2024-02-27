@@ -7,6 +7,7 @@ class CustomFloatingActionButton extends StatelessWidget {
   final Object? heroTag;
   final double screenWidth;
   final double screenHeight;
+  final Icon icon;
 
   const CustomFloatingActionButton({
     Key? key,
@@ -15,6 +16,7 @@ class CustomFloatingActionButton extends StatelessWidget {
     this.heroTag,
     required this.screenWidth,
     required this.screenHeight,
+    required this.icon,
     required bool isExtended,
   }) : super(key: key);
 
@@ -51,11 +53,7 @@ class CustomFloatingActionButton extends StatelessWidget {
             child: Center(
               child: Transform.rotate(
                 angle: math.pi / 4,
-                child: Icon(
-                  Icons.add,
-                  color: Theme.of(context).primaryColor,
-                  size: MediaQuery.of(context).size.width * 0.1,
-                ),
+                child: icon,
               ),
             ),
           ),

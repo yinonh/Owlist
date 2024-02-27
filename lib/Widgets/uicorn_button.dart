@@ -86,8 +86,7 @@ class _UnicornDialer extends State<UnicornDialer>
   Widget build(BuildContext context) {
     _animationController.reverse();
 
-    var hasChildButtons =
-        widget.childButtons != null && widget.childButtons.length > 0;
+    var hasChildButtons = widget.childButtons.isNotEmpty;
 
     if (!_parentController.isAnimating) {
       if (_parentController.isCompleted) {
@@ -117,6 +116,7 @@ class _UnicornDialer extends State<UnicornDialer>
           ),
           alignment: FractionalOffset.center,
           child: CustomFloatingActionButton(
+            icon: widget.parentButton,
             isExtended: false,
             heroTag: widget.parentHeroTag,
             onPressed: () {

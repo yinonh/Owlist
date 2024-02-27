@@ -127,29 +127,38 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: widget.existingItems.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ToDoItemTile(
-            item: widget.existingItems[index],
-            onDelete: (item) {
-              widget.deleteItem(item);
-            },
-            refresh: widget.refresh,
-          ),
-        );
+    return RefreshIndicator(
+      backgroundColor: Colors.white,
+      color: Colors.purple,
+      onRefresh: () {
+        return Future.delayed(Duration(seconds: 1), () {
+          return widget.refresh();
+        });
       },
-      separatorBuilder: (BuildContext context, int index) {
-        if (index == randomNumber) {
-          return _getAdWidget();
-        } else {
-          return const SizedBox(
-            height: 0,
+      child: ListView.separated(
+        itemCount: widget.existingItems.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ToDoItemTile(
+              item: widget.existingItems[index],
+              onDelete: (item) {
+                widget.deleteItem(item);
+              },
+              refresh: widget.refresh,
+            ),
           );
-        }
-      },
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          if (index == randomNumber) {
+            return _getAdWidget();
+          } else {
+            return const SizedBox(
+              height: 0,
+            );
+          }
+        },
+      ),
     );
   }
 }
