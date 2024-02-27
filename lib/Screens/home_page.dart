@@ -2,15 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Utils/strings.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Providers/notification_provider.dart';
-import '../Utils/shared_preferences_helper.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
 import '../Widgets/my_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
+import '../Utils/strings.dart';
+import '../Utils/shared_preferences_helper.dart';
 
 enum SortBy {
   creationNTL,
@@ -127,25 +129,21 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void showMessage(String text) {
-    // Display Snackbar with the scheduled time
-    final snackBar = SnackBar(
-      content: Text(
-        text,
-        style: const TextStyle(color: Colors.white),
+  void showMessage(String text, IconData icon) {
+    showTopSnackBar(
+      Overlay.of(context),
+      CustomSnackBar.success(
+        message: text,
+        backgroundColor: Theme.of(context).highlightColor,
+        icon: Icon(
+          icon,
+          color: const Color(0x15000000),
+          size: 120,
+        ),
       ),
-      backgroundColor:
-          Theme.of(context).highlightColor, // Change background color
-      duration: const Duration(seconds: 2), // Set duration
-      behavior: SnackBarBehavior.floating, // Change behavior to floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Add border radius
-      ),
-      elevation: 6, // Add elevation
-      margin: const EdgeInsets.all(10), // Add margin
+      snackBarPosition: SnackBarPosition.bottom,
+      displayDuration: Duration(seconds: 1),
     );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> deleteList(ToDoList item) async {
@@ -173,7 +171,8 @@ class _HomePageState extends State<HomePage> {
               .cancelNotification(item.notificationIndex, item.deadline);
       if (notificationExsist) {
         showMessage(
-            context.translate(Strings.theNotificationForThisListWasCanceled));
+            context.translate(Strings.theNotificationForThisListWasCanceled),
+            Icons.notifications_off);
       }
     }
   }
@@ -188,7 +187,8 @@ class _HomePageState extends State<HomePage> {
               .then((result) {
             if (result != null) {
               showMessage(
-                  "${context.translate(Strings.scheduleNotificationFor)} $result");
+                  "${context.translate(Strings.scheduleNotificationFor)} $result",
+                  Icons.notification_add);
             }
             return provider.getActiveItems();
           });
@@ -230,6 +230,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     provider = Provider.of<ListsProvider>(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       bottomNavigationBar: DiamondBottomNavigation(
         itemIcons: const [
           Icons.checklist,

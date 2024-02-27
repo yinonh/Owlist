@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
-import 'package:to_do/Utils/strings.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
-import '../Widgets/diamond_button.dart';
+import '../Utils/strings.dart';
 import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
@@ -134,27 +135,20 @@ class _SingleListScreenState extends State<SingleListScreen> {
   }
 
   void showMessage(String text) {
-    // Display Snackbar with the scheduled time
-    final snackBar = SnackBar(
-      content: Text(
-        text,
-        style: const TextStyle(color: Colors.white),
+    showTopSnackBar(
+      Overlay.of(context),
+      CustomSnackBar.success(
+        message: text,
+        backgroundColor: Theme.of(context).highlightColor,
+        icon: const Icon(
+          Icons.notifications_active,
+          color: Color(0x15000000),
+          size: 120,
+        ),
       ),
-      backgroundColor: Theme.of(context).highlightColor,
-      // Change background color
-      duration: const Duration(seconds: 2),
-      // Set duration
-      behavior: SnackBarBehavior.floating,
-      // Change behavior to floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Add border radius
-      ),
-      elevation: 6,
-      // Add elevation
-      margin: const EdgeInsets.all(10), // Add margin
+      snackBarPosition: SnackBarPosition.bottom,
+      displayDuration: Duration(seconds: 1),
     );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _save() async {
@@ -233,7 +227,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             onPressed: () {
               print("notification");
             },
-            child: Icon(Icons.notification_add)),
+            child: const Icon(Icons.notification_add)),
       ),
     );
 
@@ -250,160 +244,163 @@ class _SingleListScreenState extends State<SingleListScreen> {
     //   ),
     // );
 
-    return ScaffoldMessenger(
-      child: Scaffold(
-        floatingActionButton: editMode
-            ? UnicornDialer(
-                backgroundColor: Colors.transparent,
-                parentButton: Icon(
-                  Icons.calendar_month,
-                  color: list!.hasDeadline
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
-                  size: MediaQuery.of(context).size.width * 0.1,
-                ),
-                childButtons: [],
-                onMainButtonPressed: list!.hasDeadline
-                    ? () {
-                        _showChangeDateDialog(context);
-                      }
-                    : () {},
-                finalButtonIcon: Icon(Icons.close),
-              )
-            : UnicornDialer(
-                backgroundColor: Colors.transparent,
-                parentButton: Icon(
-                  Icons.add,
-                  size: MediaQuery.of(context).size.width * 0.1,
-                ),
-                childButtons: childButtons,
-                onMainButtonPressed: () {},
-                finalButtonIcon: Icon(Icons.close),
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      floatingActionButton: editMode
+          ? UnicornDialer(
+              backgroundColor: Colors.transparent,
+              parentButton: Icon(
+                Icons.calendar_month,
+                color: list!.hasDeadline
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
+                size: MediaQuery.of(context).size.width * 0.1,
               ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).primaryColorLight,
-                Theme.of(context).primaryColorDark
-              ],
+              childButtons: [],
+              onMainButtonPressed: list!.hasDeadline
+                  ? () {
+                      _showChangeDateDialog(context);
+                    }
+                  : () {},
+              finalButtonIcon: Icon(Icons.close),
+            )
+          : UnicornDialer(
+              backgroundColor: Colors.transparent,
+              parentButton: Icon(
+                Icons.add,
+                color: Theme.of(context).primaryColor,
+                size: MediaQuery.of(context).size.width * 0.1,
+              ),
+              childButtons: childButtons,
+              onMainButtonPressed: () {},
+              finalButtonIcon: Icon(
+                Icons.close,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).primaryColorLight,
+              Theme.of(context).primaryColorDark
+            ],
           ),
-          child: SafeArea(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      height: 110,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 24.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          editMode
-                              ? IconButton(
-                                  icon: const Icon(Icons.cancel),
-                                  onPressed: () {
+        ),
+        child: SafeArea(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height -
+                MediaQuery.of(context).padding.top,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: 110,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        editMode
+                            ? IconButton(
+                                icon: const Icon(Icons.cancel),
+                                onPressed: () {
+                                  setState(() {
+                                    newDeadline = list!.deadline;
+                                    _titleController.text = list!.title;
+                                    toggleEditMode();
+                                  });
+                                },
+                              )
+                            : IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                        editMode
+                            ? Expanded(
+                                child: TextField(
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  onChanged: (txt) {
                                     setState(() {
-                                      newDeadline = list!.deadline;
-                                      _titleController.text = list!.title;
-                                      toggleEditMode();
+                                      newTextEmpty = txt.trim().isEmpty;
                                     });
                                   },
-                                )
-                              : IconButton(
-                                  icon: const Icon(Icons.arrow_back),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                          editMode
-                              ? Expanded(
-                                  child: TextField(
-                                    textCapitalization:
-                                        TextCapitalization.sentences,
-                                    onChanged: (txt) {
-                                      setState(() {
-                                        newTextEmpty = txt.trim().isEmpty;
-                                      });
-                                    },
-                                    controller: _titleController,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 12.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    maxLength: 25,
-                                    // Set the maximum length
-                                    decoration: const InputDecoration(
-                                      counterText:
-                                          "", // Hide the character counter
-                                      // border: InputBorder.none,
-                                    ),
+                                  controller: _titleController,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                )
-                              : Expanded(
-                                  child: Text(
-                                    _titleController.text,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                  maxLength: 25,
+                                  // Set the maximum length
+                                  decoration: const InputDecoration(
+                                    counterText:
+                                        "", // Hide the character counter
+                                    // border: InputBorder.none,
                                   ),
                                 ),
-                          editMode
-                              ? IconButton(
-                                  icon: const Icon(Icons.save),
-                                  onPressed: newTextEmpty
-                                      ? null
-                                      : () {
-                                          _save();
-                                        },
-                                )
-                              : IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: toggleEditMode,
-                                ),
-                        ],
-                      ),
-                    ),
-                    isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            children: [
-                              SizedBox(
-                                height: MediaQuery.of(context).size.height -
-                                    MediaQuery.of(context).padding.top -
-                                    (110 + 40),
-                                child: ItemList(
-                                  toggleEditMode: toggleEditMode,
-                                  editMode: editMode,
-                                  currentList: currentList,
-                                  editList: editList,
-                                  reorderItems: reorderItems,
-                                  checkItem: checkItem,
-                                  controller: itemListController,
-                                  updateSingleListScreen: initListDate,
+                              )
+                            : Expanded(
+                                child: Text(
+                                  _titleController.text,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(
-                                height: 40,
+                        editMode
+                            ? IconButton(
+                                icon: const Icon(Icons.save),
+                                onPressed: newTextEmpty
+                                    ? null
+                                    : () {
+                                        _save();
+                                      },
                               )
-                            ],
-                          ),
-                  ],
-                ),
+                            : IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: toggleEditMode,
+                              ),
+                      ],
+                    ),
+                  ),
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height -
+                                  MediaQuery.of(context).padding.top -
+                                  (110 + 40),
+                              child: ItemList(
+                                toggleEditMode: toggleEditMode,
+                                editMode: editMode,
+                                currentList: currentList,
+                                editList: editList,
+                                reorderItems: reorderItems,
+                                checkItem: checkItem,
+                                controller: itemListController,
+                                updateSingleListScreen: initListDate,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 40,
+                            )
+                          ],
+                        ),
+                ],
               ),
             ),
           ),

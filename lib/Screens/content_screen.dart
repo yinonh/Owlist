@@ -131,6 +131,7 @@ class _ContentScreenState extends State<ContentScreen> {
     // );
 
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       resizeToAvoidBottomInset: false,
       floatingActionButton: DiamondButton(
         icon: Icon(

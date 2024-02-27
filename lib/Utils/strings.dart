@@ -87,8 +87,7 @@ class Strings {
   static String itemsInProcess = "Items In Process";
 
   // to do item widget
-  static String itemDeleted = "Item deleted";
-  static String undo = "Undo";
+  static String itemDeletedPressHereToUndo = "Item deleted press here to undo";
 
   //notifications provider
   static String hurryUpTomorrowsDeadline = "Hurry up! Tomorrow's Deadline!";

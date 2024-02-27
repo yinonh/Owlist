@@ -23,6 +23,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final listsProvider = Provider.of<ListsProvider>(context);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(

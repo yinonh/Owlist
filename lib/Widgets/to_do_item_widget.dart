@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Providers/item_provider.dart';
-import 'package:to_do/Utils/strings.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
+import '../Providers/item_provider.dart';
+import '../Utils/strings.dart';
 import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
 import 'dog_ear_list_tile.dart';
@@ -29,38 +30,29 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
 
   void dismiss(ItemProvider provider) {
     provider.deleteItemById(widget.item.id, widget.item.done);
-    // Create a Completer to control the flow
-    Completer<bool> completer = Completer<bool>();
 
     setState(() {
       _itemVisible = false;
     });
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.translate(Strings.itemDeleted),
-          style: const TextStyle(color: Colors.white),
-        ),
+    showTopSnackBar(
+      Overlay.of(context),
+      CustomSnackBar.success(
+        message: context.translate(Strings.itemDeletedPressHereToUndo),
         backgroundColor: Theme.of(context).highlightColor,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 6,
-        margin: const EdgeInsets.all(10),
-        action: SnackBarAction(
-          label: context.translate(Strings.undo),
-          onPressed: () {
-            provider.addExistingItem(widget.item);
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            setState(() {
-              _itemVisible = true;
-            });
-          },
+        icon: const Icon(
+          Icons.notifications_off,
+          color: Color(0x15000000),
+          size: 120,
         ),
       ),
+      onTap: () {
+        provider.addExistingItem(widget.item);
+        setState(() {
+          _itemVisible = true;
+        });
+      },
+      snackBarPosition: SnackBarPosition.bottom,
+      displayDuration: const Duration(seconds: 1, milliseconds: 500),
     );
   }
 
