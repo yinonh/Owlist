@@ -45,13 +45,22 @@ class _SingleListScreenState extends State<SingleListScreen> {
     setState(() {
       isLoading = true;
     });
+
     list = await Provider.of<ListsProvider>(context, listen: false)
         .getListById(widget.listId);
-    if (list == null) Navigator.pop;
+
+    if (list == null) {
+      Navigator.pop(context); // Add parenthesis to actually call Navigator.pop
+      return; // Exit the function if list is null
+    }
+
     newDeadline = list!.deadline;
     _titleController.text = list!.title;
+
+    // Wait for currentList to be fully updated before proceeding
     currentList = await Provider.of<ItemProvider>(context, listen: false)
         .itemsByListId(list!.id);
+
     currentList.sort((a, b) {
       if (a.done == b.done) {
         return a.itemIndex.compareTo(b.itemIndex);
@@ -59,7 +68,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
         return a.done ? 1 : -1;
       }
     });
+
     editList = List.from(currentList);
+
     setState(() {
       isLoading = false;
     });
