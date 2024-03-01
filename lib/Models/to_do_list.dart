@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 class ToDoList {
   final String id;
   final String userID;
-  final int notificationIndex;
+  // final int notificationIndex;
   bool hasDeadline;
   String title;
   DateTime creationDate;
@@ -14,7 +14,7 @@ class ToDoList {
   ToDoList({
     required this.id,
     required this.userID,
-    required this.notificationIndex,
+    // required this.notificationIndex,
     required this.hasDeadline,
     required this.title,
     required this.creationDate,
@@ -28,7 +28,7 @@ class ToDoList {
     return {
       'userID': userID,
       'title': title,
-      'notificationIndex': notificationIndex,
+      // 'notificationIndex': notificationIndex,
       'hasDeadline': hasDeadline ? 1 : 0,
       'creationDate': DateFormat('yyyy-MM-dd').format(creationDate),
       'deadline': DateFormat('yyyy-MM-dd').format(deadline),

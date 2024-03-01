@@ -165,16 +165,17 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
-    if (item.hasDeadline) {
-      bool notificationExsist =
-          await Provider.of<NotificationProvider>(context, listen: false)
-              .cancelNotification(item.notificationIndex, item.deadline);
-      if (notificationExsist) {
-        showMessage(
-            context.translate(Strings.theNotificationForThisListWasCanceled),
-            Icons.notifications_off);
-      }
-    }
+    // if (item.hasDeadline) {
+    //TODO:cancelNotification
+    //   // bool notificationExsist =
+    //   //     await Provider.of<NotificationProvider>(context, listen: false)
+    //   //         .cancelNotification(item.notificationIndex, item.deadline);
+    //   if (notificationExsist) {
+    //     showMessage(
+    //         context.translate(Strings.theNotificationForThisListWasCanceled),
+    //         Icons.notifications_off);
+    //   }
+    // }
   }
 
   void addItem(String title, DateTime deadline, bool hasDeadline) {
@@ -378,6 +379,7 @@ class _HomePageState extends State<HomePage> {
                             child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasError) {
+                          print(snapshot.error);
                           return Text(
                             context.translate(Strings.errorHasOccurred),
                             style: const TextStyle(color: Colors.white),
@@ -402,18 +404,6 @@ class _HomePageState extends State<HomePage> {
                             child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasError) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: const Duration(seconds: 2),
-                              content: Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(
-                                  color: Colors.deepOrange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
                           return Text(
                             context.translate(Strings.errorHasOccurred),
                             style: const TextStyle(color: Colors.white),
@@ -438,18 +428,6 @@ class _HomePageState extends State<HomePage> {
                             child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasError) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: const Duration(seconds: 2),
-                              content: Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(
-                                  color: Colors.deepOrange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
                           return Text(
                             context.translate(Strings.errorHasOccurred),
                             style: const TextStyle(color: Colors.white),

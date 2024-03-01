@@ -233,8 +233,9 @@ class ItemProvider extends ChangeNotifier {
             accomplishedItems++;
           }
           if (accomplishedItems == totalItems) {
-            Provider.of<NotificationProvider>(context, listen: false)
-                .cancelNotification(notificationIndex);
+            //TODO: cancelNotification
+            // Provider.of<NotificationProvider>(context, listen: false)
+            //     .cancelNotification(notificationIndex);
           }
 
           // Update 'accomplishedItems' in the todo_lists table

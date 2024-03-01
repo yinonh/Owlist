@@ -4,13 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import '../Utils/shared_preferences_helper.dart';
 
-const VERSION = 1;
+const VERSION = 2;
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
@@ -39,18 +40,17 @@ class ListsProvider extends ChangeNotifier {
       onCreate: (db, version) async {
         print('Creating tables...');
         await db.execute('''
-          CREATE TABLE todo_lists(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userID TEXT,
-            title TEXT,
-            creationDate TEXT,
-            deadline TEXT,
-            hasDeadline INTEGER,
-            totalItems INTEGER,
-            notificationIndex INTEGER,
-            accomplishedItems INTEGER
-          )
-        ''');
+        CREATE TABLE todo_lists(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          userID TEXT,
+          title TEXT,
+          creationDate TEXT,
+          deadline TEXT,
+          hasDeadline INTEGER,
+          totalItems INTEGER,
+          accomplishedItems INTEGER
+        )
+      ''');
         await db.execute('''
         CREATE TABLE todo_items(
           id TEXT PRIMARY KEY, 
@@ -59,32 +59,55 @@ class ListsProvider extends ChangeNotifier {
           content TEXT, 
           done INTEGER, 
           itemIndex INTEGER
+        );
+      ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+          CREATE TABLE notifications(
+            id TEXT PRIMARY KEY,
+            listId INTEGER,
+            notificationIndex INTEGER,
+            notificationDate TEXT,
+            notificationTime INTEGER,
+            disabled INTEGER
           );
         ''');
+          int notificationTime =
+              await SharedPreferencesHelper.instance.getNotificationTime();
+          // Migrate existing data from todo_lists to notifications
+          List<Map<String, dynamic>> lists = await db.query('todo_lists');
+          for (var list in lists) {
+            int listId = list['id'];
+            int notificationIndex = list['notificationIndex'];
+            String deadline = list['deadline'];
+            // Calculate notification date one day before the deadline
+            DateTime notificationDate =
+                DateFormat('yyyy-MM-dd').parse(deadline);
+            notificationDate = notificationDate.subtract(Duration(days: 1));
+            await db.insert('notifications', {
+              'id': Uuid().v4(),
+              'listId': listId,
+              'notificationIndex': notificationIndex,
+              'notificationDate':
+                  DateFormat('yyyy-MM-dd').format(notificationDate),
+              'notificationTime': notificationTime,
+              'disabled': 0, // Not disabled by default
+            });
+          }
+          // Remove notificationIndex from todo_lists
+          await db.execute('''
+          CREATE TABLE todo_lists_temp AS SELECT
+            id, userID, title, creationDate, deadline, hasDeadline, totalItems, accomplishedItems
+          FROM todo_lists;
+        ''');
+          await db.execute('DROP TABLE todo_lists;');
+          await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists;');
+        }
       },
       version: VERSION,
     );
-  }
-
-  Future<void> printTableColumns(String tableName) async {
-    try {
-      // Open or create the SQLite database
-      final Database db = await database;
-
-      // Query the SQLite database to fetch the table columns
-      List<Map<String, dynamic>> columns =
-          await db.rawQuery('PRAGMA table_info($tableName)');
-
-      // Print the column names
-      for (var column in columns) {
-        print('Column Name: ${column['name']}');
-      }
-
-      // Close the database
-      // await db.close();
-    } catch (error) {
-      print("Error printing table columns: $error");
-    }
   }
 
   Future<List<ToDoList>> getActiveItems() async {
@@ -113,7 +136,7 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        notificationIndex: maps[i]['notificationIndex'],
+        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -139,7 +162,7 @@ class ListsProvider extends ChangeNotifier {
         totalItems: map['totalItems'],
         accomplishedItems: map['accomplishedItems'],
         userID: map['userID'],
-        notificationIndex: map['notificationIndex'],
+        // notificationIndex: map['notificationIndex'],
       );
       //return ToDoList.fromMap(maps.first);
     }
@@ -172,7 +195,7 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        notificationIndex: maps[i]['notificationIndex'],
+        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -204,7 +227,7 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        notificationIndex: maps[i]['notificationIndex'],
+        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -229,13 +252,13 @@ class ListsProvider extends ChangeNotifier {
       final List<Map<String, dynamic>> snapshot = await db.rawQuery(
           'SELECT MAX(notificationIndex) as maxIndex FROM todo_lists');
 
-      int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
+      // int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
 
       ToDoList newList = ToDoList(
         id: '0',
         // SQLite will auto-generate the ID
-        userID: '1', // FirebaseAuth.instance.currentUser!.uid,
-        notificationIndex: notificationIndex,
+        userID: '1',
+        // notificationIndex: notificationIndex,
         hasDeadline: hasDeadline,
         title: title,
         creationDate: DateTime.now(),
@@ -251,10 +274,11 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
-        return await notificationProvider.scheduleNotification(
-            newList,
-            SharedPreferencesHelper.instance.selectedLanguage ??
-                Localizations.localeOf(context).languageCode);
+        //TODO: scheduleNotification
+        // return await notificationProvider.scheduleNotification(
+        //     newList,
+        //     SharedPreferencesHelper.instance.selectedLanguage ??
+        //         Localizations.localeOf(context).languageCode);
       }
     } catch (error) {
       print("Error adding new item: $error");
@@ -368,20 +392,22 @@ class ListsProvider extends ChangeNotifier {
 
       invalidateCache();
       notifyListeners();
-      String? newTime = await notificationProvider.scheduleNotification(
-          ToDoList(
-              id: list.id,
-              userID: list.userID,
-              notificationIndex: list.notificationIndex,
-              hasDeadline: list.hasDeadline,
-              title: list.title,
-              creationDate: list.creationDate,
-              deadline: newDeadline,
-              totalItems: list.totalItems,
-              accomplishedItems: list.accomplishedItems),
-          SharedPreferencesHelper.instance.selectedLanguage ??
-              Localizations.localeOf(context).languageCode);
-      return newTime;
+      //TODO: scheduleNotification
+      // String? newTime = await notificationProvider.scheduleNotification(
+      //     ToDoList(
+      //         id: list.id,
+      //         userID: list.userID,
+      //         // notificationIndex: list.notificationIndex,
+      //         hasDeadline: list.hasDeadline,
+      //         title: list.title,
+      //         creationDate: list.creationDate,
+      //         deadline: newDeadline,
+      //         totalItems: list.totalItems,
+      //         accomplishedItems: list.accomplishedItems),
+      //     SharedPreferencesHelper.instance.selectedLanguage ??
+      //         Localizations.localeOf(context).languageCode);
+      // return newTime;
+      return "00:00";
     } catch (e) {
       print('Error updating the deadline: $e');
     }
@@ -408,19 +434,20 @@ class ListsProvider extends ChangeNotifier {
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
-      await notificationProvider.scheduleNotification(
-          ToDoList(
-              id: list.id,
-              userID: list.userID,
-              notificationIndex: list.notificationIndex,
-              hasDeadline: list.hasDeadline,
-              title: newTitle,
-              creationDate: list.creationDate,
-              deadline: list.deadline,
-              totalItems: list.totalItems,
-              accomplishedItems: list.accomplishedItems),
-          SharedPreferencesHelper.instance.selectedLanguage ??
-              Localizations.localeOf(context).languageCode);
+      //TODO: scheduleNotification
+      // await notificationProvider.scheduleNotification(
+      //     ToDoList(
+      //         id: list.id,
+      //         userID: list.userID,
+      //         // notificationIndex: list.notificationIndex,
+      //         hasDeadline: list.hasDeadline,
+      //         title: newTitle,
+      //         creationDate: list.creationDate,
+      //         deadline: list.deadline,
+      //         totalItems: list.totalItems,
+      //         accomplishedItems: list.accomplishedItems),
+      //     SharedPreferencesHelper.instance.selectedLanguage ??
+      //         Localizations.localeOf(context).languageCode);
     } catch (e) {
       print('Error updating the title: $e');
     }

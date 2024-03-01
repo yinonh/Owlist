@@ -102,29 +102,29 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> cancelNotification(int id, [DateTime? deadline]) async {
-    bool notificationExists = true;
-    if (deadline != null) {
-      final pendingNotifications =
-          await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-      notificationExists =
-          pendingNotifications.any((notification) => notification.id == id);
-      final notificationTime = DateTime(
-          deadline.year,
-          deadline.month,
-          deadline.subtract(const Duration(days: 1)).day,
-          _notificationTime.hour,
-          _notificationTime.minute,
-          0);
-      if (notificationTime.isBefore(DateTime.now())) return false;
-    }
-
-    if (notificationExists) {
-      await flutterLocalNotificationsPlugin.cancel(id);
-      return true;
-    }
-    return false;
-  }
+  // Future<bool> cancelNotification(int id, [DateTime? deadline]) async {
+  //   bool notificationExists = true;
+  //   if (deadline != null) {
+  //     final pendingNotifications =
+  //         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+  //     notificationExists =
+  //         pendingNotifications.any((notification) => notification.id == id);
+  //     final notificationTime = DateTime(
+  //         deadline.year,
+  //         deadline.month,
+  //         deadline.subtract(const Duration(days: 1)).day,
+  //         _notificationTime.hour,
+  //         _notificationTime.minute,
+  //         0);
+  //     if (notificationTime.isBefore(DateTime.now())) return false;
+  //   }
+  //
+  //   if (notificationExists) {
+  //     await flutterLocalNotificationsPlugin.cancel(id);
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
   Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
@@ -152,41 +152,41 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  Future<String?> scheduleNotification(
-      ToDoList list, String languageCode) async {
-    if (!isActive) return null;
-    cancelNotification(list.notificationIndex);
-    final deadline = list.deadline.subtract(const Duration(days: 1));
-    final tz.TZDateTime scheduledTime = tz.TZDateTime(
-      tz.local,
-      deadline.year,
-      deadline.month,
-      deadline.day,
-      _notificationTime.hour, // Hour
-      _notificationTime.minute, // Minute
-      _notificationTime.second, // Second
-    );
-    if (scheduledTime.isBefore(DateTime.now())) return null;
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      list.notificationIndex,
-      list.title,
-      await getRandomNotificationText(languageCode),
-      scheduledTime,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'main_channel_id',
-          'Deadline notifications',
-          channelDescription:
-              'Notification scheduled for one day before the deadline',
-          channelShowBadge: false,
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
-
-    return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
-  }
+  // Future<String?> scheduleNotification(
+  //     ToDoList list, String languageCode) async {
+  //   if (!isActive) return null;
+  //   cancelNotification(list.notificationIndex);
+  //   final deadline = list.deadline.subtract(const Duration(days: 1));
+  //   final tz.TZDateTime scheduledTime = tz.TZDateTime(
+  //     tz.local,
+  //     deadline.year,
+  //     deadline.month,
+  //     deadline.day,
+  //     _notificationTime.hour, // Hour
+  //     _notificationTime.minute, // Minute
+  //     _notificationTime.second, // Second
+  //   );
+  //   if (scheduledTime.isBefore(DateTime.now())) return null;
+  //
+  //   await flutterLocalNotificationsPlugin.zonedSchedule(
+  //     list.notificationIndex,
+  //     list.title,
+  //     await getRandomNotificationText(languageCode),
+  //     scheduledTime,
+  //     const NotificationDetails(
+  //       android: AndroidNotificationDetails(
+  //         'main_channel_id',
+  //         'Deadline notifications',
+  //         channelDescription:
+  //             'Notification scheduled for one day before the deadline',
+  //         channelShowBadge: false,
+  //       ),
+  //     ),
+  //     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.absoluteTime,
+  //   );
+  //
+  //   return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
+  // }
 }
