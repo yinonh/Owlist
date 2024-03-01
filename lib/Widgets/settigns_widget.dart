@@ -6,6 +6,8 @@ import 'package:to_do/Screens/statistics_screen.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:to_do/Utils/strings.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
@@ -57,24 +59,27 @@ class _SettingsState extends State<Settings> {
   }
 
   void onTimeChanged(Time originalTime) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.translate(Strings.allTheChangesWillTakeEffectFromNowOnOnly),
-          style: const TextStyle(color: Colors.white),
-        ),
+    showTopSnackBar(
+      Overlay.of(context),
+      CustomSnackBar.success(
+        message:
+            context.translate(Strings.allTheChangesWillTakeEffectFromNowOnOnly),
         backgroundColor: Theme.of(context).highlightColor,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        icon: const Icon(
+          Icons.warning,
+          color: Color(0x15000000),
+          size: 120,
         ),
-        elevation: 6,
-        margin: const EdgeInsets.all(10),
       ),
+      snackBarPosition: SnackBarPosition.bottom,
+      displayDuration: const Duration(seconds: 2),
     );
+
     NotificationTime newTime = NotificationTime(
-        hour: originalTime.hour, minute: originalTime.minute, second: 0);
+      hour: originalTime.hour,
+      minute: originalTime.minute,
+      second: 0,
+    );
     Provider.of<NotificationProvider>(context, listen: false)
         .saveNotificationTimeToPrefs(newTime);
   }

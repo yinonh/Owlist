@@ -346,6 +346,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                         editMode
                             ? Expanded(
                                 child: TextField(
+                                  autofocus: true,
                                   textCapitalization:
                                       TextCapitalization.sentences,
                                   onChanged: (txt) {
