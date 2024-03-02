@@ -248,9 +248,10 @@ class ListsProvider extends ChangeNotifier {
   Future<String?> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
     try {
-      final Database db = await database;
-      final List<Map<String, dynamic>> snapshot = await db.rawQuery(
-          'SELECT MAX(notificationIndex) as maxIndex FROM todo_lists');
+      //TODO: return this lines
+      // final Database db = await database;
+      // final List<Map<String, dynamic>> snapshot = await db.rawQuery(
+      //     'SELECT MAX(notificationIndex) as maxIndex FROM todo_lists');
 
       // int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
 

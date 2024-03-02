@@ -202,9 +202,14 @@ class _UnicornDialer extends State<UnicornDialer>
                   child: widget.childButtons[index].currentButton.child);
 
               return Positioned(
-                right:
-                    widget.childButtons[index].currentButton.mini ? 4.0 : 0.0,
-                bottom: ((widget.childButtons.length - index) * 55.0) + 15,
+                // right:
+                //     widget.childButtons[index].currentButton.mini ? 4.0 : 0.0,
+                // bottom: ((widget.childButtons.length - index) * 55.0) + 15,
+                bottom: MediaQuery.of(context).size.height * 0.1,
+                right: MediaQuery.of(context).size.width / 2 -
+                    24.0 -
+                    (MediaQuery.of(context).size.width * 0.1) +
+                    (index * MediaQuery.of(context).size.width * 0.2),
                 child: Row(
                   children: [
                     ScaleTransition(
@@ -231,6 +236,7 @@ class _UnicornDialer extends State<UnicornDialer>
       var unicornDialWidget = Container(
         margin: null,
         height: double.infinity,
+        width: double.infinity,
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: childButtonsList.cast<Widget>().toList()
