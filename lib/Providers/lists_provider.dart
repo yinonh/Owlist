@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
+import 'package:to_do/Utils/notification_time.dart';
 import 'package:uuid/uuid.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import '../Utils/shared_preferences_helper.dart';
-
-const VERSION = 2;
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
@@ -41,7 +41,7 @@ class ListsProvider extends ChangeNotifier {
         print('Creating tables...');
         await db.execute('''
         CREATE TABLE todo_lists(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          id TEXT PRIMARY KEY,
           userID TEXT,
           title TEXT,
           creationDate TEXT,
@@ -61,21 +61,29 @@ class ListsProvider extends ChangeNotifier {
           itemIndex INTEGER
         );
       ''');
+        await db.execute('''
+          CREATE TABLE notifications(
+            id TEXT PRIMARY KEY,
+            listId INTEGER,
+            notificationIndex INTEGER,
+            notificationDateTime TEXT,
+            disabled INTEGER
+          );
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('''
           CREATE TABLE notifications(
             id TEXT PRIMARY KEY,
-            listId INTEGER,
+            listId STRING,
             notificationIndex INTEGER,
-            notificationDate TEXT,
-            notificationTime INTEGER,
+            notificationDateTime TEXT,
             disabled INTEGER
           );
         ''');
-          int notificationTime =
-              await SharedPreferencesHelper.instance.getNotificationTime();
+          NotificationTime notificationTime = NotificationTime.fromInt(
+              await SharedPreferencesHelper.instance.getNotificationTime());
           // Migrate existing data from todo_lists to notifications
           List<Map<String, dynamic>> lists = await db.query('todo_lists');
           for (var list in lists) {
@@ -83,16 +91,23 @@ class ListsProvider extends ChangeNotifier {
             int notificationIndex = list['notificationIndex'];
             String deadline = list['deadline'];
             // Calculate notification date one day before the deadline
-            DateTime notificationDate =
-                DateFormat('yyyy-MM-dd').parse(deadline);
-            notificationDate = notificationDate.subtract(Duration(days: 1));
+            DateTime notificationDate = DateFormat('yyyy-MM-dd')
+                .parse(deadline)
+                .subtract(Duration(days: 1));
+            String notificationDateTime = DateFormat('yyyy-MM-dd HH:mm').format(
+              DateTime(
+                  notificationDate.year,
+                  notificationDate.month,
+                  notificationDate.day,
+                  notificationTime.hour,
+                  notificationTime.minute),
+            );
             await db.insert('notifications', {
               'id': Uuid().v4(),
               'listId': listId,
               'notificationIndex': notificationIndex,
-              'notificationDate':
-                  DateFormat('yyyy-MM-dd').format(notificationDate),
-              'notificationTime': notificationTime,
+              'notificationDateTime': notificationDateTime,
+              // 'notificationTime': notificationTime,
               'disabled': 0, // Not disabled by default
             });
           }
@@ -106,7 +121,7 @@ class ListsProvider extends ChangeNotifier {
           await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists;');
         }
       },
-      version: VERSION,
+      version: int.parse(dotenv.env['DBVERSION']!),
     );
   }
 
@@ -128,7 +143,7 @@ class ListsProvider extends ChangeNotifier {
     _activeItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
       return ToDoList(
-        id: maps[i]['id'].toString(),
+        id: maps[i]['id'],
         title: maps[i]['title'],
         creationDate: DateTime.parse(maps[i]['creationDate']),
         deadline: deadline,
@@ -154,7 +169,7 @@ class ListsProvider extends ChangeNotifier {
     var deadline = DateTime.parse(map['deadline']);
     if (maps.isNotEmpty) {
       return ToDoList(
-        id: map['id'].toString(),
+        id: map['id'],
         title: map['title'],
         creationDate: DateTime.parse(map['creationDate']),
         deadline: deadline,
@@ -187,7 +202,7 @@ class ListsProvider extends ChangeNotifier {
     _achievedItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
       return ToDoList(
-        id: maps[i]['id'].toString(),
+        id: maps[i]['id'],
         title: maps[i]['title'],
         creationDate: DateTime.parse(maps[i]['creationDate']),
         deadline: deadline,
@@ -248,15 +263,9 @@ class ListsProvider extends ChangeNotifier {
   Future<String?> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
     try {
-      //TODO: return this lines
-      // final Database db = await database;
-      // final List<Map<String, dynamic>> snapshot = await db.rawQuery(
-      //     'SELECT MAX(notificationIndex) as maxIndex FROM todo_lists');
-
-      // int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
-
+      String newListId = Uuid().v4();
       ToDoList newList = ToDoList(
-        id: '0',
+        id: newListId,
         // SQLite will auto-generate the ID
         userID: '1',
         // notificationIndex: notificationIndex,
@@ -275,11 +284,10 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
-        //TODO: scheduleNotification
-        // return await notificationProvider.scheduleNotification(
-        //     newList,
-        //     SharedPreferencesHelper.instance.selectedLanguage ??
-        //         Localizations.localeOf(context).languageCode);
+        return await notificationProvider.addNotificationDayBeforeDeadline(
+            newList,
+            SharedPreferencesHelper.instance.selectedLanguage ??
+                Localizations.localeOf(context).languageCode);
       }
     } catch (error) {
       print("Error adding new item: $error");
@@ -299,6 +307,12 @@ class ListsProvider extends ChangeNotifier {
       // Delete items associated with the list from the SQLite database
       await db.delete(
         'todo_items',
+        where: 'listId = ?',
+        whereArgs: [list.id],
+      );
+
+      await db.delete(
+        'notifications',
         where: 'listId = ?',
         whereArgs: [list.id],
       );

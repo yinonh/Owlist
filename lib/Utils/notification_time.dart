@@ -9,6 +9,10 @@ class NotificationTime extends Time {
     return hour * 10000 + minute * 100 + second;
   }
 
+  Duration toDuration() {
+    return Duration(hours: hour, minutes: minute, seconds: second);
+  }
+
   // Static method to create a Time object from an integer value
   static NotificationTime fromInt(int value) {
     int hour = value ~/ 10000;

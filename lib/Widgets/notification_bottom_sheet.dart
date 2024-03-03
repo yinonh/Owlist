@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/Providers/notification_provider.dart';
+
+import '../Models/notification.dart';
 
 class NotificationBottomSheet extends StatefulWidget {
+  final String listId;
+
+  const NotificationBottomSheet({required this.listId, Key? key})
+      : super(key: key);
+
   @override
   _NotificationBottomSheetState createState() =>
       _NotificationBottomSheetState();
@@ -32,41 +42,45 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const Text(
-              'Notifications',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            SizedBox(height: 16),
-            _buildNotificationItem(context, "One day before deadline",
-                Icons.notifications_active, Icons.edit, _oneDayController),
-            _buildNotificationItem(context, "One week before deadline",
-                Icons.notifications, Icons.edit, _oneWeekController),
-            _buildNotificationItem(context, "Two weeks before deadline",
-                Icons.notifications, Icons.edit, _twoWeeksController),
-            _buildNotificationItem(context, "One month before deadline",
-                Icons.notifications, Icons.edit, _oneMonthController),
-          ],
-        ),
-      ),
+    final provider = Provider.of<NotificationProvider>(context);
+    return FutureBuilder<List<Notifications>>(
+      future: provider.getNotificationsByListId(widget.listId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Placeholder while loading
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+          return Text('No notifications found');
+        } else {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final notification = snapshot.data![index];
+              return _buildNotificationItem(context, notification);
+            },
+          );
+        }
+      },
     );
   }
 
-  Widget _buildNotificationItem(BuildContext context, String title,
-      IconData icon, IconData trailingIcon, TextEditingController controller) {
+  Widget _buildNotificationItem(
+      BuildContext context, Notifications notification) {
+    final title = 'Notification ${notification.notificationIndex}';
+    final trailingIcon = Icons.edit;
+    final controller = TextEditingController(
+      text: DateFormat('yyyy-MM-dd HH:mm')
+          .format(notification.notificationDateTime),
+    );
+
     return ListTile(
       leading: Icon(
-        icon,
-        color: icon == Icons.notifications_active ? Colors.purple : Colors.grey,
+        notification.disabled
+            ? Icons.notifications_off
+            : Icons.notifications_active,
+        color: notification.disabled ? Colors.grey : Colors.purple,
       ),
       title: Text(title),
       trailing: IconButton(
@@ -85,8 +99,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       lastDate: DateTime.now().add(Duration(days: 365)),
     );
     if (pickedDate != null) {
-      controller.text =
-          pickedDate.toString(); // You can format the date as needed
+      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
     }
   }
 }

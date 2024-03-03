@@ -11,7 +11,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
-import '../Widgets/notification_time.dart';
+import '../Utils/notification_time.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);

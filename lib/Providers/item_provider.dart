@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
@@ -6,8 +7,6 @@ import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
 import 'notification_provider.dart';
-
-const VERSION = 1;
 
 class ItemProvider extends ChangeNotifier {
   Database? _database;
@@ -21,7 +20,7 @@ class ItemProvider extends ChangeNotifier {
   initDB() async {
     return await sql.openDatabase(
       path.join(await sql.getDatabasesPath(), 'to_do.db'),
-      version: VERSION,
+      version: int.parse(dotenv.env['DBVERSION']!),
     );
   }
 

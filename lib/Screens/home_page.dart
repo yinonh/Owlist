@@ -9,7 +9,7 @@ import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
-import '../Widgets/my_bottom_navigation_bar.dart';
+import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Utils/strings.dart';
 import '../Utils/shared_preferences_helper.dart';

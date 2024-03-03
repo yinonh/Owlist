@@ -4,24 +4,45 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqlite_api.dart';
+import 'package:path/path.dart' as path;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:uuid/uuid.dart';
 import 'dart:math';
 
+import '../Models/notification.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
-import '../Widgets/notification_time.dart';
+import '../Utils/notification_time.dart';
 import '../Models/to_do_list.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
+
   // late SharedPreferences _prefs;
   late NotificationTime _notificationTime;
   late bool isActive;
+  Database? _database;
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await initDB();
+    return _database!;
+  }
+
+  initDB() async {
+    return await sql.openDatabase(
+      path.join(await sql.getDatabasesPath(), 'to_do.db'),
+      version: int.parse(dotenv.env['DBVERSION']!),
+    );
+  }
 
   FlutterLocalNotificationsPlugin get flutterLocalNotificationsPlugin =>
       _flutterLocalNotificationsPlugin;
@@ -102,29 +123,63 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  // Future<bool> cancelNotification(int id, [DateTime? deadline]) async {
-  //   bool notificationExists = true;
-  //   if (deadline != null) {
-  //     final pendingNotifications =
-  //         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-  //     notificationExists =
-  //         pendingNotifications.any((notification) => notification.id == id);
-  //     final notificationTime = DateTime(
-  //         deadline.year,
-  //         deadline.month,
-  //         deadline.subtract(const Duration(days: 1)).day,
-  //         _notificationTime.hour,
-  //         _notificationTime.minute,
-  //         0);
-  //     if (notificationTime.isBefore(DateTime.now())) return false;
-  //   }
-  //
-  //   if (notificationExists) {
-  //     await flutterLocalNotificationsPlugin.cancel(id);
-  //     return true;
-  //   }
-  //   return false;
-  // }
+  Future<String?> addNotificationDayBeforeDeadline(
+      ToDoList list, String languageCode) async {
+    if (!isActive) return null;
+    final deadline = list.deadline.subtract(const Duration(days: 1));
+    final tz.TZDateTime scheduledTime = tz.TZDateTime(
+      tz.local,
+      deadline.year,
+      deadline.month,
+      deadline.day,
+      _notificationTime.hour,
+      // Hour
+      _notificationTime.minute,
+      // Minute
+    );
+    final disabled = scheduledTime.isBefore(DateTime.now());
+    final Database db = await database;
+    final List<Map<String, dynamic>> snapshot = await db.rawQuery(
+        'SELECT MAX(notificationIndex) as maxIndex FROM notifications');
+
+    int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
+    addNotification(
+        list,
+        Notifications(
+            id: Uuid().v4(),
+            listId: list.id,
+            notificationIndex: notificationIndex,
+            notificationDateTime: scheduledTime,
+            disabled: disabled),
+        languageCode);
+  }
+
+  Future<String?> addNotification(
+      ToDoList list, Notifications notification, String languageCode) async {
+    final db = await database;
+
+    await db.insert(
+      'notifications',
+      notification.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    notifyListeners();
+    return scheduleNotification(list, languageCode);
+  }
+
+  Future<List<Notifications>> getNotificationsByListId(String listId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db
+        .query('notifications', where: 'listId = ?', whereArgs: [listId]);
+    return List.generate(maps.length, (i) {
+      return Notifications.fromMap(maps[i]);
+    });
+  }
+
+  Future<bool> cancelNotification(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
+    return true;
+  }
 
   Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
@@ -152,41 +207,88 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  // Future<String?> scheduleNotification(
-  //     ToDoList list, String languageCode) async {
-  //   if (!isActive) return null;
-  //   cancelNotification(list.notificationIndex);
-  //   final deadline = list.deadline.subtract(const Duration(days: 1));
-  //   final tz.TZDateTime scheduledTime = tz.TZDateTime(
-  //     tz.local,
-  //     deadline.year,
-  //     deadline.month,
-  //     deadline.day,
-  //     _notificationTime.hour, // Hour
-  //     _notificationTime.minute, // Minute
-  //     _notificationTime.second, // Second
-  //   );
-  //   if (scheduledTime.isBefore(DateTime.now())) return null;
-  //
-  //   await flutterLocalNotificationsPlugin.zonedSchedule(
-  //     list.notificationIndex,
-  //     list.title,
-  //     await getRandomNotificationText(languageCode),
-  //     scheduledTime,
-  //     const NotificationDetails(
-  //       android: AndroidNotificationDetails(
-  //         'main_channel_id',
-  //         'Deadline notifications',
-  //         channelDescription:
-  //             'Notification scheduled for one day before the deadline',
-  //         channelShowBadge: false,
-  //       ),
-  //     ),
-  //     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-  //     uiLocalNotificationDateInterpretation:
-  //         UILocalNotificationDateInterpretation.absoluteTime,
-  //   );
-  //
-  //   return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
-  // }
+  Future<String?> scheduleNotification(
+      ToDoList list, String languageCode) async {
+    if (!isActive) return null;
+
+    // Retrieve notifications with the same listId
+    List<Notifications> notifications = await getNotificationsByListId(list.id);
+
+    notifications.forEach((notification) {
+      cancelNotification(notification.notificationIndex);
+    });
+
+    // Schedule new notifications based on notification date and time
+    for (var notification in notifications) {
+      final scheduledDateTime = notification.notificationDateTime;
+
+      if (scheduledDateTime.isBefore(DateTime.now())) continue;
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        notification.notificationIndex,
+        list.title,
+        await getRandomNotificationText(languageCode),
+        tz.TZDateTime.from(scheduledDateTime, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'main_channel_id',
+            'Deadline notifications',
+            channelDescription:
+                'Notification scheduled for one day before the deadline',
+            channelShowBadge: false,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    }
+
+    // Returning the formatted scheduled time of the first notification
+    if (notifications.isNotEmpty) {
+      final firstNotification = notifications.first;
+      final scheduledDateTime = firstNotification.notificationDateTime;
+      return DateFormat('yyyy-MM-dd HH:mm').format(scheduledDateTime);
+    }
+
+    return null;
+  }
+
+// Future<String?> scheduleNotification(
+//     ToDoList list, String languageCode) async {
+//   if (!isActive) return null;
+//   cancelNotification(list.notificationIndex);
+//   final deadline = list.deadline.subtract(const Duration(days: 1));
+//   final tz.TZDateTime scheduledTime = tz.TZDateTime(
+//     tz.local,
+//     deadline.year,
+//     deadline.month,
+//     deadline.day,
+//     _notificationTime.hour, // Hour
+//     _notificationTime.minute, // Minute
+//     _notificationTime.second, // Second
+//   );
+//   if (scheduledTime.isBefore(DateTime.now())) return null;
+//
+//   await flutterLocalNotificationsPlugin.zonedSchedule(
+//     list.notificationIndex,
+//     list.title,
+//     await getRandomNotificationText(languageCode),
+//     scheduledTime,
+//     const NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         'main_channel_id',
+//         'Deadline notifications',
+//         channelDescription:
+//             'Notification scheduled for one day before the deadline',
+//         channelShowBadge: false,
+//       ),
+//     ),
+//     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+//     uiLocalNotificationDateInterpretation:
+//         UILocalNotificationDateInterpretation.absoluteTime,
+//   );
+//
+//   return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
+// }
 }

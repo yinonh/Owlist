@@ -217,7 +217,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return NotificationBottomSheet();
+        return NotificationBottomSheet(
+          listId: widget.listId,
+        );
       },
     );
   }
