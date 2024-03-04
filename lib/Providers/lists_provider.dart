@@ -7,7 +7,6 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 import 'package:to_do/Utils/notification_time.dart';
 import 'package:uuid/uuid.dart';
-// import 'package:awesome_notifications/awesome_notifications.dart';
 
 import '../Models/notification.dart';
 import '../Providers/notification_provider.dart';
@@ -108,7 +107,6 @@ class ListsProvider extends ChangeNotifier {
               'listId': listId,
               'notificationIndex': notificationIndex,
               'notificationDateTime': notificationDateTime,
-              // 'notificationTime': notificationTime,
               'disabled': 0, // Not disabled by default
             });
           }
@@ -152,7 +150,6 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -178,9 +175,7 @@ class ListsProvider extends ChangeNotifier {
         totalItems: map['totalItems'],
         accomplishedItems: map['accomplishedItems'],
         userID: map['userID'],
-        // notificationIndex: map['notificationIndex'],
       );
-      //return ToDoList.fromMap(maps.first);
     }
 
     return null; // Return null if no matching ToDoList is found.
@@ -211,7 +206,6 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -243,7 +237,6 @@ class ListsProvider extends ChangeNotifier {
         totalItems: maps[i]['totalItems'],
         accomplishedItems: maps[i]['accomplishedItems'],
         userID: maps[i]['userID'],
-        // notificationIndex: maps[i]['notificationIndex'],
       );
     });
 
@@ -269,7 +262,6 @@ class ListsProvider extends ChangeNotifier {
         id: newListId,
         // SQLite will auto-generate the ID
         userID: '1',
-        // notificationIndex: notificationIndex,
         hasDeadline: hasDeadline,
         title: title,
         creationDate: DateTime.now(),

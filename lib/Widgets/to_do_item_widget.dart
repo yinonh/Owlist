@@ -30,6 +30,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
 
   void dismiss(ItemProvider provider) {
     provider.deleteItemById(widget.item.id, widget.item.done);
+    widget.updateSingleListScreen();
 
     setState(() {
       _itemVisible = false;
@@ -47,9 +48,10 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       ),
       onTap: () {
         provider.addExistingItem(widget.item);
-        setState(() {
-          _itemVisible = true;
-        });
+        widget.updateSingleListScreen();
+        // setState(() {
+        _itemVisible = true;
+        // });
       },
       snackBarPosition: SnackBarPosition.bottom,
       displayDuration: const Duration(seconds: 1, milliseconds: 500),
@@ -117,41 +119,52 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 ),
               ),
             ),
-            child: DogEarListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  ContentScreen.routeName,
-                  arguments: {
-                    'id': widget.item.id,
-                  },
-                ).then((value) => widget.updateSingleListScreen());
-              },
-              leading: widget.editMode
-                  ? Icon(
+            child: widget.editMode
+                ? ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 6),
+                    leading: Icon(
                       Icons.drag_handle,
                       color: Theme.of(context).hintColor,
-                    )
-                  : const SizedBox(
+                    ),
+                    title: Text(
+                      widget.item.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    trailing: Checkbox(
+                      // activeColor: Color(0xFF945985),
+                      value: widget.item.done,
+                      onChanged: null,
+                    ),
+                  )
+                : DogEarListTile(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        ContentScreen.routeName,
+                        arguments: {
+                          'id': widget.item.id,
+                        },
+                      ).then((value) => widget.updateSingleListScreen());
+                    },
+                    leading: const SizedBox(
                       width: 10,
                     ),
-              title: Text(
-                widget.item.title,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              trailing: Checkbox(
-                // activeColor: Color(0xFF945985),
-                value: widget.item.done,
-                onChanged: widget.editMode
-                    ? null
-                    : (value) {
+                    title: Text(
+                      widget.item.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    trailing: Checkbox(
+                      // activeColor: Color(0xFF945985),
+                      value: widget.item.done,
+                      onChanged: (value) {
                         setState(() {
                           widget.checkItem(widget.item.id, widget.item.listId,
                               widget.item.done);
                         });
                       },
-              ),
-            ),
+                    ),
+                  ),
           ),
         ),
       ),

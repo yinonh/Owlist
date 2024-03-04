@@ -81,7 +81,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                     ),
                   ),
                 )
-              : SizedBox(
+              : const SizedBox(
                   height: 0,
                 ),
           widget.statistics['totalLists'] == 0

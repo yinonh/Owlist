@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
@@ -25,8 +24,6 @@ import '../Models/to_do_list.dart';
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
-
-  // late SharedPreferences _prefs;
   late NotificationTime _notificationTime;
   late bool isActive;
   Database? _database;
@@ -66,7 +63,6 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> saveNotificationTimeToPrefs(NotificationTime time) async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
     _notificationTime = time;
     await SharedPreferencesHelper.instance.setNotificationTime(time.toInt());
     notifyListeners();
@@ -132,10 +128,10 @@ class NotificationProvider with ChangeNotifier {
       deadline.year,
       deadline.month,
       deadline.day,
-      _notificationTime.hour,
       // Hour
-      _notificationTime.minute,
+      _notificationTime.hour,
       // Minute
+      _notificationTime.minute,
     );
     final disabled = scheduledTime.isBefore(DateTime.now());
     final Database db = await database;
@@ -227,12 +223,12 @@ class NotificationProvider with ChangeNotifier {
       cancelNotification(notification.notificationIndex);
     });
     bool notificationScheduled = false;
-    // Schedule new notifications based on notification date and time
     for (var notification in notifications) {
       final scheduledDateTime = notification.notificationDateTime;
 
-      if (scheduledDateTime.isBefore(DateTime.now()) || notification.disabled)
+      if (scheduledDateTime.isBefore(DateTime.now()) || notification.disabled) {
         continue;
+      }
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notification.notificationIndex,
@@ -256,42 +252,4 @@ class NotificationProvider with ChangeNotifier {
     }
     return notificationScheduled;
   }
-
-// Future<String?> scheduleNotification(
-//     ToDoList list, String languageCode) async {
-//   if (!isActive) return null;
-//   cancelNotification(list.notificationIndex);
-//   final deadline = list.deadline.subtract(const Duration(days: 1));
-//   final tz.TZDateTime scheduledTime = tz.TZDateTime(
-//     tz.local,
-//     deadline.year,
-//     deadline.month,
-//     deadline.day,
-//     _notificationTime.hour, // Hour
-//     _notificationTime.minute, // Minute
-//     _notificationTime.second, // Second
-//   );
-//   if (scheduledTime.isBefore(DateTime.now())) return null;
-//
-//   await flutterLocalNotificationsPlugin.zonedSchedule(
-//     list.notificationIndex,
-//     list.title,
-//     await getRandomNotificationText(languageCode),
-//     scheduledTime,
-//     const NotificationDetails(
-//       android: AndroidNotificationDetails(
-//         'main_channel_id',
-//         'Deadline notifications',
-//         channelDescription:
-//             'Notification scheduled for one day before the deadline',
-//         channelShowBadge: false,
-//       ),
-//     ),
-//     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-//     uiLocalNotificationDateInterpretation:
-//         UILocalNotificationDateInterpretation.absoluteTime,
-//   );
-//
-//   return DateFormat('dd/MM/yyyy HH:mm').format(scheduledTime);
-// }
 }

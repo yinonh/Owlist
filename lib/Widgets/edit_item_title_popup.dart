@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/Utils/strings.dart';
 
-import '../Utils/l10n/app_localizations.dart';
-
 class EditItemDialog extends StatefulWidget {
   final Function(String) addNewItem; // Function parameter
 

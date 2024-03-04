@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/settigns_widget.dart';
@@ -165,17 +164,6 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
-    // if (item.hasDeadline) {
-    //TODO:cancelNotification
-    //   // bool notificationExsist =
-    //   //     await Provider.of<NotificationProvider>(context, listen: false)
-    //   //         .cancelNotification(item.notificationIndex, item.deadline);
-    //   if (notificationExsist) {
-    //     showMessage(
-    //         context.translate(Strings.theNotificationForThisListWasCanceled),
-    //         Icons.notifications_off);
-    //   }
-    // }
   }
 
   void addItem(String title, DateTime deadline, bool hasDeadline) {
