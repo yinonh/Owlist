@@ -42,27 +42,65 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<NotificationProvider>(context);
-    return FutureBuilder<List<Notifications>>(
-      future: provider.getNotificationsByListId(widget.listId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Placeholder while loading
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-          return Text('No notifications found');
-        } else {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final notification = snapshot.data![index];
-              return _buildNotificationItem(context, notification);
-            },
-          );
-        }
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 8),
+          height: 4,
+          width: 40,
+          decoration: BoxDecoration(
+            color: Colors.grey[400],
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.3,
+          padding: EdgeInsets.all(16.0),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Notifications',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16.0),
+              FutureBuilder<List<Notifications>>(
+                future: Provider.of<NotificationProvider>(context)
+                    .getNotificationsByListId(widget.listId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Placeholder while loading
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                    return Text('No notifications found');
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final notification = snapshot.data![index];
+                        return _buildNotificationItem(context, notification);
+                      },
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -169,11 +169,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
       isLoading = true;
     });
     if (list!.deadline != newDeadline) {
-      String? result = await Provider.of<ListsProvider>(context, listen: false)
+      bool result = await Provider.of<ListsProvider>(context, listen: false)
           .editDeadline(list!, newDeadline);
-      if (result != null) {
-        showMessage(
-            "${context.translate(Strings.scheduleNotificationFor)} $result");
+      if (result) {
+        showMessage(context.translate(Strings.notificationsUpdated));
       }
     }
     if (list!.title != newTitle) {

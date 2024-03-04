@@ -38,4 +38,21 @@ class Notifications {
       disabled: map['disabled'] == 1,
     );
   }
+
+  // CopyWith function to create a copy of Notifications with updated values
+  Notifications copyWith({
+    String? id,
+    String? listId,
+    int? notificationIndex,
+    DateTime? notificationDateTime,
+    bool? disabled,
+  }) {
+    return Notifications(
+      id: id ?? this.id,
+      listId: listId ?? this.listId,
+      notificationIndex: notificationIndex ?? this.notificationIndex,
+      notificationDateTime: notificationDateTime ?? this.notificationDateTime,
+      disabled: disabled ?? this.disabled,
+    );
+  }
 }

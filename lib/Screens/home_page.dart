@@ -186,9 +186,8 @@ class _HomePageState extends State<HomePage> {
           return provider
               .createNewList(title, deadline, hasDeadline)
               .then((result) {
-            if (result != null) {
-              showMessage(
-                  "${context.translate(Strings.scheduleNotificationFor)} $result",
+            if (result) {
+              showMessage(context.translate(Strings.scheduleNotification),
                   Icons.notification_add);
             }
             return provider.getActiveItems();

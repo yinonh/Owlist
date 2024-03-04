@@ -123,9 +123,9 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> addNotificationDayBeforeDeadline(
+  Future<bool> addNotificationDayBeforeDeadline(
       ToDoList list, String languageCode) async {
-    if (!isActive) return null;
+    if (!isActive) return false;
     final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
@@ -143,7 +143,7 @@ class NotificationProvider with ChangeNotifier {
         'SELECT MAX(notificationIndex) as maxIndex FROM notifications');
 
     int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
-    addNotification(
+    return addNotification(
         list,
         Notifications(
             id: Uuid().v4(),
@@ -154,7 +154,7 @@ class NotificationProvider with ChangeNotifier {
         languageCode);
   }
 
-  Future<String?> addNotification(
+  Future<bool> addNotification(
       ToDoList list, Notifications notification, String languageCode) async {
     final db = await database;
 
@@ -176,8 +176,18 @@ class NotificationProvider with ChangeNotifier {
     });
   }
 
-  Future<bool> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+  Future<void> disableNotificationById(String notificationId) async {
+    final db = await database;
+    await db.update(
+      'notifications',
+      {'disabled': 1},
+      where: 'id = ?',
+      whereArgs: [notificationId],
+    );
+  }
+
+  Future<bool> cancelNotification(int notificationID) async {
+    await flutterLocalNotificationsPlugin.cancel(notificationID);
     return true;
   }
 
@@ -207,9 +217,8 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  Future<String?> scheduleNotification(
-      ToDoList list, String languageCode) async {
-    if (!isActive) return null;
+  Future<bool> scheduleNotification(ToDoList list, String languageCode) async {
+    if (!isActive) return false;
 
     // Retrieve notifications with the same listId
     List<Notifications> notifications = await getNotificationsByListId(list.id);
@@ -217,12 +226,13 @@ class NotificationProvider with ChangeNotifier {
     notifications.forEach((notification) {
       cancelNotification(notification.notificationIndex);
     });
-
+    bool notificationScheduled = false;
     // Schedule new notifications based on notification date and time
     for (var notification in notifications) {
       final scheduledDateTime = notification.notificationDateTime;
 
-      if (scheduledDateTime.isBefore(DateTime.now())) continue;
+      if (scheduledDateTime.isBefore(DateTime.now()) || notification.disabled)
+        continue;
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notification.notificationIndex,
@@ -242,16 +252,9 @@ class NotificationProvider with ChangeNotifier {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
+      notificationScheduled = true;
     }
-
-    // Returning the formatted scheduled time of the first notification
-    if (notifications.isNotEmpty) {
-      final firstNotification = notifications.first;
-      final scheduledDateTime = firstNotification.notificationDateTime;
-      return DateFormat('yyyy-MM-dd HH:mm').format(scheduledDateTime);
-    }
-
-    return null;
+    return notificationScheduled;
   }
 
 // Future<String?> scheduleNotification(

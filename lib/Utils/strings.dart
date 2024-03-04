@@ -27,7 +27,8 @@ class Strings {
   static String progressLowToHigh = "Progress: Low to High";
 
   // single list screen
-  static String scheduleNotificationFor = "Schedule notification for:";
+  static String scheduleNotification = "Schedule notification";
+  static String notificationsUpdated = "Notifications updated";
 
   //statistics screen
   static String statistics = "Statistics";

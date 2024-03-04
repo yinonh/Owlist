@@ -5,6 +5,7 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
+import '../Models/notification.dart';
 import '../Models/to_do_item.dart';
 import 'notification_provider.dart';
 
@@ -216,7 +217,7 @@ class ItemProvider extends ChangeNotifier {
         // Fetch the list data to update 'accomplishedItems'
         List<Map<String, dynamic>> listResult = await db.query(
           'todo_lists',
-          columns: ['accomplishedItems', 'totalItems', 'notificationIndex'],
+          columns: ['accomplishedItems', 'totalItems'],
           where: 'id = ?',
           whereArgs: [listId],
         );
@@ -224,7 +225,6 @@ class ItemProvider extends ChangeNotifier {
         if (listResult.isNotEmpty) {
           int accomplishedItems = listResult[0]['accomplishedItems'] as int;
           int totalItems = listResult[0]['totalItems'] as int;
-          int notificationIndex = listResult[0]['notificationIndex'] as int;
 
           if (currentDoneValue) {
             accomplishedItems--;
@@ -232,9 +232,13 @@ class ItemProvider extends ChangeNotifier {
             accomplishedItems++;
           }
           if (accomplishedItems == totalItems) {
-            //TODO: cancelNotification
-            // Provider.of<NotificationProvider>(context, listen: false)
-            //     .cancelNotification(notificationIndex);
+            NotificationProvider notificationProvider =
+                Provider.of<NotificationProvider>(context, listen: false);
+            List<Notifications> notifications =
+                await notificationProvider.getNotificationsByListId(listId);
+            notifications.forEach((notification) {
+              notificationProvider.disableNotificationById(notification.id);
+            });
           }
 
           // Update 'accomplishedItems' in the todo_lists table

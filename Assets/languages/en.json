@@ -64,7 +64,8 @@
   "Urgent Reminder: Due Tomorrow!": "Urgent Reminder: Due Tomorrow!",
   "Just One Day Left: Deadline Tomorrow!": "Just One Day Left: Deadline Tomorrow!",
   "The notification for this list was canceled": "The notification for this list was canceled",
-  "Schedule notification for:": "Schedule notification for:",
+  "Schedule notification": "Schedule notification",
+  "Notifications updated": "Notifications updated",
   "OK": "OK",
   "Add some content": "Add some content",
   "Could not launch": "Could not launch"

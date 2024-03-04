@@ -9,6 +9,7 @@ import 'package:to_do/Utils/notification_time.dart';
 import 'package:uuid/uuid.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 
+import '../Models/notification.dart';
 import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
 import '../Utils/shared_preferences_helper.dart';
@@ -260,7 +261,7 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> createNewList(
+  Future<bool> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
     try {
       String newListId = Uuid().v4();
@@ -292,6 +293,7 @@ class ListsProvider extends ChangeNotifier {
     } catch (error) {
       print("Error adding new item: $error");
     }
+    return false;
   }
 
   void invalidateCache() {
@@ -304,27 +306,33 @@ class ListsProvider extends ChangeNotifier {
     try {
       final Database db = await database;
 
-      // Delete items associated with the list from the SQLite database
+      // Delete items associated with the list
       await db.delete(
         'todo_items',
         where: 'listId = ?',
         whereArgs: [list.id],
       );
 
+      // Cancel the associated notifications
+      List<Notifications> notifications =
+          await notificationProvider.getNotificationsByListId(list.id);
+      for (var notification in notifications) {
+        notificationProvider.cancelNotification(notification.notificationIndex);
+      }
+
+      // Delete notifications associated with the list
       await db.delete(
         'notifications',
         where: 'listId = ?',
         whereArgs: [list.id],
       );
 
-      // Delete the list itself from the SQLite database
+      // Delete the list itself
       await db.delete(
         'todo_lists',
         where: 'id = ?',
         whereArgs: [list.id],
       );
-      // Close the database
-      // await db.close();
 
       invalidateCache();
       notifyListeners();
@@ -388,11 +396,11 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> editDeadline(ToDoList list, DateTime? newDeadline) async {
+  Future<bool> editDeadline(ToDoList list, DateTime? newDeadline) async {
     if (newDeadline == null) {
-      return null;
+      return false;
     }
-
+    bool notificationDisabled = false;
     try {
       final Database db = await database;
 
@@ -407,25 +415,22 @@ class ListsProvider extends ChangeNotifier {
 
       invalidateCache();
       notifyListeners();
-      //TODO: scheduleNotification
-      // String? newTime = await notificationProvider.scheduleNotification(
-      //     ToDoList(
-      //         id: list.id,
-      //         userID: list.userID,
-      //         // notificationIndex: list.notificationIndex,
-      //         hasDeadline: list.hasDeadline,
-      //         title: list.title,
-      //         creationDate: list.creationDate,
-      //         deadline: newDeadline,
-      //         totalItems: list.totalItems,
-      //         accomplishedItems: list.accomplishedItems),
-      //     SharedPreferencesHelper.instance.selectedLanguage ??
-      //         Localizations.localeOf(context).languageCode);
-      // return newTime;
-      return "00:00";
+      List<Notifications> notifications =
+          await notificationProvider.getNotificationsByListId(list.id);
+      for (var notification in notifications) {
+        if (newDeadline.isBefore(notification.notificationDateTime)) {
+          notificationProvider.disableNotificationById(notification.id);
+          notificationDisabled = true;
+        }
+      }
+      notificationProvider.scheduleNotification(
+          list,
+          SharedPreferencesHelper.instance.selectedLanguage ??
+              Localizations.localeOf(context).languageCode);
     } catch (e) {
       print('Error updating the deadline: $e');
     }
+    return notificationDisabled;
   }
 
   Future<void> editTitle(ToDoList list, String? newTitle) async {
@@ -445,24 +450,15 @@ class ListsProvider extends ChangeNotifier {
         where: 'id = ?',
         whereArgs: [list.id],
       );
+      ToDoList newList = list.copyWith(title: newTitle);
 
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
-      //TODO: scheduleNotification
-      // await notificationProvider.scheduleNotification(
-      //     ToDoList(
-      //         id: list.id,
-      //         userID: list.userID,
-      //         // notificationIndex: list.notificationIndex,
-      //         hasDeadline: list.hasDeadline,
-      //         title: newTitle,
-      //         creationDate: list.creationDate,
-      //         deadline: list.deadline,
-      //         totalItems: list.totalItems,
-      //         accomplishedItems: list.accomplishedItems),
-      //     SharedPreferencesHelper.instance.selectedLanguage ??
-      //         Localizations.localeOf(context).languageCode);
+      notificationProvider.scheduleNotification(
+          newList,
+          SharedPreferencesHelper.instance.selectedLanguage ??
+              Localizations.localeOf(context).languageCode);
     } catch (e) {
       print('Error updating the title: $e');
     }
