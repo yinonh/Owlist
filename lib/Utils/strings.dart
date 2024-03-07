@@ -104,4 +104,10 @@ class Strings {
   static String urgentReminderDueTomorrow = "Urgent Reminder: Due Tomorrow!";
   static String justOneDayLeftDeadlineTomorrow =
       "Just One Day Left: Deadline Tomorrow!";
+
+  //Notifications Bottom Sheet
+  static String notifications = "Notifications";
+  static String noNotificationsFound = "No notifications found";
+  static String date = "Date";
+  static String time = "Time";
 }

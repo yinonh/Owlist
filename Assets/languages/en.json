@@ -68,5 +68,9 @@
   "Notifications updated": "Notifications updated",
   "OK": "OK",
   "Add some content": "Add some content",
-  "Could not launch": "Could not launch"
+  "Could not launch": "Could not launch",
+  "Notifications": "Notifications",
+  "No notifications found": "No notifications found",
+  "Date": "Date",
+  "Time": "Time"
 }

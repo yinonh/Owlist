@@ -68,5 +68,9 @@
   "Notifications updated": "התראות עודכנו",
   "OK": "אישור",
   "Add some content": "הוסף תוכן",
-  "Could not launch": "לא היה ניתן להפעיל"
+  "Could not launch": "לא היה ניתן להפעיל",
+  "Notifications": "התראות",
+  "No notifications found": "לא נמצאו התראות",
+  "Date": "בתאריך",
+  "Time": "בשעה"
 }

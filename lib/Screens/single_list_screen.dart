@@ -217,7 +217,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
       context: context,
       builder: (BuildContext context) {
         return NotificationBottomSheet(
-          list: list!,
+          listId: list!.id,
         );
       },
     );

@@ -21,7 +21,7 @@ class ToDoList {
     required this.accomplishedItems,
   });
 
-  bool get isDone {
+  bool get isAchieved {
     return (accomplishedItems >= totalItems && totalItems > 0) ||
         (hasDeadline && DateTime.now().isAfter(deadline));
   }
