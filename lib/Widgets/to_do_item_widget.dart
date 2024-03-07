@@ -67,7 +67,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       visible: _itemVisible,
       child: AnimatedOpacity(
         opacity: _itemVisible ? 1.0 : 0.0,
-        duration: Duration(milliseconds: 500),
+        duration: Duration(milliseconds: 10),
         curve: Curves.easeInOut,
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 5),

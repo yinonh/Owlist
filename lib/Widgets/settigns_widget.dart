@@ -78,7 +78,6 @@ class _SettingsState extends State<Settings> {
     NotificationTime newTime = NotificationTime(
       hour: originalTime.hour,
       minute: originalTime.minute,
-      second: 0,
     );
     Provider.of<NotificationProvider>(context, listen: false)
         .saveNotificationTimeToPrefs(newTime);
@@ -271,17 +270,19 @@ class _SettingsState extends State<Settings> {
                           ? () {
                               Navigator.of(context).push(
                                 showPicker(
-                                  height: 350,
-                                  is24HrFormat: true,
-                                  accentColor: Theme.of(context).highlightColor,
-                                  context: context,
-                                  showSecondSelector: false,
-                                  value: _time,
-                                  onChange: onTimeChanged,
-                                  minuteInterval: TimePickerInterval.FIVE,
-                                  okText: context.translate(Strings.ok),
-                                  cancelText: context.translate(Strings.cancel),
-                                ),
+                                    height: 350,
+                                    is24HrFormat: true,
+                                    accentColor:
+                                        Theme.of(context).highlightColor,
+                                    context: context,
+                                    showSecondSelector: false,
+                                    value: _time,
+                                    onChange: onTimeChanged,
+                                    minuteInterval: TimePickerInterval.FIVE,
+                                    okText: context.translate(Strings.ok),
+                                    cancelText:
+                                        context.translate(Strings.cancel),
+                                    blurredBackground: true),
                               );
                             }
                           : null,

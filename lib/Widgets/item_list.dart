@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:great_list_view/great_list_view.dart';
-import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
-import '../Providers/lists_provider.dart';
 import '../Widgets/to_do_item_widget.dart';
 
 class ItemList extends StatefulWidget {
@@ -35,7 +33,6 @@ class ItemList extends StatefulWidget {
 class _ItemListState extends State<ItemList> {
   @override
   Widget build(BuildContext context) {
-    // Provider.of<ListsProvider>(context).getListById(widget.listId);
     return widget.editMode
         ? ReorderableListView.builder(
             itemCount: widget.editList.length,

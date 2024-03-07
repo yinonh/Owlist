@@ -1,19 +1,20 @@
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
-import 'package:day_night_time_picker/lib/state/time.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Providers/notification_provider.dart';
-import 'package:to_do/Utils/strings.dart';
 
-import '../Models/notification.dart';
 import '../Utils/shared_preferences_helper.dart';
+import '../Providers/notification_provider.dart';
+import '../Utils/notification_time.dart';
+import '../Utils/strings.dart';
+import '../Models/notification.dart';
+import '../Models/to_do_list.dart';
 
 class NotificationBottomSheet extends StatefulWidget {
-  final String listId;
+  final ToDoList list;
 
-  const NotificationBottomSheet({required this.listId, Key? key})
+  const NotificationBottomSheet({required this.list, Key? key})
       : super(key: key);
 
   @override
@@ -22,29 +23,6 @@ class NotificationBottomSheet extends StatefulWidget {
 }
 
 class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
-  late TextEditingController _oneDayController;
-  late TextEditingController _oneWeekController;
-  late TextEditingController _twoWeeksController;
-  late TextEditingController _oneMonthController;
-
-  @override
-  void initState() {
-    super.initState();
-    _oneDayController = TextEditingController();
-    _oneWeekController = TextEditingController();
-    _twoWeeksController = TextEditingController();
-    _oneMonthController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _oneDayController.dispose();
-    _oneWeekController.dispose();
-    _twoWeeksController.dispose();
-    _oneMonthController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -55,7 +33,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
           height: 4,
           width: 40,
           decoration: BoxDecoration(
-            color: Colors.grey[400],
+            color: Theme.of(context).highlightColor,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -86,7 +64,14 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        DateTime? newTime = await _openDateTimePicker(context);
+                        if (newTime != null) {
+                          Provider.of<NotificationProvider>(context,
+                                  listen: false)
+                              .addNotification(widget.list, newTime);
+                        }
+                      },
                       icon: Icon(
                         Icons.add,
                         color: Theme.of(context).canvasColor,
@@ -97,7 +82,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               ),
               FutureBuilder<List<Notifications>>(
                 future: Provider.of<NotificationProvider>(context)
-                    .getNotificationsByListId(widget.listId),
+                    .getNotificationsByListId(widget.list.id),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator(); // Placeholder while loading
@@ -139,64 +124,103 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         DateFormat('HH:mm').format(notification.notificationDateTime);
 
     return ListTile(
-      leading: Icon(
-        notification.disabled
-            ? Icons.notifications_off
-            : Icons.notifications_active,
-        color: notification.disabled
-            ? Theme.of(context).hintColor
-            : Theme.of(context).highlightColor,
+      leading: IconButton(
+        onPressed: () =>
+            Provider.of<NotificationProvider>(context, listen: false)
+                .toggleNotificationDisabled(notification),
+        icon: Icon(
+          notification.disabled
+              ? Icons.notifications_off
+              : notification.notificationDateTime.isBefore(DateTime.now())
+                  ? Icons.notifications_none
+                  : Icons.notifications_active,
+          color: notification.disabled ||
+                  notification.notificationDateTime.isBefore(DateTime.now())
+              ? Theme.of(context).hintColor
+              : Theme.of(context).highlightColor,
+        ),
       ),
       title: Text("Date: $dateFormatted"),
       subtitle: Text("Time: $timeFormatted"),
-      onTap: () => _openDateTimePicker(context, notification),
+      onTap: () async {
+        DateTime? newTime =
+            await _openDateTimePicker(context, notification: notification);
+        if (newTime != null) {
+          Provider.of<NotificationProvider>(context, listen: false)
+              .editNotification(
+                  notification.copyWith(notificationDateTime: newTime),
+                  widget.list);
+        }
+      },
       trailing: IconButton(
         icon: Icon(
           Icons.delete, // Use constant trailing icon
           color: Theme.of(context).highlightColor,
         ),
-        onPressed: () {}, // Pass notification object to function
+        onPressed: () async {
+          Provider.of<NotificationProvider>(context, listen: false)
+              .deleteNotification(notification, widget.list);
+        }, // Pass notification object to function
       ),
     );
   }
 
-  void onTimeChanged(Time originalTime) {
-    print(originalTime);
-  }
+  Future<DateTime?> _openDateTimePicker(BuildContext context,
+      {Notifications? notification}) async {
+    late DateTime initialDate;
+    late NotificationTime newTime;
+    if (notification == null) {
+      initialDate = DateTime.now();
+      newTime = NotificationTime.fromInt(
+          await SharedPreferencesHelper.instance.getNotificationTime());
+    } else {
+      initialDate = notification.notificationDateTime;
+      newTime =
+          NotificationTime(hour: initialDate.hour, minute: initialDate.minute);
+    }
 
-  void _openDateTimePicker(
-      BuildContext context, Notifications notification) async {
-    DateTime initialDateTime = notification.notificationDateTime;
-
-    // Check if initialDateTime is before the firstDate
-    if (initialDateTime.isBefore(DateTime.now())) {
-      initialDateTime = DateTime.now();
+    // Check if initialDate is before the firstDate
+    if (initialDate.isBefore(DateTime.now())) {
+      initialDate = DateTime.now();
     }
 
     final selectedDate = await showDatePicker(
       context: context,
-      initialDate: initialDateTime,
+      initialDate: initialDate,
       firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
+      lastDate: widget.list.deadline,
     );
 
-    Time value = Time(hour: 12, minute: 00);
-
     if (selectedDate != null) {
-      Navigator.of(context).push(
+      return Navigator.of(context)
+          .push(
         showPicker(
           height: 350,
           is24HrFormat: true,
           accentColor: Theme.of(context).highlightColor,
           context: context,
           showSecondSelector: false,
-          value: value,
-          onChange: onTimeChanged,
+          value: newTime,
+          onChange: (time) {
+            newTime = NotificationTime(hour: time.hour, minute: time.minute);
+          },
           minuteInterval: TimePickerInterval.FIVE,
           okText: context.translate(Strings.ok),
           cancelText: context.translate(Strings.cancel),
         ),
-      );
+      )
+          .then((value) {
+        DateTime selectedDateTime = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          newTime.hour,
+          newTime.minute,
+        );
+        return selectedDateTime;
+      });
     }
+
+    return null;
   }
 }

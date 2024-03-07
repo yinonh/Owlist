@@ -144,6 +144,7 @@ class _ContentScreenState extends State<ContentScreen> {
                               titleEditMode
                                   ? Expanded(
                                       child: TextField(
+                                        maxLines: 2,
                                         autofocus: true,
                                         textCapitalization:
                                             TextCapitalization.sentences,

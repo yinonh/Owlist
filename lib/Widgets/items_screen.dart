@@ -50,16 +50,14 @@ class _ItemsScreenState extends State<ItemsScreen> {
   }
 
   void _loadAd() async {
+    // Dispose previous ad
     await _inlineAdaptiveAd?.dispose();
-    setState(() {
-      _inlineAdaptiveAd = null;
-      _isLoaded = false;
-    });
 
     // Get an inline adaptive size for the current orientation.
     AdSize size = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(
         _adWidth.truncate());
 
+    // Create a new banner ad
     _inlineAdaptiveAd = BannerAd(
       adUnitId: dotenv.env['UNIT_ID']!,
       size: size,
@@ -69,8 +67,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
           print('Inline adaptive banner loaded: ${ad.responseInfo}');
 
           // After the ad is loaded, get the platform ad size and use it to
-          // update the height of the container. This is necessary because the
-          // height can change after the ad is loaded.
+          // update the height of the container.
           BannerAd bannerAd = (ad as BannerAd);
           final AdSize? size = await bannerAd.getPlatformAdSize();
           if (size == null) {
@@ -78,6 +75,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             return;
           }
 
+          // Update state with loaded ad and size
           setState(() {
             _inlineAdaptiveAd = bannerAd;
             _isLoaded = true;
@@ -90,31 +88,33 @@ class _ItemsScreenState extends State<ItemsScreen> {
         },
       ),
     );
+
+    // Load the ad
     await _inlineAdaptiveAd!.load();
   }
 
   Widget _getAdWidget() {
     return OrientationBuilder(
       builder: (context, orientation) {
-        if (_currentOrientation == orientation &&
-            _inlineAdaptiveAd != null &&
-            _isLoaded &&
-            _adSize != null) {
-          return Align(
-              child: SizedBox(
-            width: _adWidth,
-            height: _adSize!.height.toDouble(),
-            child: AdWidget(
-              ad: _inlineAdaptiveAd!,
-            ),
-          ));
-        }
-        // Reload the ad if the orientation changes.
         if (_currentOrientation != orientation) {
           _currentOrientation = orientation;
-          _loadAd();
+          _loadAd(); // Load the ad only when orientation changes
         }
-        return Container();
+
+        // Return the ad widget if loaded and orientation matches
+        if (_inlineAdaptiveAd != null && _isLoaded && _adSize != null) {
+          return Align(
+            child: SizedBox(
+              width: _adWidth,
+              height: _adSize!.height.toDouble(),
+              child: AdWidget(
+                ad: _inlineAdaptiveAd!,
+              ),
+            ),
+          );
+        }
+
+        return Container(); // Return an empty container if ad is not loaded or orientation doesn't match
       },
     );
   }
@@ -151,6 +151,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
         },
         separatorBuilder: (BuildContext context, int index) {
           if (index == randomNumber) {
+            // return Container(
+            //   height: 20,
+            //   width: double.infinity,
+            //   color: Colors.red,
+            // );
             return _getAdWidget();
           } else {
             return const SizedBox(

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
@@ -20,6 +21,7 @@ import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
 import '../Utils/notification_time.dart';
 import '../Models/to_do_list.dart';
+import 'lists_provider.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
@@ -27,6 +29,7 @@ class NotificationProvider with ChangeNotifier {
   late NotificationTime _notificationTime;
   late bool isActive;
   Database? _database;
+  late BuildContext context;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -58,7 +61,6 @@ class NotificationProvider with ChangeNotifier {
         await SharedPreferencesHelper.instance.getNotificationTime();
     _notificationTime = NotificationTime.fromInt(storedTime);
     isActive = await SharedPreferencesHelper.instance.isNotificationActive();
-
     notifyListeners();
   }
 
@@ -74,7 +76,8 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setUpNotifications() async {
+  Future<void> setUpNotifications(BuildContext context) async {
+    this.context = context;
     await _configureLocalTimeZone();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -99,7 +102,6 @@ class NotificationProvider with ChangeNotifier {
                 AndroidFlutterLocalNotificationsPlugin>()
             ?.areNotificationsEnabled() ??
         false;
-
     _notificationsEnabled = granted;
     notifyListeners();
   }
@@ -119,8 +121,7 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> addNotificationDayBeforeDeadline(
-      ToDoList list, String languageCode) async {
+  Future<bool> addNotificationDayBeforeDeadline(ToDoList list) async {
     if (!isActive) return false;
     final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
@@ -133,34 +134,62 @@ class NotificationProvider with ChangeNotifier {
       // Minute
       _notificationTime.minute,
     );
-    final disabled = scheduledTime.isBefore(DateTime.now());
+
+    return addNotification(list, scheduledTime);
+  }
+
+  Future<bool> addNotification(
+      ToDoList list, DateTime notificationDateTime) async {
+    if (!isActive) return false;
+
+    final disabled = notificationDateTime.isBefore(DateTime.now());
     final Database db = await database;
+
     final List<Map<String, dynamic>> snapshot = await db.rawQuery(
         'SELECT MAX(notificationIndex) as maxIndex FROM notifications');
 
     int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
-    return addNotification(
-        list,
-        Notifications(
-            id: Uuid().v4(),
-            listId: list.id,
-            notificationIndex: notificationIndex,
-            notificationDateTime: scheduledTime,
-            disabled: disabled),
-        languageCode);
-  }
 
-  Future<bool> addNotification(
-      ToDoList list, Notifications notification, String languageCode) async {
-    final db = await database;
+    final Notifications notification = Notifications(
+      id: Uuid().v4(),
+      listId: list.id,
+      notificationIndex: notificationIndex,
+      notificationDateTime: notificationDateTime,
+      disabled: disabled,
+    );
 
     await db.insert(
       'notifications',
       notification.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    notifyListeners();
-    return scheduleNotification(list, languageCode);
+
+    return scheduleNotification(list);
+  }
+
+  Future<bool> editNotification(
+      Notifications notification, ToDoList list) async {
+    final db = await database;
+
+    await db.update(
+      'notifications',
+      notification.toMap(),
+      where: 'id = ?',
+      whereArgs: [notification.id],
+    );
+    return scheduleNotification(list);
+  }
+
+  Future<bool> deleteNotification(
+      Notifications notification, ToDoList list) async {
+    final db = await database;
+
+    await db.delete(
+      'notifications',
+      where: 'id = ?',
+      whereArgs: [notification.id],
+    );
+    return scheduleNotification(list);
   }
 
   Future<List<Notifications>> getNotificationsByListId(String listId) async {
@@ -172,14 +201,41 @@ class NotificationProvider with ChangeNotifier {
     });
   }
 
-  Future<void> disableNotificationById(String notificationId) async {
+  Future<void> toggleNotificationDisabled(Notifications notification) async {
+    if (!isActive && notification.disabled) return;
+    final db = await database;
+
+    // Toggle the 'disabled' field
+    final int newDisabledValue = notification.disabled ? 0 : 1;
+
+    await db.update(
+      'notifications',
+      {'disabled': newDisabledValue},
+      where: 'id = ?',
+      whereArgs: [notification.id],
+    );
+
+    // Retrieve the corresponding ToDoList
+    ToDoList? list = await Provider.of<ListsProvider>(context, listen: false)
+        .getListById(notification.listId);
+
+    // Schedule notifications for the list
+    if (list != null) {
+      await scheduleNotification(list);
+    }
+  }
+
+  Future<void> disableNotificationById(Notifications notification) async {
     final db = await database;
     await db.update(
       'notifications',
       {'disabled': 1},
       where: 'id = ?',
-      whereArgs: [notificationId],
+      whereArgs: [notification.id],
     );
+    ToDoList? list = await Provider.of<ListsProvider>(context, listen: false)
+        .getListById(notification.listId);
+    scheduleNotification(list!);
   }
 
   Future<bool> cancelNotification(int notificationID) async {
@@ -191,8 +247,12 @@ class NotificationProvider with ChangeNotifier {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  Future<String> getRandomNotificationText(String languageCode) async {
-    languageCode = languageCode != 'he' ? 'en' : 'he';
+  Future<String> getRandomNotificationText() async {
+    String languageCode = (SharedPreferencesHelper.instance.selectedLanguage ??
+                Localizations.localeOf(context).languageCode) !=
+            'he'
+        ? 'en'
+        : 'he';
     String jsonString =
         await rootBundle.loadString('Assets/languages/$languageCode.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
@@ -213,7 +273,7 @@ class NotificationProvider with ChangeNotifier {
     return notificationOptions[index];
   }
 
-  Future<bool> scheduleNotification(ToDoList list, String languageCode) async {
+  Future<bool> scheduleNotification(ToDoList list) async {
     if (!isActive) return false;
 
     // Retrieve notifications with the same listId
@@ -233,7 +293,7 @@ class NotificationProvider with ChangeNotifier {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notification.notificationIndex,
         list.title,
-        await getRandomNotificationText(languageCode),
+        await getRandomNotificationText(),
         tz.TZDateTime.from(scheduledDateTime, tz.local),
         const NotificationDetails(
           android: AndroidNotificationDetails(
@@ -250,6 +310,7 @@ class NotificationProvider with ChangeNotifier {
       );
       notificationScheduled = true;
     }
+    notifyListeners();
     return notificationScheduled;
   }
 }

@@ -237,7 +237,7 @@ class ItemProvider extends ChangeNotifier {
             List<Notifications> notifications =
                 await notificationProvider.getNotificationsByListId(listId);
             notifications.forEach((notification) {
-              notificationProvider.disableNotificationById(notification.id);
+              notificationProvider.disableNotificationById(notification);
             });
           }
 

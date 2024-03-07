@@ -21,6 +21,11 @@ class ToDoList {
     required this.accomplishedItems,
   });
 
+  bool get isDone {
+    return (accomplishedItems >= totalItems && totalItems > 0) ||
+        (hasDeadline && DateTime.now().isAfter(deadline));
+  }
+
   // Method to convert a ToDoList object to a Map
   Map<String, dynamic> toMap() {
     return {

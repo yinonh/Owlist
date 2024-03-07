@@ -217,7 +217,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
       context: context,
       builder: (BuildContext context) {
         return NotificationBottomSheet(
-          listId: widget.listId,
+          list: list!,
         );
       },
     );
@@ -252,19 +252,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
             child: const Icon(Icons.notification_add)),
       ),
     );
-
-    // childButtons.add(
-    //   UnicornButton(
-    //     currentButton: FloatingActionButton(
-    //         heroTag: "directions",
-    //         backgroundColor: Color(0xFF635985), //Colors.blueAccent,
-    //         mini: true,
-    //         onPressed: () {
-    //           print("link");
-    //         },
-    //         child: Icon(Icons.link)),
-    //   ),
-    // );
 
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,

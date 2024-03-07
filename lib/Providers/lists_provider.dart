@@ -25,7 +25,7 @@ class ListsProvider extends ChangeNotifier {
     this.context = context;
     notificationProvider =
         Provider.of<NotificationProvider>(context, listen: false);
-    await notificationProvider.setUpNotifications();
+    await notificationProvider.setUpNotifications(context);
   }
 
   Future<Database> get database async {
@@ -277,10 +277,8 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
-        return await notificationProvider.addNotificationDayBeforeDeadline(
-            newList,
-            SharedPreferencesHelper.instance.selectedLanguage ??
-                Localizations.localeOf(context).languageCode);
+        return await notificationProvider
+            .addNotificationDayBeforeDeadline(newList);
       }
     } catch (error) {
       print("Error adding new item: $error");
@@ -411,14 +409,11 @@ class ListsProvider extends ChangeNotifier {
           await notificationProvider.getNotificationsByListId(list.id);
       for (var notification in notifications) {
         if (newDeadline.isBefore(notification.notificationDateTime)) {
-          notificationProvider.disableNotificationById(notification.id);
+          notificationProvider.disableNotificationById(notification);
           notificationDisabled = true;
         }
       }
-      notificationProvider.scheduleNotification(
-          list,
-          SharedPreferencesHelper.instance.selectedLanguage ??
-              Localizations.localeOf(context).languageCode);
+      notificationProvider.scheduleNotification(list);
     } catch (e) {
       print('Error updating the deadline: $e');
     }
@@ -447,10 +442,7 @@ class ListsProvider extends ChangeNotifier {
       // Invalidate cache and notify listeners to reflect the changes
       invalidateCache();
       notifyListeners();
-      notificationProvider.scheduleNotification(
-          newList,
-          SharedPreferencesHelper.instance.selectedLanguage ??
-              Localizations.localeOf(context).languageCode);
+      notificationProvider.scheduleNotification(newList);
     } catch (e) {
       print('Error updating the title: $e');
     }
