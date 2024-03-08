@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -17,8 +18,19 @@ import './Screens/content_screen.dart';
 import './Providers/lists_provider.dart';
 import './Providers/item_provider.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+String? selectedNotificationPayload;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+    selectedNotificationPayload =
+        notificationAppLaunchDetails!.notificationResponse?.payload;
+  }
   await dotenv.load(fileName: ".env");
   await SharedPreferencesHelper.instance.initialise();
 
@@ -177,7 +189,9 @@ class _OwlistAppState extends State<OwlistApp> {
               }
           }
         },
-        home: HomePage(),
+        home: selectedNotificationPayload != null
+            ? SingleListScreen(listId: selectedNotificationPayload!)
+            : HomePage(),
       ),
     );
   }

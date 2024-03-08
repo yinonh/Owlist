@@ -28,13 +28,13 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Provider.of<ListsProvider>(context).getListById(widget.listId),
-      builder: (context, providedList) {
-        if (providedList.connectionState == ConnectionState.waiting) {
+      builder: (context, futureList) {
+        if (futureList.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (providedList.hasError) {
-          return Text('Error: ${providedList.error}');
+        } else if (futureList.hasError) {
+          return Text('Error: ${futureList.error}');
         } else {
-          ToDoList list = providedList.data!;
+          ToDoList list = futureList.data!;
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -59,22 +59,31 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                 child: FutureBuilder<List<Notifications>>(
                   future: Provider.of<NotificationProvider>(context)
                       .getNotificationsByListId(list.id),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                  builder: (context, futureNotificationList) {
+                    if (futureNotificationList.connectionState ==
+                        ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                      return Expanded(
-                        child: Center(
-                          child: Text(
-                            context.translate(Strings.noNotificationsFound),
-                          ),
+                    } else if (futureNotificationList.hasError) {
+                      return Text('Error: ${futureNotificationList.error}');
+                    } else if (futureNotificationList.hasData &&
+                        futureNotificationList.data!.isEmpty) {
+                      return Column(mainAxisSize: MainAxisSize.min, children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: header(list),
                         ),
-                      );
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              context.translate(Strings.noNotificationsFound),
+                            ),
+                          ),
+                        )
+                      ]);
                     } else {
                       List<Notifications> notificationsList =
-                          List.from(snapshot.data!);
+                          List.from(futureNotificationList.data!);
                       notificationsList.sort((a, b) => a.notificationDateTime
                           .compareTo(b.notificationDateTime));
                       return Column(
@@ -83,46 +92,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    icon: Icon(
-                                      Icons.arrow_downward,
-                                      color: Theme.of(context).canvasColor,
-                                    )),
-                                FittedBox(
-                                  child: Text(
-                                    context.translate(Strings.notifications),
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: !list.isAchieved &&
-                                          notificationsList.length < 4
-                                      ? () async {
-                                          DateTime? newTime =
-                                              await _openDateTimePicker(
-                                                  context, list);
-                                          if (newTime != null) {
-                                            Provider.of<NotificationProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .addNotification(list, newTime);
-                                          }
-                                        }
-                                      : null,
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: Theme.of(context).canvasColor,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: header(list,
+                                notificationsList: notificationsList),
                           ),
                           Expanded(
                             child: ListView.builder(
@@ -148,6 +119,52 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
     );
   }
 
+  Widget header(ToDoList list, {List<Notifications>? notificationsList}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_downward,
+              color: Theme.of(context).canvasColor,
+            )),
+        FittedBox(
+          child: Text(
+            context.translate(Strings.notifications),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        !list.isAchieved &&
+                (notificationsList == null
+                    ? true
+                    : notificationsList.length < 4)
+            ? IconButton(
+                onPressed: () async {
+                  DateTime? newTime = await _openDateTimePicker(context, list);
+                  if (newTime != null) {
+                    Provider.of<NotificationProvider>(context, listen: false)
+                        .addNotification(list, newTime);
+                  }
+                },
+                icon: Icon(
+                  Icons.add,
+                  color: Theme.of(context).canvasColor,
+                ),
+              )
+            : const IconButton(
+                onPressed: null,
+                icon: Icon(
+                  Icons.add,
+                  color: Colors.grey,
+                ),
+              ),
+      ],
+    );
+  }
+
   Widget _buildNotificationItem(
       BuildContext context, Notifications notification, ToDoList list) {
     var dateFormatted =
@@ -164,9 +181,10 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
     return ListTile(
       leading: IconButton(
-        onPressed: () =>
-            Provider.of<NotificationProvider>(context, listen: false)
-                .toggleNotificationDisabled(notification),
+        onPressed: !list.isAchieved
+            ? () => Provider.of<NotificationProvider>(context, listen: false)
+                .toggleNotificationDisabled(notification)
+            : null,
         icon: Icon(
           notification.disabled
               ? Icons.notifications_off
@@ -181,15 +199,18 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       ),
       title: Text("${context.translate(Strings.date)}: $dateFormatted"),
       subtitle: Text("${context.translate(Strings.time)}: $timeFormatted"),
-      onTap: () async {
-        DateTime? newTime = await _openDateTimePicker(context, list,
-            notification: notification);
-        if (newTime != null) {
-          Provider.of<NotificationProvider>(context, listen: false)
-              .editNotification(
-                  notification.copyWith(notificationDateTime: newTime), list);
-        }
-      },
+      onTap: !list.isAchieved
+          ? () async {
+              DateTime? newTime = await _openDateTimePicker(context, list,
+                  notification: notification);
+              if (newTime != null) {
+                Provider.of<NotificationProvider>(context, listen: false)
+                    .editNotification(
+                        notification.copyWith(notificationDateTime: newTime),
+                        list);
+              }
+            }
+          : null,
       trailing: IconButton(
         icon: Icon(
           Icons.delete, // Use constant trailing icon
@@ -201,6 +222,13 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         }, // Pass notification object to function
       ),
     );
+  }
+
+  bool isToday(DateTime dateTime) {
+    DateTime now = DateTime.now();
+    return dateTime.year == now.year &&
+        dateTime.month == now.month &&
+        dateTime.day == now.day;
   }
 
   Future<DateTime?> _openDateTimePicker(BuildContext context, ToDoList list,

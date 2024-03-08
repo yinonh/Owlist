@@ -13,6 +13,7 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:to_do/Screens/single_list_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math';
 
@@ -87,7 +88,20 @@ class NotificationProvider with ChangeNotifier {
       android: initializationSettingsAndroid,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveBackgroundNotificationResponse: (response) {
+      // Pop all routes until the first route
+      Navigator.popUntil(context, (route) => route.isFirst);
+      // Push the new route
+      Navigator.pushNamed(context, SingleListScreen.routeName,
+          arguments: response.payload);
+    }, onDidReceiveNotificationResponse: (response) {
+      // Pop all routes until the first route
+      Navigator.popUntil(context, (route) => route.isFirst);
+      // Push the new route
+      Navigator.pushNamed(context, SingleListScreen.routeName,
+          arguments: response.payload);
+    });
   }
 
   Future<void> _configureLocalTimeZone() async {
@@ -304,6 +318,7 @@ class NotificationProvider with ChangeNotifier {
             channelShowBadge: false,
           ),
         ),
+        payload: list.id,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,

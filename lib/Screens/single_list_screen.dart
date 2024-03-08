@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
+import 'package:to_do/Screens/home_page.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
@@ -51,8 +52,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
         .getListById(widget.listId);
 
     if (list == null) {
-      Navigator.pop(context); // Add parenthesis to actually call Navigator.pop
-      return; // Exit the function if list is null
+      Navigator.pop(context);
+      return;
     }
 
     newDeadline = list!.deadline;
@@ -329,7 +330,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
                             : IconButton(
                                 icon: const Icon(Icons.arrow_back),
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context).pushReplacementNamed(
+                                        HomePage.routeName);
+                                  }
                                 },
                               ),
                         editMode
