@@ -25,15 +25,32 @@ class DogEarListTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 10.0, // Width of the dog-ear
-            height: 10.0, // Height of the dog-ear
-            child: ClipPath(
-              clipper: isRTL(context) ? DogEarRTLClipper() : DogEarLTRClipper(),
-              child: Container(
-                color: Colors.red, // Dog-ear color
+          Stack(
+            children: [
+              SizedBox(
+                width: 10.0,
+                height: 10.0,
+                child: ClipPath(
+                  clipper:
+                      isRTL(context) ? DogEarRTLClipper() : DogEarLTRClipper(),
+                  child: Container(
+                    color: Colors.red,
+                  ),
+                ),
               ),
-            ),
+              SizedBox(
+                width: 10.0,
+                height: 10.0,
+                child: ClipPath(
+                  clipper: isRTL(context)
+                      ? DogEarRTLClipper1()
+                      : DogEarLTRClipper1(),
+                  child: Container(
+                    color: Theme.of(context).unselectedWidgetColor,
+                  ),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: ListTile(
@@ -63,11 +80,41 @@ class DogEarLTRClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
+class DogEarLTRClipper1 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0, size.height);
+    path.lineTo(size.width, size.height);
+    path.lineTo(size.width, 0);
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
 class DogEarRTLClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class DogEarRTLClipper1 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height);
     path.lineTo(size.width, size.height);
     path.close();
     return path;
