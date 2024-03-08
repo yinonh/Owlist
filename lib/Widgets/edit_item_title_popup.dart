@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:to_do/Utils/strings.dart';
 
 class EditItemDialog extends StatefulWidget {
@@ -22,7 +23,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
       ),
       content: TextField(
         textCapitalization: TextCapitalization.sentences,
-        maxLength: 25,
+        maxLength: 50,
         autofocus: true,
         decoration: InputDecoration(
           hintText: context.translate(Strings.title),
@@ -38,6 +39,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
             newTitle = value;
           });
         },
+        inputFormatters: [FilteringTextInputFormatter.deny(new RegExp(r"\n"))],
       ),
       actions: <Widget>[
         Row(

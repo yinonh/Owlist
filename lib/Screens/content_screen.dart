@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../Utils/strings.dart';
@@ -144,10 +145,9 @@ class _ContentScreenState extends State<ContentScreen> {
                               titleEditMode
                                   ? Expanded(
                                       child: TextField(
-                                        maxLines: 2,
-                                        autofocus: true,
                                         textCapitalization:
                                             TextCapitalization.sentences,
+                                        autofocus: true,
                                         onChanged: (txt) {
                                           setState(() {
                                             newTextEmpty = txt.trim().isEmpty;
@@ -160,14 +160,49 @@ class _ContentScreenState extends State<ContentScreen> {
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
-                                        maxLength: 25,
+                                        maxLength: 50,
                                         // Set the maximum length
                                         decoration: const InputDecoration(
                                           counterText:
                                               "", // Hide the character counter
-                                          // border: InputBorder.none,
                                         ),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.deny(
+                                              new RegExp(r"\n"))
+                                        ],
+                                        onSubmitted: (_) {
+                                          _save();
+                                        },
                                       ),
+                                      // child: TextField(
+                                      //   maxLines: 2,
+                                      //   autofocus: true,
+                                      //   textCapitalization:
+                                      //       TextCapitalization.sentences,
+                                      //   onChanged: (txt) {
+                                      //     setState(() {
+                                      //       newTextEmpty = txt.trim().isEmpty;
+                                      //     });
+                                      //   },
+                                      //   controller: _titleController,
+                                      //   textAlign: TextAlign.center,
+                                      //   style: const TextStyle(
+                                      //     // fontSize: 12.0,
+                                      //     fontWeight: FontWeight.bold,
+                                      //     color: Colors.white,
+                                      //   ),
+                                      //   maxLength: 50,
+                                      //   // Set the maximum length
+                                      //   decoration: const InputDecoration(
+                                      //     counterText:
+                                      //         "", // Hide the character counter
+                                      //     // border: InputBorder.none,
+                                      //   ),
+                                      //   inputFormatters: [
+                                      //     FilteringTextInputFormatter.deny(
+                                      //         new RegExp(r"\n"))
+                                      //   ],
+                                      // ),
                                     )
                                   : Flexible(
                                       child: Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -344,17 +345,23 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   controller: _titleController,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 12.0,
+                                    // fontSize: 12.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
-                                  maxLength: 25,
+                                  maxLength: 50,
                                   // Set the maximum length
                                   decoration: const InputDecoration(
                                     counterText:
                                         "", // Hide the character counter
-                                    // border: InputBorder.none,
                                   ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.deny(
+                                        new RegExp(r"\n"))
+                                  ],
+                                  onSubmitted: (_) {
+                                    _save();
+                                  },
                                 ),
                               )
                             : Expanded(

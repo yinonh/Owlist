@@ -128,6 +128,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                     ),
                     title: Text(
                       widget.item.title,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
@@ -151,6 +152,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                     ),
                     title: Text(
                       widget.item.title,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
