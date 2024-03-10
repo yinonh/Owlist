@@ -78,6 +78,8 @@ class Strings {
       "Choose default time for notification:";
   static String ok = "OK";
   static String chooseTime = "Choose time";
+  static String setReminderDayBeforeDeadline =
+      "Set a reminder one day before the deadline";
 
   // statistics graphs
   static String listData = "List Data:";

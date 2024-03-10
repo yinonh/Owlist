@@ -29,6 +29,7 @@ class NotificationProvider with ChangeNotifier {
   bool _notificationsEnabled = false;
   late NotificationTime _notificationTime;
   late bool isActive;
+  late bool autoNotification;
   Database? _database;
   late BuildContext context;
 
@@ -61,7 +62,9 @@ class NotificationProvider with ChangeNotifier {
     int storedTime =
         await SharedPreferencesHelper.instance.getNotificationTime();
     _notificationTime = NotificationTime.fromInt(storedTime);
-    isActive = await SharedPreferencesHelper.instance.isNotificationActive();
+    isActive = SharedPreferencesHelper.instance.notificationActive;
+    autoNotification =
+        await SharedPreferencesHelper.instance.isAutoNotification();
     notifyListeners();
   }
 
@@ -72,8 +75,18 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> saveActive(bool isActive) async {
+    if (!isActive) {
+      cancelAllNotifications();
+    }
     this.isActive = isActive;
-    await SharedPreferencesHelper.instance.setNotificationStatus(isActive);
+    SharedPreferencesHelper.instance.notificationsActive = isActive;
+    notifyListeners();
+  }
+
+  Future<void> saveAutoNotification(bool autoNotification) async {
+    this.autoNotification = autoNotification;
+    await SharedPreferencesHelper.instance
+        .setAutoNotification(autoNotification);
     notifyListeners();
   }
 
@@ -132,7 +145,7 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<bool> addNotificationDayBeforeDeadline(ToDoList list) async {
-    if (!isActive) return false;
+    if (!isActive || !autoNotification) return false;
     final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
@@ -254,6 +267,11 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> cancelAllNotifications() async {
+    final db = await database;
+    await db.update(
+      'notifications',
+      {'disabled': true},
+    );
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 

@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -6,11 +7,13 @@ class SharedPreferencesHelper {
   late SharedPreferences prefs;
   late String? language;
   late String? themePref;
+  late bool notificationActive;
 
   Future<void> initialise() async {
     prefs = await SharedPreferences.getInstance();
     language = prefs.getString('selectedLanguage');
     themePref = prefs.getString('selectedTheme');
+    notificationActive = prefs.getBool('notification_active') ?? true;
   }
 
   static final SharedPreferencesHelper instance = SharedPreferencesHelper._();
@@ -29,6 +32,13 @@ class SharedPreferencesHelper {
     prefs.setString('selectedTheme', value ?? '');
   }
 
+  bool get notificationsActive => notificationActive;
+
+  set notificationsActive(bool active) {
+    notificationActive = active;
+    prefs.setBool('notification_active', active);
+  }
+
   Future<void> removeSelectedTheme() async {
     await prefs.remove('selectedTheme');
   }
@@ -41,12 +51,12 @@ class SharedPreferencesHelper {
     await prefs.setInt('notification_time', time);
   }
 
-  Future<bool> isNotificationActive() async {
-    return prefs.getBool('notification_active') ?? true;
+  Future<bool> isAutoNotification() async {
+    return prefs.getBool('auto_notification') ?? true;
   }
 
-  Future<void> setNotificationStatus(bool status) async {
-    await prefs.setBool('notification_active', status);
+  Future<void> setAutoNotification(bool status) async {
+    await prefs.setBool('auto_notification', status);
   }
 
   Future<int> sortByIndex() async {

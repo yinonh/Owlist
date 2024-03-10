@@ -144,10 +144,10 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
-        !list.isAchieved &&
+        (!list.isAchieved &&
                 (notificationsList == null
                     ? true
-                    : notificationsList.length < 4)
+                    : notificationsList.length < 4))
             ? IconButton(
                 onPressed: () async {
                   DateTime? newTime = await _openDateTimePicker(context, list);

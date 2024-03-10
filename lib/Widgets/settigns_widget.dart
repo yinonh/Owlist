@@ -25,6 +25,7 @@ class _SettingsState extends State<Settings> {
   late NotificationProvider notificationProvider;
   late NotificationTime _time;
   late bool _notificationsActive;
+  late bool _autoNotificationsActive;
   List<Widget> languages = <Widget>[
     SvgPicture.asset(
       'Assets/english.svg',
@@ -45,6 +46,7 @@ class _SettingsState extends State<Settings> {
     notificationProvider = Provider.of<NotificationProvider>(context);
     _time = notificationProvider.notificationTime;
     _notificationsActive = notificationProvider.isActive;
+    _autoNotificationsActive = notificationProvider.autoNotification;
   }
 
   Future<void> _loadSharedPreferences() async {
@@ -211,8 +213,6 @@ class _SettingsState extends State<Settings> {
               )
             ],
           ),
-          //   ],
-          // ),
           const SizedBox(
             height: 25,
           ),
@@ -238,6 +238,38 @@ class _SettingsState extends State<Settings> {
                     value: _notificationsActive,
                     trackColor: MaterialStateProperty.all<Color>(
                         _notificationsActive
+                            ? Theme.of(context).primaryColorLight
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    context.translate(Strings.setReminderDayBeforeDeadline),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Transform.scale(
+                  scale: 1,
+                  child: Switch(
+                    onChanged: (val) {
+                      notificationProvider.saveAutoNotification(val);
+                    },
+                    value: _notificationsActive && _autoNotificationsActive,
+                    trackColor: MaterialStateProperty.all<Color>(
+                        _notificationsActive && _autoNotificationsActive
                             ? Theme.of(context).primaryColorLight
                             : Colors.black),
                   ),

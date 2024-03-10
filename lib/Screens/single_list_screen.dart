@@ -6,6 +6,7 @@ import 'package:to_do/Screens/home_page.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
+import '../Utils/shared_preferences_helper.dart';
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
 import '../Utils/strings.dart';
@@ -283,8 +284,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
                 color: Theme.of(context).primaryColor,
                 size: MediaQuery.of(context).size.width * 0.1,
               ),
-              childButtons: childButtons,
-              onMainButtonPressed: () {},
+              childButtons:
+                  (SharedPreferencesHelper.instance.notificationActive ?? true)
+                      ? childButtons
+                      : [],
+              onMainButtonPressed:
+                  (SharedPreferencesHelper.instance.notificationActive ?? true)
+                      ? () {}
+                      : () {
+                          _showNewItemDialog(context);
+                        },
               finalButtonIcon: Icon(
                 Icons.close,
                 color: Theme.of(context).primaryColor,
