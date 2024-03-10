@@ -35,6 +35,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   late ToDoList? list;
   late List<ToDoItem> currentList;
   late List<ToDoItem> editList;
+  AnimatedListController itemListController = AnimatedListController();
 
   @override
   void initState() {
@@ -431,5 +432,3 @@ class _SingleListScreenState extends State<SingleListScreen> {
     );
   }
 }
-
-AnimatedListController itemListController = AnimatedListController();

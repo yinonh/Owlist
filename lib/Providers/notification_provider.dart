@@ -90,15 +90,11 @@ class NotificationProvider with ChangeNotifier {
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onDidReceiveBackgroundNotificationResponse: (response) {
-      // Pop all routes until the first route
-      Navigator.popUntil(context, (route) => route.isFirst);
-      // Push the new route
+      Navigator.of(context).popUntil((route) => true);
       Navigator.pushNamed(context, SingleListScreen.routeName,
           arguments: response.payload);
     }, onDidReceiveNotificationResponse: (response) {
-      // Pop all routes until the first route
-      Navigator.popUntil(context, (route) => route.isFirst);
-      // Push the new route
+      Navigator.of(context).popUntil((route) => true);
       Navigator.pushNamed(context, SingleListScreen.routeName,
           arguments: response.payload);
     });
@@ -304,10 +300,19 @@ class NotificationProvider with ChangeNotifier {
         continue;
       }
 
+      DateTime dayBefore = list.deadline.subtract(Duration(days: 1));
+      String? notificationText = null;
+      if (list.hasDeadline &&
+          dayBefore.year == scheduledDateTime.year &&
+          dayBefore.month == scheduledDateTime.month &&
+          dayBefore.day == scheduledDateTime.day) {
+        notificationText = await getRandomNotificationText();
+      }
+
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notification.notificationIndex,
         list.title,
-        await getRandomNotificationText(),
+        notificationText,
         tz.TZDateTime.from(scheduledDateTime, tz.local),
         const NotificationDetails(
           android: AndroidNotificationDetails(

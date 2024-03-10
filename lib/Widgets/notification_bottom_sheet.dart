@@ -26,96 +26,103 @@ class NotificationBottomSheet extends StatefulWidget {
 class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Provider.of<ListsProvider>(context).getListById(widget.listId),
-      builder: (context, futureList) {
-        if (futureList.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (futureList.hasError) {
-          return Text('Error: ${futureList.error}');
-        } else {
-          ToDoList list = futureList.data!;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.4,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.4 + 20,
+      child: FutureBuilder(
+        future: Provider.of<ListsProvider>(context).getListById(widget.listId),
+        builder: (context, futureList) {
+          if (futureList.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (futureList.hasError) {
+            return Text('Error: ${futureList.error}');
+          } else {
+            ToDoList list = futureList.data!;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).highlightColor,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                child: FutureBuilder<List<Notifications>>(
-                  future: Provider.of<NotificationProvider>(context)
-                      .getNotificationsByListId(list.id),
-                  builder: (context, futureNotificationList) {
-                    if (futureNotificationList.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (futureNotificationList.hasError) {
-                      return Text('Error: ${futureNotificationList.error}');
-                    } else if (futureNotificationList.hasData &&
-                        futureNotificationList.data!.isEmpty) {
-                      return Column(mainAxisSize: MainAxisSize.min, children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: header(list),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              context.translate(Strings.noNotificationsFound),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: FutureBuilder<List<Notifications>>(
+                    future: Provider.of<NotificationProvider>(context)
+                        .getNotificationsByListId(list.id),
+                    builder: (context, futureNotificationList) {
+                      if (futureNotificationList.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (futureNotificationList.hasError) {
+                        return Text('Error: ${futureNotificationList.error}');
+                      } else if (futureNotificationList.hasData &&
+                          futureNotificationList.data!.isEmpty) {
+                        return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: header(list),
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    context.translate(
+                                        Strings.noNotificationsFound),
+                                  ),
+                                ),
+                              )
+                            ]);
+                      } else {
+                        List<Notifications> notificationsList =
+                            List.from(futureNotificationList.data!);
+                        notificationsList.sort((a, b) => a.notificationDateTime
+                            .compareTo(b.notificationDateTime));
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: header(list,
+                                  notificationsList: notificationsList),
                             ),
-                          ),
-                        )
-                      ]);
-                    } else {
-                      List<Notifications> notificationsList =
-                          List.from(futureNotificationList.data!);
-                      notificationsList.sort((a, b) => a.notificationDateTime
-                          .compareTo(b.notificationDateTime));
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            child: header(list,
-                                notificationsList: notificationsList),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: notificationsList.length,
-                              itemBuilder: (context, index) {
-                                final notification = notificationsList[index];
-                                return _buildNotificationItem(
-                                    context, notification, list);
-                              },
+                            Expanded(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: notificationsList.length,
+                                itemBuilder: (context, index) {
+                                  final notification = notificationsList[index];
+                                  return _buildNotificationItem(
+                                      context, notification, list);
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    }
-                  },
+                          ],
+                        );
+                      }
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
-        }
-      },
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 

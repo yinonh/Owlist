@@ -155,7 +155,7 @@ class _SettingsState extends State<Settings> {
                 ],
                 customTextStyles: [TextStyle(color: Colors.white)],
                 activeBgColors: const [
-                  [Color(0xFF38305B)],
+                  [Color(0xFF251D43)],
                   [Color(0xFF635985)],
                   [Color(0xFF9685D9)]
                 ],
