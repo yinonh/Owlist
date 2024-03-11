@@ -158,7 +158,7 @@ class DiamondBottomNavigation extends StatelessWidget {
             Positioned.fill(
               child: DiamondButton(
                 icon: Icon(
-                  Icons.add,
+                  Icons.add_rounded,
                   color: bgColor,
                   size: getRelativeWidth(0.1),
                 ),

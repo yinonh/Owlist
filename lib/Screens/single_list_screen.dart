@@ -157,7 +157,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
         message: text,
         backgroundColor: Theme.of(context).highlightColor,
         icon: const Icon(
-          Icons.notifications_active,
+          Icons.notifications_active_rounded,
           color: Color(0x15000000),
           size: 120,
         ),
@@ -240,7 +240,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             onPressed: () {
               _showNewItemDialog(context);
             },
-            child: const Icon(Icons.text_fields)),
+            child: const Icon(Icons.text_fields_rounded)),
       ),
     );
 
@@ -253,7 +253,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
             onPressed: () {
               _openBottomSheet(context);
             },
-            child: const Icon(Icons.notification_add)),
+            child: const Icon(Icons.notification_add_rounded)),
       ),
     );
 
@@ -263,7 +263,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
           ? UnicornDialer(
               backgroundColor: Colors.transparent,
               parentButton: Icon(
-                Icons.calendar_month,
+                Icons.calendar_month_rounded,
                 color: list!.hasDeadline
                     ? Theme.of(context).primaryColor
                     : Colors.grey,
@@ -275,12 +275,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
                       _showChangeDateDialog(context);
                     }
                   : () {},
-              finalButtonIcon: Icon(Icons.close),
+              finalButtonIcon: Icon(Icons.close_rounded),
             )
           : UnicornDialer(
               backgroundColor: Colors.transparent,
               parentButton: Icon(
-                Icons.add,
+                Icons.add_rounded,
                 color: Theme.of(context).primaryColor,
                 size: MediaQuery.of(context).size.width * 0.1,
               ),
@@ -295,7 +295,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                           _showNewItemDialog(context);
                         },
               finalButtonIcon: Icon(
-                Icons.close,
+                Icons.close_rounded,
                 color: Theme.of(context).primaryColor,
               ),
             ),
@@ -328,7 +328,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                       children: [
                         editMode
                             ? IconButton(
-                                icon: const Icon(Icons.cancel),
+                                icon: const Icon(Icons.close_rounded),
                                 onPressed: () {
                                   setState(() {
                                     newDeadline = list!.deadline;
@@ -338,7 +338,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 },
                               )
                             : IconButton(
-                                icon: const Icon(Icons.arrow_back),
+                                icon: const Icon(Icons.arrow_back_ios_new),
                                 onPressed: () {
                                   if (Navigator.of(context).canPop()) {
                                     Navigator.of(context).pop();
@@ -394,7 +394,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               ),
                         editMode
                             ? IconButton(
-                                icon: const Icon(Icons.save),
+                                icon: const Icon(Icons.save_as_rounded),
                                 onPressed: newTextEmpty
                                     ? null
                                     : () {
@@ -402,7 +402,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                       },
                               )
                             : IconButton(
-                                icon: const Icon(Icons.edit),
+                                icon: const Icon(Icons.edit_rounded),
                                 onPressed: toggleEditMode,
                               ),
                       ],

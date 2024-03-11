@@ -97,7 +97,7 @@ class _ContentScreenState extends State<ContentScreen> {
       resizeToAvoidBottomInset: false,
       floatingActionButton: DiamondButton(
         icon: Icon(
-          Icons.text_fields,
+          Icons.text_fields_rounded,
           color: textEditMode ? Colors.grey : Theme.of(context).primaryColor,
           size: MediaQuery.of(context).size.width * 0.1,
         ),
@@ -133,11 +133,12 @@ class _ContentScreenState extends State<ContentScreen> {
                             children: [
                               titleEditMode || textEditMode
                                   ? IconButton(
-                                      icon: const Icon(Icons.cancel),
+                                      icon: const Icon(Icons.close_rounded),
                                       onPressed: _discard,
                                     )
                                   : IconButton(
-                                      icon: const Icon(Icons.arrow_back),
+                                      icon:
+                                          const Icon(Icons.arrow_back_ios_new),
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
@@ -174,35 +175,6 @@ class _ContentScreenState extends State<ContentScreen> {
                                           _save();
                                         },
                                       ),
-                                      // child: TextField(
-                                      //   maxLines: 2,
-                                      //   autofocus: true,
-                                      //   textCapitalization:
-                                      //       TextCapitalization.sentences,
-                                      //   onChanged: (txt) {
-                                      //     setState(() {
-                                      //       newTextEmpty = txt.trim().isEmpty;
-                                      //     });
-                                      //   },
-                                      //   controller: _titleController,
-                                      //   textAlign: TextAlign.center,
-                                      //   style: const TextStyle(
-                                      //     // fontSize: 12.0,
-                                      //     fontWeight: FontWeight.bold,
-                                      //     color: Colors.white,
-                                      //   ),
-                                      //   maxLength: 50,
-                                      //   // Set the maximum length
-                                      //   decoration: const InputDecoration(
-                                      //     counterText:
-                                      //         "", // Hide the character counter
-                                      //     // border: InputBorder.none,
-                                      //   ),
-                                      //   inputFormatters: [
-                                      //     FilteringTextInputFormatter.deny(
-                                      //         new RegExp(r"\n"))
-                                      //   ],
-                                      // ),
                                     )
                                   : Flexible(
                                       child: Text(
@@ -218,11 +190,11 @@ class _ContentScreenState extends State<ContentScreen> {
                                     ),
                               titleEditMode || textEditMode
                                   ? IconButton(
-                                      icon: const Icon(Icons.save),
+                                      icon: const Icon(Icons.save_as_rounded),
                                       onPressed: newTextEmpty ? null : _save,
                                     )
                                   : IconButton(
-                                      icon: const Icon(Icons.edit),
+                                      icon: const Icon(Icons.edit_rounded),
                                       onPressed: _toggleTitleEditMode,
                                     ),
                             ],

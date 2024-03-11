@@ -41,7 +41,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         message: context.translate(Strings.itemDeletedPressHereToUndo),
         backgroundColor: Theme.of(context).highlightColor,
         icon: const Icon(
-          Icons.notifications_off,
+          Icons.notifications_off_rounded,
           color: Color(0x15000000),
           size: 120,
         ),
@@ -114,7 +114,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
                   child: Icon(
-                    Icons.delete,
+                    Icons.delete_rounded,
                   ),
                 ),
               ),
@@ -123,7 +123,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                 ? ListTile(
                     contentPadding: EdgeInsets.symmetric(horizontal: 6),
                     leading: Icon(
-                      Icons.drag_handle,
+                      Icons.drag_handle_rounded,
                       color: Theme.of(context).hintColor,
                     ),
                     title: Text(

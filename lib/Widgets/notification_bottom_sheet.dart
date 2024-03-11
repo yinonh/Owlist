@@ -1,6 +1,7 @@
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -135,8 +136,9 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               Navigator.of(context).pop();
             },
             icon: Icon(
-              Icons.arrow_downward,
+              Icons.keyboard_arrow_down_rounded,
               color: Theme.of(context).canvasColor,
+              size: 32,
             )),
         FittedBox(
           child: Text(
@@ -157,14 +159,14 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   }
                 },
                 icon: Icon(
-                  Icons.add,
+                  Icons.add_rounded,
                   color: Theme.of(context).canvasColor,
                 ),
               )
             : const IconButton(
                 onPressed: null,
                 icon: Icon(
-                  Icons.add,
+                  Icons.add_rounded,
                   color: Colors.grey,
                 ),
               ),
@@ -194,10 +196,10 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             : null,
         icon: Icon(
           notification.disabled
-              ? Icons.notifications_off
+              ? Icons.notifications_off_rounded
               : notification.notificationDateTime.isBefore(DateTime.now())
-                  ? Icons.notifications_none
-                  : Icons.notifications_active,
+                  ? Icons.notifications_none_rounded
+                  : Icons.notifications_active_rounded,
           color: notification.disabled ||
                   notification.notificationDateTime.isBefore(DateTime.now())
               ? Theme.of(context).hintColor
@@ -220,7 +222,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
           : null,
       trailing: IconButton(
         icon: Icon(
-          Icons.delete, // Use constant trailing icon
+          Icons.delete_rounded, // Use constant trailing icon
           color: Theme.of(context).highlightColor,
         ),
         onPressed: () async {

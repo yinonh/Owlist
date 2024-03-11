@@ -140,7 +140,7 @@ class _UnicornDialer extends State<UnicornDialer>
                           _animationController.isDismissed
                               ? widget.parentButton.icon
                               : widget.finalButtonIcon == null
-                                  ? Icons.close
+                                  ? Icons.close_rounded
                                   : widget.finalButtonIcon.icon,
                         ),
                       );

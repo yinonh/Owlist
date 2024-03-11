@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
               .then((result) {
             if (result) {
               showMessage(context.translate(Strings.scheduleNotification),
-                  Icons.notification_add);
+                  Icons.notification_add_rounded);
             }
             return provider.getActiveItems();
           });
@@ -221,10 +221,10 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).primaryColor,
       bottomNavigationBar: DiamondBottomNavigation(
         itemIcons: const [
-          Icons.checklist,
-          Icons.archive,
-          Icons.notifications_off_rounded,
-          Icons.settings,
+          Icons.checklist_rounded,
+          Icons.archive_rounded,
+          Icons.watch_off_rounded,
+          Icons.settings_rounded,
         ],
         addItem: addItem,
         selectedIndex: currentIndex,
@@ -268,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(fontSize: 33),
                           )
                         : PopupMenuButton<SortBy>(
-                            icon: const Icon(Icons.filter_list),
+                            icon: const Icon(Icons.filter_list_rounded),
                             onSelected: (value) async {
                               setState(() {
                                 selectedOption = value;

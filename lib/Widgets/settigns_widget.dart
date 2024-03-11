@@ -68,7 +68,7 @@ class _SettingsState extends State<Settings> {
             context.translate(Strings.allTheChangesWillTakeEffectFromNowOnOnly),
         backgroundColor: Theme.of(context).highlightColor,
         icon: const Icon(
-          Icons.warning,
+          Icons.warning_rounded,
           color: Color(0x15000000),
           size: 120,
         ),
@@ -151,9 +151,9 @@ class _SettingsState extends State<Settings> {
                 minWidth: MediaQuery.of(context).size.width - 20,
                 totalSwitches: 3,
                 customIcons: [
-                  Icon(Icons.dark_mode),
-                  Icon(Icons.autorenew),
-                  Icon(Icons.light_mode)
+                  Icon(Icons.dark_mode_rounded),
+                  Icon(Icons.autorenew_rounded),
+                  Icon(Icons.light_mode_rounded)
                 ],
                 customTextStyles: [TextStyle(color: Colors.white)],
                 activeBgColors: const [

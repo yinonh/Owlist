@@ -36,7 +36,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       child: Row(
         children: [
           const Icon(
-            Icons.calendar_month,
+            Icons.calendar_month_rounded,
             color: Color(0xFF635985),
           ),
           const SizedBox(width: 8),

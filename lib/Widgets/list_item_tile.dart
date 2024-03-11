@@ -171,7 +171,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                     onPressed: () {
                       _showDeleteConfirmation(context);
                     },
-                    icon: Icon(Icons.delete,
+                    icon: Icon(Icons.delete_rounded,
                         color: Theme.of(context).highlightColor),
                   ),
                 ],

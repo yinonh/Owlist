@@ -193,6 +193,7 @@ class NotificationProvider with ChangeNotifier {
   Future<bool> editNotification(
       Notifications notification, ToDoList list) async {
     final db = await database;
+    notification.disabled = false;
 
     await db.update(
       'notifications',
