@@ -195,6 +195,8 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                         ),
                         const SizedBox(height: 8.0),
                         LinearProgressIndicator(
+                          minHeight: 13.0,
+                          borderRadius: BorderRadius.circular(5),
                           value: remainingHours <= 0
                               ? 1
                               : (totalHours - remainingHours) / totalHours,
@@ -236,6 +238,8 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         LinearProgressIndicator(
+                          borderRadius: BorderRadius.circular(5),
+                          minHeight: 13.0,
                           value: progressPercentage,
                         ),
                         const SizedBox(height: 8.0),

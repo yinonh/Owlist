@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _loadCheckedStatus();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
     Provider.of<ListsProvider>(context, listen: false).initialization(context);
@@ -67,7 +68,6 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
-    _loadCheckedStatus();
     sortLists();
   }
 
@@ -268,6 +268,11 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(fontSize: 33),
                           )
                         : PopupMenuButton<SortBy>(
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
+                            ),
                             icon: const Icon(Icons.filter_list_rounded),
                             onSelected: (value) async {
                               setState(() {
