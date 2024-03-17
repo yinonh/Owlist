@@ -41,6 +41,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
   @override
   void initState() {
     super.initState();
+    Provider.of<ListsProvider>(context, listen: false).initialization(context);
     initListDate();
     editMode = false;
   }
