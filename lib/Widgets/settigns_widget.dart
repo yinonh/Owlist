@@ -87,278 +87,310 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.topCenter,
-      child: ListView(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            title: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                context.translate(Strings.settings),
+                style: const TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          context.translate(Strings.chooseLanguage),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ToggleButtons(
+                        onPressed: (int index) async {
+                          setState(() {
+                            _selectedLanguages = List.generate(
+                                _selectedLanguages.length, (i) => i == index);
+                          });
+
+                          String newLanguageCode = index == 0 ? 'en' : 'he';
+                          SharedPreferencesHelper.instance.selectedLanguage =
+                              newLanguageCode;
+
+                          Locale newLocale = Locale(newLanguageCode);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            OwlistApp.setLocale(context, newLocale);
+                          });
+                        },
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        selectedColor: Theme.of(context).primaryColor,
+                        fillColor: Theme.of(context).primaryColorLight,
+                        constraints: const BoxConstraints(
+                          minHeight: 40.0,
+                          minWidth: 80.0,
+                        ),
+                        isSelected: _selectedLanguages,
+                        children: languages,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    context.translate(Strings.chooseLanguage),
+                    context.translate(Strings.switchThemeMode),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ToggleButtons(
-                  onPressed: (int index) async {
-                    setState(() {
-                      _selectedLanguages = List.generate(
-                          _selectedLanguages.length, (i) => i == index);
-                    });
-
-                    String newLanguageCode = index == 0 ? 'en' : 'he';
-                    SharedPreferencesHelper.instance.selectedLanguage =
-                        newLanguageCode;
-
-                    Locale newLocale = Locale(newLanguageCode);
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      OwlistApp.setLocale(context, newLocale);
-                    });
-                  },
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  selectedColor: Theme.of(context).primaryColor,
-                  fillColor: Theme.of(context).primaryColorLight,
-                  constraints: const BoxConstraints(
-                    minHeight: 40.0,
-                    minWidth: 80.0,
-                  ),
-                  isSelected: _selectedLanguages,
-                  children: languages,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              context.translate(Strings.switchThemeMode),
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ),
-          Column(
-            children: [
-              ToggleSwitch(
-                initialLabelIndex: OwlistApp.themeMode(context),
-                minWidth: MediaQuery.of(context).size.width - 20,
-                totalSwitches: 3,
-                customIcons: [
-                  Icon(Icons.dark_mode_rounded),
-                  Icon(Icons.autorenew_rounded),
-                  Icon(Icons.light_mode_rounded)
-                ],
-                customTextStyles: [TextStyle(color: Colors.white)],
-                activeBgColors: const [
-                  [Color(0xFF251D43)],
-                  [Color(0xFF635985)],
-                  [Color(0xFF9685D9)]
-                ],
-                inactiveBgColor: Theme.of(context).primaryColorDark,
-                animate: true,
-                curve: Curves.easeInQuad,
-                centerText: true,
-                onToggle: (index) {
-                  switch (index) {
-                    case 0:
-                      SharedPreferencesHelper.instance.selectedTheme = "dark";
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        OwlistApp.setTheme(context, "dark");
-                      });
-                      break;
-                    case 1:
-                      SharedPreferencesHelper.instance.removeSelectedTheme();
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        OwlistApp.setTheme(context, null);
-                      });
-                      break;
-                    case 2:
-                      SharedPreferencesHelper.instance.selectedTheme = "light";
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        OwlistApp.setTheme(context, "light");
-                      });
-                      break;
-                  }
-                },
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 56),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
-                    Text(
-                      context.translate(Strings.dark),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ToggleSwitch(
+                      initialLabelIndex: OwlistApp.themeMode(context),
+                      minWidth: MediaQuery.of(context).size.width - 20,
+                      totalSwitches: 3,
+                      customIcons: [
+                        Icon(Icons.dark_mode_rounded),
+                        Icon(Icons.autorenew_rounded),
+                        Icon(Icons.light_mode_rounded)
+                      ],
+                      customTextStyles: [TextStyle(color: Colors.white)],
+                      activeBgColors: const [
+                        [Color(0xFF251D43)],
+                        [Color(0xFF635985)],
+                        [Color(0xFF9685D9)]
+                      ],
+                      inactiveBgColor: Theme.of(context).primaryColorDark,
+                      animate: true,
+                      curve: Curves.easeInQuad,
+                      centerText: true,
+                      onToggle: (index) {
+                        switch (index) {
+                          case 0:
+                            SharedPreferencesHelper.instance.selectedTheme =
+                                "dark";
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              OwlistApp.setTheme(context, "dark");
+                            });
+                            break;
+                          case 1:
+                            SharedPreferencesHelper.instance
+                                .removeSelectedTheme();
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              OwlistApp.setTheme(context, null);
+                            });
+                            break;
+                          case 2:
+                            SharedPreferencesHelper.instance.selectedTheme =
+                                "light";
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              OwlistApp.setTheme(context, "light");
+                            });
+                            break;
+                        }
+                      },
                     ),
-                    Text(
-                      context.translate(Strings.automatic),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    Text(
-                      context.translate(Strings.light),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 56),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            context.translate(Strings.dark),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            context.translate(Strings.automatic),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            context.translate(Strings.light),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    context.translate(Strings.enableNotifications),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+                const SizedBox(
+                  height: 25,
                 ),
-              ),
-              Expanded(
-                child: Transform.scale(
-                  scale: 1,
-                  child: Switch(
-                    onChanged: (val) {
-                      notificationProvider.saveActive(val);
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          context.translate(Strings.enableNotifications),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Transform.scale(
+                        scale: 1,
+                        child: Switch(
+                          onChanged: (val) {
+                            notificationProvider.saveActive(val);
+                          },
+                          value: _notificationsActive,
+                          trackColor: MaterialStateProperty.all<Color>(
+                              _notificationsActive
+                                  ? Theme.of(context).primaryColorLight
+                                  : Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          context
+                              .translate(Strings.setReminderDayBeforeDeadline),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Transform.scale(
+                        scale: 1,
+                        child: Switch(
+                          onChanged: (val) {
+                            notificationProvider.saveAutoNotification(val);
+                          },
+                          value:
+                              _notificationsActive && _autoNotificationsActive,
+                          trackColor: MaterialStateProperty.all<Color>(
+                              _notificationsActive && _autoNotificationsActive
+                                  ? Theme.of(context).primaryColorLight
+                                  : Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          context.translate(
+                              Strings.chooseDefaultTimeForNotification),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Transform.scale(
+                        scale: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: ElevatedButton(
+                            onPressed: _notificationsActive
+                                ? () {
+                                    Navigator.of(context).push(
+                                      showPicker(
+                                          height: 350,
+                                          is24HrFormat: true,
+                                          accentColor:
+                                              Theme.of(context).highlightColor,
+                                          context: context,
+                                          showSecondSelector: false,
+                                          value: _time,
+                                          onChange: onTimeChanged,
+                                          minuteInterval:
+                                              TimePickerInterval.FIVE,
+                                          okText: context.translate(Strings.ok),
+                                          cancelText:
+                                              context.translate(Strings.cancel),
+                                          blurredBackground: true),
+                                    );
+                                  }
+                                : null,
+                            child: Text(
+                              context.translate(Strings.chooseTime),
+                              style: _notificationsActive
+                                  ? Theme.of(context)
+                                      .primaryTextTheme
+                                      .titleMedium!
+                                      .copyWith(color: Colors.white)
+                                  : Theme.of(context)
+                                      .primaryTextTheme
+                                      .titleMedium!
+                                      .copyWith(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed(StatisticsScreen.routeName);
                     },
-                    value: _notificationsActive,
-                    trackColor: MaterialStateProperty.all<Color>(
-                        _notificationsActive
-                            ? Theme.of(context).primaryColorLight
-                            : Colors.black),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    context.translate(Strings.setReminderDayBeforeDeadline),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Transform.scale(
-                  scale: 1,
-                  child: Switch(
-                    onChanged: (val) {
-                      notificationProvider.saveAutoNotification(val);
-                    },
-                    value: _notificationsActive && _autoNotificationsActive,
-                    trackColor: MaterialStateProperty.all<Color>(
-                        _notificationsActive && _autoNotificationsActive
-                            ? Theme.of(context).primaryColorLight
-                            : Colors.black),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    context.translate(Strings.chooseDefaultTimeForNotification),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Transform.scale(
-                  scale: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: ElevatedButton(
-                      onPressed: _notificationsActive
-                          ? () {
-                              Navigator.of(context).push(
-                                showPicker(
-                                    height: 350,
-                                    is24HrFormat: true,
-                                    accentColor:
-                                        Theme.of(context).highlightColor,
-                                    context: context,
-                                    showSecondSelector: false,
-                                    value: _time,
-                                    onChange: onTimeChanged,
-                                    minuteInterval: TimePickerInterval.FIVE,
-                                    okText: context.translate(Strings.ok),
-                                    cancelText:
-                                        context.translate(Strings.cancel),
-                                    blurredBackground: true),
-                              );
-                            }
-                          : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        context.translate(Strings.chooseTime),
-                        style: _notificationsActive
-                            ? Theme.of(context)
-                                .primaryTextTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.white)
-                            : Theme.of(context)
-                                .primaryTextTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.grey),
+                        context.translate(Strings.statistics),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .titleMedium!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(StatisticsScreen.routeName);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  context.translate(Strings.statistics),
-                  style: Theme.of(context)
-                      .primaryTextTheme
-                      .titleMedium!
-                      .copyWith(color: Colors.white),
+                const SizedBox(
+                  height: 25,
                 ),
-              ),
+              ],
             ),
-          ),
-          const SizedBox(
-            height: 25,
           ),
         ],
       ),

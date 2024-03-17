@@ -160,7 +160,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                 icon: Icon(
                   Icons.add_rounded,
                   color: bgColor,
-                  size: getRelativeWidth(0.1),
+                  size: getRelativeWidth(0.13),
                 ),
                 onTap: () async {
                   TextEditingController newTitle = TextEditingController();

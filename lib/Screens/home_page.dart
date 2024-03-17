@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
       context.translate(Strings.withoutDeadline),
       context.translate(Strings.settings),
     ];
+    sortLists();
   }
 
   @override
@@ -249,8 +250,7 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 24.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                 child: Row(
                   textDirection: TextDirection.ltr,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -335,17 +335,17 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  titles[currentIndex],
-                  style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Text(
+              //     titles[currentIndex],
+              //     style: const TextStyle(
+              //       fontSize: 24.0,
+              //       fontWeight: FontWeight.bold,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 16.0),
               Expanded(
                 child: PageView(
@@ -377,6 +377,7 @@ class _HomePageState extends State<HomePage> {
                             existingItems: snapshot.data!,
                             deleteItem: deleteList,
                             refresh: refreshLists,
+                            title: titles[currentIndex],
                           );
                         }
                       },
@@ -401,6 +402,7 @@ class _HomePageState extends State<HomePage> {
                             existingItems: snapshot.data!,
                             deleteItem: deleteList,
                             refresh: refreshLists,
+                            title: titles[currentIndex],
                           );
                         }
                       },
@@ -425,6 +427,7 @@ class _HomePageState extends State<HomePage> {
                             existingItems: snapshot.data!,
                             deleteItem: deleteList,
                             refresh: refreshLists,
+                            title: titles[currentIndex],
                           );
                         }
                       },

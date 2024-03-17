@@ -11,12 +11,14 @@ class ItemsScreen extends StatefulWidget {
   final List<ToDoList> existingItems;
   final Function deleteItem;
   final Function refresh;
+  final String title;
 
   const ItemsScreen({
     required this.selectedIndex,
     required this.existingItems,
     required this.deleteItem,
     required this.refresh,
+    required this.title,
     Key? key,
   }) : super(key: key);
 
@@ -127,42 +129,49 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      backgroundColor: Colors.white,
-      color: Colors.purple,
-      onRefresh: () {
-        return Future.delayed(Duration(seconds: 1), () {
-          return widget.refresh();
-        });
-      },
-      child: ListView.separated(
-        itemCount: widget.existingItems.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ToDoItemTile(
-              item: widget.existingItems[index],
-              onDelete: (item) {
-                widget.deleteItem(item);
-              },
-              refresh: widget.refresh,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            title: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          if (index == randomNumber) {
-            // return Container(
-            //   height: 20,
-            //   width: double.infinity,
-            //   color: Colors.red,
-            // );
-            return _getAdWidget();
-          } else {
-            return const SizedBox(
-              height: 0,
-            );
-          }
-        },
+            backgroundColor: Colors.transparent,
+          ),
+          SliverList.separated(
+            itemCount: widget.existingItems.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ToDoItemTile(
+                  item: widget.existingItems[index],
+                  onDelete: (item) {
+                    widget.deleteItem(item);
+                  },
+                  refresh: widget.refresh,
+                ),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              if (index == randomNumber) {
+                return _getAdWidget();
+              } else {
+                return const SizedBox(
+                  height: 0,
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }

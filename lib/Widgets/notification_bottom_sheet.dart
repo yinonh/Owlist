@@ -1,9 +1,10 @@
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Providers/lists_provider.dart';
 import '../Utils/shared_preferences_helper.dart';
@@ -127,6 +128,23 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
     );
   }
 
+  void showPopup(String message) {
+    showTopSnackBar(
+      Overlay.of(context),
+      CustomSnackBar.success(
+        message: message,
+        backgroundColor: Theme.of(context).highlightColor,
+        icon: const Icon(
+          Icons.notifications_off_rounded,
+          color: Color(0x15000000),
+          size: 120,
+        ),
+      ),
+      snackBarPosition: SnackBarPosition.bottom,
+      displayDuration: const Duration(seconds: 1, milliseconds: 500),
+    );
+  }
+
   Widget header(ToDoList list, {List<Notifications>? notificationsList}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -163,8 +181,10 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   color: Theme.of(context).canvasColor,
                 ),
               )
-            : const IconButton(
-                onPressed: null,
+            : IconButton(
+                onPressed: () {
+                  showPopup("אי אפשר להוסיף תזכורת לרשימה זו");
+                },
                 icon: Icon(
                   Icons.add_rounded,
                   color: Colors.grey,
@@ -226,9 +246,28 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
           color: Theme.of(context).highlightColor,
         ),
         onPressed: () async {
-          Provider.of<NotificationProvider>(context, listen: false)
-              .deleteNotification(notification, list);
-        }, // Pass notification object to function
+          var notificationProvider =
+              Provider.of<NotificationProvider>(context, listen: false);
+          notificationProvider.deleteNotification(notification, list);
+          showTopSnackBar(
+            Overlay.of(context),
+            CustomSnackBar.success(
+              message: context.translate(Strings.itemDeletedPressHereToUndo),
+              backgroundColor: Theme.of(context).highlightColor,
+              icon: const Icon(
+                Icons.warning_rounded,
+                color: Color(0x15000000),
+                size: 120,
+              ),
+            ),
+            onTap: () {
+              notificationProvider.addNotification(
+                  list, notification.notificationDateTime);
+            },
+            snackBarPosition: SnackBarPosition.bottom,
+            displayDuration: const Duration(seconds: 1, milliseconds: 500),
+          );
+        },
       ),
     );
   }

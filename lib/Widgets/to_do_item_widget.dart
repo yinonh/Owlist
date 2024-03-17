@@ -41,7 +41,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         message: context.translate(Strings.itemDeletedPressHereToUndo),
         backgroundColor: Theme.of(context).highlightColor,
         icon: const Icon(
-          Icons.notifications_off_rounded,
+          Icons.warning_rounded,
           color: Color(0x15000000),
           size: 120,
         ),

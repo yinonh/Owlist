@@ -282,7 +282,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
               parentButton: Icon(
                 Icons.add_rounded,
                 color: Theme.of(context).primaryColor,
-                size: MediaQuery.of(context).size.width * 0.1,
+                size: MediaQuery.of(context).size.width * 0.13,
               ),
               childButtons:
                   (SharedPreferencesHelper.instance.notificationActive ?? true)
