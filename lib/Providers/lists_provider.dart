@@ -11,6 +11,7 @@ import 'package:uuid/uuid.dart';
 import '../Models/notification.dart';
 import '../Providers/notification_provider.dart';
 import '../Models/to_do_list.dart';
+import '../Screens/home_page.dart';
 import '../Utils/shared_preferences_helper.dart';
 
 class ListsProvider extends ChangeNotifier {
@@ -20,9 +21,19 @@ class ListsProvider extends ChangeNotifier {
   List<ToDoList>? _withoutDeadlineItemsCache;
   late NotificationProvider notificationProvider;
   late BuildContext context;
+  late SortBy selectedOption;
+
+  SortBy get selectedOptionVal => selectedOption;
+
+  set selectedOptionVal(SortBy newValue) {
+    selectedOption = newValue;
+    notifyListeners();
+  }
 
   initialization(BuildContext context) async {
     this.context = context;
+    int index = await SharedPreferencesHelper.instance.sortByIndex();
+    selectedOption = SortBy.values[index];
     notificationProvider =
         Provider.of<NotificationProvider>(context, listen: false);
     await notificationProvider.setUpNotifications(context);
@@ -124,6 +135,49 @@ class ListsProvider extends ChangeNotifier {
     );
   }
 
+  List<ToDoList> sortLists(List<ToDoList>? items) {
+    void sortFunction(List<ToDoList> lists) {
+      lists.sort((a, b) {
+        switch (selectedOption) {
+          case SortBy.creationLTN:
+            return a.creationDate.isBefore(b.creationDate) ? -1 : 1;
+          case SortBy.creationNTL:
+            return b.creationDate.isBefore(a.creationDate) ? -1 : 1;
+          case SortBy.deadlineLTN:
+            if (!a.hasDeadline && b.hasDeadline) {
+              return 1;
+            } else if (a.hasDeadline && !b.hasDeadline) {
+              return -1;
+            }
+            return b.deadline.isBefore(a.deadline) ? -1 : 1;
+          case SortBy.deadlineNTL:
+            if (!a.hasDeadline && b.hasDeadline) {
+              return 1;
+            } else if (a.hasDeadline && !b.hasDeadline) {
+              return -1;
+            }
+            return a.deadline.isBefore(b.deadline) ? -1 : 1;
+          case SortBy.progressBTS:
+            return (b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems)
+                .compareTo(
+                    a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems);
+          case SortBy.progressSTB:
+            return (a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems)
+                .compareTo(
+                    b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems);
+          default:
+            return 0; // Default case
+        }
+      });
+    }
+
+    if (items != null) {
+      sortFunction(items);
+      return items;
+    }
+    return [];
+  }
+
   Future<List<ToDoList>> getActiveItems() async {
     if (_activeItemsCache != null) {
       return _activeItemsCache!;
@@ -153,7 +207,7 @@ class ListsProvider extends ChangeNotifier {
       );
     });
 
-    return _activeItemsCache ?? [];
+    return sortLists(_activeItemsCache);
   }
 
   Future<ToDoList?> getListById(String id) async {
@@ -209,7 +263,7 @@ class ListsProvider extends ChangeNotifier {
       );
     });
 
-    return _achievedItemsCache ?? [];
+    return sortLists(_achievedItemsCache);
   }
 
   Future<List<ToDoList>> getWithoutDeadlineItems() async {
@@ -240,7 +294,7 @@ class ListsProvider extends ChangeNotifier {
       );
     });
 
-    return _withoutDeadlineItemsCache ?? [];
+    return sortLists(_withoutDeadlineItemsCache);
   }
 
   Future<void> addNewList(ToDoList newList) async {

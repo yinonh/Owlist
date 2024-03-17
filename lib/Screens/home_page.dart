@@ -36,7 +36,8 @@ class _HomePageState extends State<HomePage> {
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-  SortBy selectedOption = SortBy.creationNTL;
+
+  // SortBy selectedOption = SortBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
@@ -51,13 +52,13 @@ class _HomePageState extends State<HomePage> {
       context.translate(Strings.withoutDeadline),
       context.translate(Strings.settings),
     ];
-    sortLists();
+    // sortLists();
   }
 
   @override
   void initState() {
     super.initState();
-    _loadCheckedStatus();
+    // _loadCheckedStatus();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
     Provider.of<ListsProvider>(context, listen: false).initialization(context);
@@ -68,65 +69,7 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
-    sortLists();
-  }
-
-  void _loadCheckedStatus() async {
-    int index = await SharedPreferencesHelper.instance.sortByIndex();
-    setState(() {
-      selectedOption = SortBy.values[index];
-    });
-  }
-
-  Future<void> sortLists() async {
-    List<ToDoList> activeLists = await activeItemsFuture;
-    List<ToDoList> achievedLists = await achievedItemsFuture;
-    List<ToDoList> withoutDeadlineLists = await withoutDeadlineItemsFuture;
-
-    void sortFunction(List<ToDoList> lists) {
-      lists.sort((a, b) {
-        switch (selectedOption) {
-          case SortBy.creationLTN:
-            return a.creationDate.isBefore(b.creationDate) ? -1 : 1;
-          case SortBy.creationNTL:
-            return b.creationDate.isBefore(a.creationDate) ? -1 : 1;
-          case SortBy.deadlineLTN:
-            if (!a.hasDeadline && b.hasDeadline) {
-              return 1;
-            } else if (a.hasDeadline && !b.hasDeadline) {
-              return -1;
-            }
-            return b.deadline.isBefore(a.deadline) ? -1 : 1;
-          case SortBy.deadlineNTL:
-            if (!a.hasDeadline && b.hasDeadline) {
-              return 1;
-            } else if (a.hasDeadline && !b.hasDeadline) {
-              return -1;
-            }
-            return a.deadline.isBefore(b.deadline) ? -1 : 1;
-          case SortBy.progressBTS:
-            return (b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems)
-                .compareTo(
-                    a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems);
-          case SortBy.progressSTB:
-            return (a.totalItems == 0 ? 0 : a.accomplishedItems / a.totalItems)
-                .compareTo(
-                    b.totalItems == 0 ? 0 : b.accomplishedItems / b.totalItems);
-          default:
-            return 0; // Default case
-        }
-      });
-    }
-
-    sortFunction(activeLists);
-    sortFunction(achievedLists);
-    sortFunction(withoutDeadlineLists);
-
-    setState(() {
-      activeItemsFuture = Future.value(activeLists);
-      achievedItemsFuture = Future.value(achievedLists);
-      withoutDeadlineItemsFuture = Future.value(withoutDeadlineLists);
-    });
+    // sortLists();
   }
 
   void showMessage(String text, IconData icon) {
@@ -275,17 +218,16 @@ class _HomePageState extends State<HomePage> {
                             ),
                             icon: const Icon(Icons.filter_list_rounded),
                             onSelected: (value) async {
-                              setState(() {
-                                selectedOption = value;
-                                sortLists();
-                              });
+                              provider.selectedOptionVal = value;
                               await SharedPreferencesHelper.instance
                                   .setSortByIndex(SortBy.values.indexOf(value));
+                              await refreshLists();
                             },
                             itemBuilder: (BuildContext cnx) => [
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.creationNTL,
-                                checked: selectedOption == SortBy.creationNTL,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.creationNTL,
                                 child: Text(
                                   context.translate(
                                       Strings.creationDateNewestToOldest),
@@ -294,7 +236,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.creationLTN,
-                                checked: selectedOption == SortBy.creationLTN,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.creationLTN,
                                 child: Text(
                                   context.translate(
                                       Strings.creationDateOldestToNewest),
@@ -303,7 +246,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.deadlineLTN,
-                                checked: selectedOption == SortBy.deadlineLTN,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.deadlineLTN,
                                 child: Text(
                                   context
                                       .translate(Strings.deadlineLaterToSooner),
@@ -312,7 +256,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.deadlineNTL,
-                                checked: selectedOption == SortBy.deadlineNTL,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.deadlineNTL,
                                 child: Text(
                                   context
                                       .translate(Strings.deadlineSoonerToLater),
@@ -321,7 +266,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.progressBTS,
-                                checked: selectedOption == SortBy.progressBTS,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.progressBTS,
                                 child: Text(
                                   context.translate(Strings.progressHighToLow),
                                   style: Theme.of(context).textTheme.bodyLarge,
@@ -329,7 +275,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                               CheckedPopupMenuItem<SortBy>(
                                 value: SortBy.progressSTB,
-                                checked: selectedOption == SortBy.progressSTB,
+                                checked: provider.selectedOptionVal ==
+                                    SortBy.progressSTB,
                                 child: Text(
                                   context.translate(Strings.progressLowToHigh),
                                   style: Theme.of(context).textTheme.bodyLarge,
@@ -340,17 +287,6 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Text(
-              //     titles[currentIndex],
-              //     style: const TextStyle(
-              //       fontSize: 24.0,
-              //       fontWeight: FontWeight.bold,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
               const SizedBox(height: 16.0),
               Expanded(
                 child: PageView(
