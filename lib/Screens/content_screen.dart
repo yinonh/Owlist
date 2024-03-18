@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../Utils/strings.dart';
 import '../Models/to_do_item.dart';
+import '../Providers/item_provider.dart';
+import '../Providers/lists_provider.dart';
+import '../Utils/strings.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
-import '../Providers/lists_provider.dart';
-import '../Providers/item_provider.dart';
 
 class ContentScreen extends StatefulWidget {
   static const routeName = '/content';

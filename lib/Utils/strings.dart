@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'l10n/app_localizations.dart';
+import '../Utils/l10n/app_localizations.dart';
 
 extension ContextExtensions on BuildContext {
   String translate(String text) {

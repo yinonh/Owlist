@@ -1,17 +1,17 @@
+import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Providers/notification_provider.dart';
-import 'package:to_do/Screens/statistics_screen.dart';
-import 'package:day_night_time_picker/day_night_time_picker.dart';
-import 'package:to_do/Utils/strings.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../Providers/notification_provider.dart';
+import '../Screens/statistics_screen.dart';
+import '../Utils/strings.dart';
+import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
-import '../Utils/notification_time.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);

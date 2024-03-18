@@ -1,28 +1,27 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
-import 'package:path/path.dart' as path;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:to_do/Screens/single_list_screen.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:math';
 
 import '../Models/notification.dart';
+import '../Models/to_do_list.dart';
+import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
-import '../Utils/notification_time.dart';
-import '../Models/to_do_list.dart';
-import 'lists_provider.dart';
+import '../Providers/lists_provider.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;

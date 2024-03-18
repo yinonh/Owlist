@@ -1,22 +1,23 @@
 import 'dart:async';
-import 'package:flutter/services.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:to_do/Providers/notification_provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 
-import './Utils/l10n/app_localizations.dart';
-import './Utils/themes.dart';
-import './Utils/shared_preferences_helper.dart';
+import '../Providers/notification_provider.dart';
+import './Providers/item_provider.dart';
+import './Providers/lists_provider.dart';
+import './Screens/content_screen.dart';
 import './Screens/home_page.dart';
 import './Screens/single_list_screen.dart';
 import './Screens/statistics_screen.dart';
-import './Screens/content_screen.dart';
-import './Providers/lists_provider.dart';
-import './Providers/item_provider.dart';
+import './Utils/l10n/app_localizations.dart';
+import './Utils/shared_preferences_helper.dart';
+import './Utils/themes.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();

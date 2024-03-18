@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Utils/strings.dart';
 
+import '../Utils/strings.dart';
 import '../Providers/lists_provider.dart';
 import '../Widgets/statistics_graphs.dart';
 

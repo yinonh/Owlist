@@ -1,14 +1,13 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-import '../Providers/item_provider.dart';
-import '../Utils/strings.dart';
-import '../Screens/content_screen.dart';
 import '../Models/to_do_item.dart';
-import 'dog_ear_list_tile.dart';
+import '../Providers/item_provider.dart';
+import '../Screens/content_screen.dart';
+import '../Utils/strings.dart';
+import '../Widgets/dog_ear_list_tile.dart';
 
 class ToDoItemWidget extends StatefulWidget {
   final ToDoItem item;

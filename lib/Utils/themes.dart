@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../main.dart';
-
 final ThemeData lightTheme = ThemeData(
   textSelectionTheme: const TextSelectionThemeData(
     cursorColor: Colors.purpleAccent,

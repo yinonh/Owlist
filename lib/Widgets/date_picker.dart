@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:to_do/Utils/strings.dart';
+
+import '../Utils/strings.dart';
 
 class DatePickerWidget extends StatefulWidget {
   final DateTime initialDate;

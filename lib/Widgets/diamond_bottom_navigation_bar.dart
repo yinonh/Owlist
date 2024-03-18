@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/Utils/strings.dart';
 
-import '../Widgets/diamond_button.dart';
+import '../Utils/strings.dart';
 import '../Widgets/date_picker.dart';
+import '../Widgets/diamond_button.dart';
 
 class DiamondBottomNavigation extends StatelessWidget {
   final List<IconData> itemIcons;

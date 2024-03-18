@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -7,11 +8,11 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
-import '../Widgets/settigns_widget.dart';
+import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
-import '../Utils/strings.dart';
-import '../Utils/shared_preferences_helper.dart';
+import '../Widgets/settigns_widget.dart';
 
 enum SortBy {
   creationNTL,
@@ -36,8 +37,6 @@ class _HomePageState extends State<HomePage> {
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-
-  // SortBy selectedOption = SortBy.creationNTL;
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
@@ -52,13 +51,11 @@ class _HomePageState extends State<HomePage> {
       context.translate(Strings.withoutDeadline),
       context.translate(Strings.settings),
     ];
-    // sortLists();
   }
 
   @override
   void initState() {
     super.initState();
-    // _loadCheckedStatus();
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
     Provider.of<ListsProvider>(context, listen: false).initialization(context);
@@ -69,7 +66,6 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
-    // sortLists();
   }
 
   void showMessage(String text, IconData icon) {
@@ -134,7 +130,6 @@ class _HomePageState extends State<HomePage> {
           });
         });
       }
-      //sortLists(SortBy.creationNTL);
     });
   }
 

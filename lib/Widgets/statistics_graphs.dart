@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:to_do/Utils/strings.dart';
+import 'package:flutter/material.dart';
+
+import '../Utils/strings.dart';
 
 class StatisticsGraphs extends StatefulWidget {
   final Map<String, int> statistics;
