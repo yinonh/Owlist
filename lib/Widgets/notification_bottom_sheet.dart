@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Models/notification.dart';
 import '../Models/to_do_list.dart';
@@ -82,12 +83,14 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                               ),
                               Expanded(
                                 child: Center(
-                                  child: Text(
-                                    context.translate(
-                                        Strings.noNotificationsFound),
+                                  child: Lottie.asset(
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? 'Assets/empty notifications dark.json'
+                                        : 'Assets/empty notifications light.json',
                                   ),
                                 ),
-                              )
+                              ),
                             ]);
                       } else {
                         List<Notifications> notificationsList =

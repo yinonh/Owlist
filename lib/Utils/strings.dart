@@ -111,7 +111,6 @@ class Strings {
 
   // Notifications Bottom Sheet
   static String notifications = "Notifications";
-  static String noNotificationsFound = "No notifications found";
   static String date = "Date";
   static String time = "Time";
 }
