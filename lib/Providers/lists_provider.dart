@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:to_do/Utils/notification_time.dart';
+import 'package:to_do/Utils/pair_result.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Models/notification.dart';
@@ -308,10 +309,10 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createNewList(
+  Future<PairResult> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
+    String newListId = Uuid().v4();
     try {
-      String newListId = Uuid().v4();
       ToDoList newList = ToDoList(
         id: newListId,
         // SQLite will auto-generate the ID
@@ -331,13 +332,16 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
-        return await notificationProvider
-            .addNotificationDayBeforeDeadline(newList);
+        return PairResult(
+            await notificationProvider
+                .addNotificationDayBeforeDeadline(newList),
+            newListId);
       }
     } catch (error) {
       print("Error adding new item: $error");
+      return PairResult(false, null);
     }
-    return false;
+    return PairResult(false, newListId);
   }
 
   void invalidateCache() {

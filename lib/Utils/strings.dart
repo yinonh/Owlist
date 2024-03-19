@@ -9,10 +9,10 @@ extension ContextExtensions on BuildContext {
 }
 
 class Strings {
-  // content screen
+  // Content screen
   static String addSomeContent = "Add some content";
 
-  // home page
+  // Home page
   static String activeLists = "Active Lists";
   static String archivedLists = "Archived Lists";
   static String withoutDeadline = "Without Deadline";
@@ -26,27 +26,27 @@ class Strings {
   static String progressHighToLow = "Progress: High to Low";
   static String progressLowToHigh = "Progress: Low to High";
 
-  // single list screen
+  // Single list screen
   static String scheduleNotification = "Schedule notification";
   static String notificationsUpdated = "Notifications updated";
 
-  //statistics screen
+  // Statistics screen
   static String statistics = "Statistics";
 
-  // errors
+  // Errors
   static String errorHasOccurred = "Error has occurred";
   static String couldNotLaunch = "Could not launch";
 
-  // date picker
+  // Date picker
   static String deadline = "Deadline:";
 
-  // edit item title popup
+  // Edit item title popup
   static String enterNewItemTitle = "Enter New Item Title";
   static String title = "Title";
   static String cancel = "Cancel";
   static String add = "Add";
 
-  // list item tile
+  // List item tile
   static String confirmDeletion = "Confirm Deletion";
   static String areYouSureYouWantToDeleteThisItem =
       "Are you sure you want to delete this item?";
@@ -59,13 +59,15 @@ class Strings {
   static String totalItems = "Total Items:";
   static String accomplishedItems = "Accomplished Items:";
   static String progress = "Progress:";
+  static String editList = "Edit list";
+  static String thereIsNoDeadline = "There is no deadline";
 
-  // my bottom navigation bar
+  // My bottom navigation bar
   static String enterListTitle = "Enter list title";
   static String checkForAddingDeadline = "Check for adding deadline";
   static String save = "Save";
 
-  // settings widget
+  // Settings widget
   static String allTheChangesWillTakeEffectFromNowOnOnly =
       "All the changes will take effect from now on only";
   static String chooseLanguage = "Choose language:";
@@ -81,7 +83,7 @@ class Strings {
   static String setReminderDayBeforeDeadline =
       "Set a reminder one day before the deadline";
 
-  // statistics graphs
+  // Statistics graphs
   static String listData = "List Data:";
   static String noData = "No Data";
   static String itemsData = "Items Data";
@@ -89,10 +91,10 @@ class Strings {
   static String itemsDelayed = "Items delayed";
   static String itemsInProcess = "Items In Process";
 
-  // to do item widget
+  // To do item widget
   static String itemDeletedPressHereToUndo = "Item deleted press here to undo";
 
-  //notifications provider
+  // Notifications provider
   static String hurryUpTomorrowsDeadline = "Hurry up! Tomorrow's Deadline!";
   static String reminderTomorrowsTheDeadline =
       "⏰ Reminder: Tomorrow's the Deadline!";
@@ -107,7 +109,7 @@ class Strings {
   static String justOneDayLeftDeadlineTomorrow =
       "Just One Day Left: Deadline Tomorrow!";
 
-  //Notifications Bottom Sheet
+  // Notifications Bottom Sheet
   static String notifications = "Notifications";
   static String noNotificationsFound = "No notifications found";
   static String date = "Date";

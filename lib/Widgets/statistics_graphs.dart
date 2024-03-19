@@ -62,7 +62,6 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                     child: FittedBox(
                       fit: BoxFit.fill,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildProgressBar(
                               title: context.translate(Strings.archivedLists),
@@ -129,7 +128,6 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                     child: FittedBox(
                       fit: BoxFit.fill,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildProgressBar(
                               title: context.translate(Strings.itemsDone),

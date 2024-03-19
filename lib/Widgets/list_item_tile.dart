@@ -142,7 +142,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           title: Text(
-            "edit list",
+            context.translate(Strings.editList),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           content: StatefulBuilder(
@@ -184,9 +184,9 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                                   }
                                 },
                               )
-                            : const FittedBox(
+                            : FittedBox(
                                 child: Text(
-                                  "there is no deadline",
+                                  context.translate(Strings.thereIsNoDeadline),
                                 ),
                               ),
                       ],

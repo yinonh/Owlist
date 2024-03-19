@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Screens/single_list_screen.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -114,9 +115,13 @@ class _HomePageState extends State<HomePage> {
           return provider
               .createNewList(title, deadline, hasDeadline)
               .then((result) {
-            if (result) {
+            if (result.success) {
               showMessage(context.translate(Strings.scheduleNotification),
                   Icons.notification_add_rounded);
+              if (result.data != null) {
+                Navigator.pushNamed(context, SingleListScreen.routeName,
+                    arguments: result.data);
+              }
             }
             return provider.getActiveItems();
           });
@@ -125,7 +130,13 @@ class _HomePageState extends State<HomePage> {
         onItemTapped(2);
         withoutDeadlineItemsFuture =
             withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
-          return provider.createNewList(title, deadline, hasDeadline).then((_) {
+          return provider
+              .createNewList(title, deadline, hasDeadline)
+              .then((result) {
+            if (result.data != null) {
+              Navigator.pushNamed(context, SingleListScreen.routeName,
+                  arguments: result.data);
+            }
             return provider.getWithoutDeadlineItems();
           });
         });
