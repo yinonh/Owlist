@@ -22,6 +22,7 @@ import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
 import '../Providers/lists_provider.dart';
+import '../main.dart';
 
 class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
@@ -89,6 +90,19 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  static onDidReceiveBackgroundNotificationResponse(
+      NotificationResponse response) {
+    navigatorKey.currentState?.popUntil((route) => true);
+    navigatorKey.currentState
+        ?.pushNamed(SingleListScreen.routeName, arguments: response.payload);
+  }
+
+  static onDidReceiveNotificationResponse(NotificationResponse response) {
+    navigatorKey.currentState?.popUntil((route) => true);
+    navigatorKey.currentState
+        ?.pushNamed(SingleListScreen.routeName, arguments: response.payload);
+  }
+
   Future<void> setUpNotifications(BuildContext context) async {
     this.context = context;
     await _configureLocalTimeZone();
@@ -100,16 +114,12 @@ class NotificationProvider with ChangeNotifier {
       android: initializationSettingsAndroid,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveBackgroundNotificationResponse: (response) {
-      Navigator.of(context).popUntil((route) => true);
-      Navigator.pushNamed(context, SingleListScreen.routeName,
-          arguments: response.payload);
-    }, onDidReceiveNotificationResponse: (response) {
-      Navigator.of(context).popUntil((route) => true);
-      Navigator.pushNamed(context, SingleListScreen.routeName,
-          arguments: response.payload);
-    });
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveBackgroundNotificationResponse:
+          onDidReceiveBackgroundNotificationResponse,
+      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+    );
   }
 
   Future<void> _configureLocalTimeZone() async {

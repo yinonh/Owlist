@@ -23,6 +23,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 String? selectedNotificationPayload;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -150,6 +151,7 @@ class _OwlistAppState extends State<OwlistApp> {
     return ChangeNotifierProvider(
       create: (context) => NotificationProvider(),
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         locale: _locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,

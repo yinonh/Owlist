@@ -76,7 +76,7 @@ class ListsProvider extends ChangeNotifier {
         await db.execute('''
           CREATE TABLE notifications(
             id TEXT PRIMARY KEY,
-            listId INTEGER,
+            listId TEXT,
             notificationIndex INTEGER,
             notificationDateTime TEXT,
             disabled INTEGER
@@ -86,9 +86,30 @@ class ListsProvider extends ChangeNotifier {
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('''
+      CREATE TABLE todo_lists_temp(
+        id TEXT PRIMARY KEY, 
+        userID TEXT,
+        title TEXT,
+        creationDate TEXT,
+        deadline TEXT,
+        hasDeadline INTEGER,
+        totalItems INTEGER,
+        notificationIndex INTEGER,
+        accomplishedItems INTEGER
+      )
+    ''');
+          await db.execute('''
+      INSERT INTO todo_lists_temp 
+      SELECT CAST(id AS TEXT) AS id, userID, title, creationDate, deadline, hasDeadline, totalItems, notificationIndex, accomplishedItems 
+      FROM todo_lists
+    ''');
+          await db.execute('DROP TABLE todo_lists');
+          await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists');
+
+          await db.execute('''
           CREATE TABLE notifications(
             id TEXT PRIMARY KEY,
-            listId STRING,
+            listId TEXT,
             notificationIndex INTEGER,
             notificationDateTime TEXT,
             disabled INTEGER
@@ -99,7 +120,7 @@ class ListsProvider extends ChangeNotifier {
           // Migrate existing data from todo_lists to notifications
           List<Map<String, dynamic>> lists = await db.query('todo_lists');
           for (var list in lists) {
-            int listId = list['id'];
+            String listId = list['id'];
             int notificationIndex = list['notificationIndex'];
             String deadline = list['deadline'];
             // Calculate notification date one day before the deadline
