@@ -108,6 +108,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addItem(String title, DateTime deadline, bool hasDeadline) {
+    // TODO: fix the bug when the new list added
     setState(() {
       if (hasDeadline) {
         onItemTapped(0);

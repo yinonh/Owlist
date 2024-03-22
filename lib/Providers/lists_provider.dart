@@ -117,16 +117,17 @@ class ListsProvider extends ChangeNotifier {
         ''');
           NotificationTime notificationTime = NotificationTime.fromInt(
               await SharedPreferencesHelper.instance.getNotificationTime());
-          // Migrate existing data from todo_lists to notifications
-          List<Map<String, dynamic>> lists = await db.query('todo_lists');
-          for (var list in lists) {
-            String listId = list['id'];
-            int notificationIndex = list['notificationIndex'];
-            String deadline = list['deadline'];
-            // Calculate notification date one day before the deadline
-            DateTime notificationDate = DateFormat('yyyy-MM-dd')
-                .parse(deadline)
-                .subtract(Duration(days: 1));
+          final List<Map<String, dynamic>> lists = await db.rawQuery('''
+    SELECT *
+    FROM todo_lists
+    WHERE (accomplishedItems < totalItems OR totalItems = 0)
+      AND deadline > ?
+  ''', [DateTime.now().toIso8601String()]);
+          for (var map in lists) {
+            if (map['hasDeadline'] == 0) continue;
+            ToDoList list = ToDoList.fromMap(map);
+            DateTime notificationDate =
+                list.deadline.subtract(Duration(days: 1));
             String notificationDateTime = DateFormat('yyyy-MM-dd HH:mm').format(
               DateTime(
                   notificationDate.year,
@@ -137,20 +138,31 @@ class ListsProvider extends ChangeNotifier {
             );
             await db.insert('notifications', {
               'id': Uuid().v4(),
-              'listId': listId,
-              'notificationIndex': notificationIndex,
+              'listId': list.id,
+              'notificationIndex': map['notificationIndex'],
               'notificationDateTime': notificationDateTime,
-              'disabled': 0, // Not disabled by default
+              'disabled': 0,
             });
           }
           // Remove notificationIndex from todo_lists
           await db.execute('''
-          CREATE TABLE todo_lists_temp AS SELECT
-            id, userID, title, creationDate, deadline, hasDeadline, totalItems, accomplishedItems
-          FROM todo_lists;
-        ''');
+            CREATE TABLE todo_lists_temp AS SELECT
+              id, userID, title, creationDate, deadline, hasDeadline, totalItems, accomplishedItems
+            FROM todo_lists;
+          ''');
           await db.execute('DROP TABLE todo_lists;');
           await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists;');
+        }
+        final List<Map<String, dynamic>> lists = await db.rawQuery('''
+    SELECT *
+    FROM todo_lists
+    WHERE hasDeadline = 1
+      AND (accomplishedItems < totalItems OR totalItems = 0)
+      AND deadline > ?
+  ''', [DateTime.now().toIso8601String()]);
+        for (final map in lists) {
+          ToDoList list = ToDoList.fromMap(map);
+          notificationProvider.scheduleNotification(list);
         }
       },
       version: int.parse(dotenv.env['DBVERSION']!),

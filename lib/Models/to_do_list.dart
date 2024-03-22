@@ -26,7 +26,19 @@ class ToDoList {
         (hasDeadline && DateTime.now().isAfter(deadline));
   }
 
-  // Method to convert a ToDoList object to a Map
+  factory ToDoList.fromMap(Map<String, dynamic> map) {
+    return ToDoList(
+      id: map['id'],
+      userID: map['userID'],
+      hasDeadline: map['hasDeadline'] == 1 ? true : false,
+      title: map['title'],
+      creationDate: DateFormat('yyyy-MM-dd').parse(map['creationDate']),
+      deadline: DateFormat('yyyy-MM-dd').parse(map['deadline']),
+      totalItems: map['totalItems'],
+      accomplishedItems: map['accomplishedItems'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
