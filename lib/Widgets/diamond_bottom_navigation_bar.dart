@@ -284,7 +284,7 @@ class DiamondBottomNavigation extends StatelessWidget {
                   );
                 },
                 screenWidth: getRelativeWidth(1),
-                screenHeight: getRelativeHeight(1),
+                screenHeight: getRelativeWidth(1),
               ),
             ),
           ],

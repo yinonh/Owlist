@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/home_page.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';

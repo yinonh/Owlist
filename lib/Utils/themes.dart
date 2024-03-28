@@ -14,7 +14,8 @@ final ThemeData lightTheme = ThemeData(
   focusColor: const Color(0xFF864879),
   unselectedWidgetColor: Colors.grey,
   shadowColor: Colors.black,
-  highlightColor: const Color(0xFF9685D9), //Color(0xFF18122B),
+  highlightColor: const Color(0xFF9685D9),
+  //Color(0xFF18122B),
   textTheme: const TextTheme(
     bodySmall: TextStyle(color: Colors.black),
     titleSmall: TextStyle(

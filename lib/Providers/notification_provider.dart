@@ -24,6 +24,7 @@ class NotificationProvider with ChangeNotifier {
   late bool isActive;
   late bool autoNotification;
   Database? _database;
+
   // late BuildContext context;
 
   Future<Database> get database async {

@@ -47,13 +47,15 @@ class _EditableTextViewState extends State<EditableTextView> {
             child: TextField(
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
-              cursorColor: Colors.purpleAccent, // Change cursor color
+              cursorColor: Colors.purpleAccent,
+              // Change cursor color
               style: const TextStyle(
                 color: Colors.white,
               ),
               controller: widget.controller,
               maxLines: 12,
-              textAlign: TextAlign.start, // Align the text to the start (left)
+              textAlign: TextAlign.start,
+              // Align the text to the start (left)
               decoration: const InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.purpleAccent),
@@ -74,7 +76,8 @@ class _EditableTextViewState extends State<EditableTextView> {
           text: widget.controller.text.trim(),
           style: const TextStyle(color: Colors.white),
           linkStyle: const TextStyle(color: Colors.blue),
-          textAlign: TextAlign.start, // Align the text to the start (left)
+          textAlign: TextAlign.start,
+          // Align the text to the start (left)
           linkifiers: const [
             PhoneNumberLinkifier(),
             UrlLinkifier(),

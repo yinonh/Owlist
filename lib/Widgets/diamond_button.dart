@@ -7,6 +7,7 @@ class DiamondButton extends StatelessWidget {
   final Function? onTap;
   final double screenWidth;
   final double screenHeight;
+
   const DiamondButton(
       {required this.icon,
       required this.onTap,

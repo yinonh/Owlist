@@ -8,9 +8,9 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Screens/statistics_screen.dart';
-import '../Utils/strings.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 import '../main.dart';
 
 class Settings extends StatefulWidget {

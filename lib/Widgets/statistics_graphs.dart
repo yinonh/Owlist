@@ -5,6 +5,7 @@ import '../Utils/strings.dart';
 
 class StatisticsGraphs extends StatefulWidget {
   final Map<String, int> statistics;
+
   const StatisticsGraphs({Key? key, required this.statistics})
       : super(key: key);
 

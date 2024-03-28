@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../Providers/lists_provider.dart';
-import '../Utils/strings.dart';
 import '../Models/to_do_list.dart';
+import '../Providers/lists_provider.dart';
 import '../Screens/single_list_screen.dart';
+import '../Utils/strings.dart';
 import 'date_picker.dart';
 
 class ToDoItemTile extends StatefulWidget {

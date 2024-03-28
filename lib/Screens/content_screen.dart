@@ -12,6 +12,7 @@ import '../Widgets/editable_text_view.dart';
 class ContentScreen extends StatefulWidget {
   static const routeName = '/content';
   final String id;
+
   const ContentScreen({Key? key, required this.id}) : super(key: key);
 
   @override
