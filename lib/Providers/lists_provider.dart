@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
@@ -14,6 +18,7 @@ import '../Models/to_do_list.dart';
 import '../Providers/notification_provider.dart';
 import '../Screens/home_page.dart';
 import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
@@ -37,7 +42,7 @@ class ListsProvider extends ChangeNotifier {
     selectedOption = SortBy.values[index];
     notificationProvider =
         Provider.of<NotificationProvider>(context, listen: false);
-    await notificationProvider.setUpNotifications(context);
+    await notificationProvider.setUpNotifications();
   }
 
   Future<Database> get database async {
@@ -342,6 +347,24 @@ class ListsProvider extends ChangeNotifier {
     }
   }
 
+  Future<String> getRandomNotificationText(String languageCode) async {
+    List<String> notificationOptions = [
+      context.translate(Strings.hurryUpTomorrowsDeadline),
+      context.translate(Strings.reminderTomorrowsTheDeadline),
+      context.translate(Strings.finalCallTaskDueTomorrow),
+      context.translate(Strings.deadlineAlertDueTomorrow),
+      context.translate(Strings.timesRunningOutDueTomorrow),
+      context.translate(Strings.dontForgetDueTomorrow),
+      context.translate(Strings.lastDayReminderDueTomorrow),
+      context.translate(Strings.actNowTomorrowsDeadline),
+      context.translate(Strings.urgentReminderDueTomorrow),
+      context.translate(Strings.justOneDayLeftDeadlineTomorrow)
+    ];
+    final random = Random();
+    final index = random.nextInt(notificationOptions.length);
+    return notificationOptions[index];
+  }
+
   Future<PairResult> createNewList(
       String title, DateTime deadline, bool hasDeadline) async {
     String newListId = Uuid().v4();
@@ -365,9 +388,15 @@ class ListsProvider extends ChangeNotifier {
       if (newList.hasDeadline) {
         notificationProvider.isAndroidPermissionGranted();
         notificationProvider.requestPermissions();
+        String notificationText = await getRandomNotificationText(
+            (SharedPreferencesHelper.instance.selectedLanguage ??
+                        Localizations.localeOf(context).languageCode) !=
+                    'he'
+                ? 'en'
+                : 'he');
         return PairResult(
-            await notificationProvider
-                .addNotificationDayBeforeDeadline(newList),
+            await notificationProvider.addNotificationDayBeforeDeadline(
+                newList, notificationText),
             newListId);
       }
     } catch (error) {
@@ -500,7 +529,7 @@ class ListsProvider extends ChangeNotifier {
           await notificationProvider.getNotificationsByListId(list.id);
       for (var notification in notifications) {
         if (newDeadline.isBefore(notification.notificationDateTime)) {
-          notificationProvider.disableNotificationById(notification);
+          notificationProvider.disableNotificationById(notification, list);
           notificationDisabled = true;
         }
       }

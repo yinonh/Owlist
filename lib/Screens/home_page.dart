@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/single_list_screen.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -60,6 +61,8 @@ class _HomePageState extends State<HomePage> {
     currentIndex = 0;
     selectedIndex = PageController(initialPage: 0);
     Provider.of<ListsProvider>(context, listen: false).initialization(context);
+    Provider.of<NotificationProvider>(context, listen: false)
+        .setUpNotifications();
     activeItemsFuture =
         Provider.of<ListsProvider>(context, listen: false).getActiveItems();
     achievedItemsFuture =
@@ -107,7 +110,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void addItem(String title, DateTime deadline, bool hasDeadline) {
+  Future<void> addItem(
+      String title, DateTime deadline, bool hasDeadline) async {
     // TODO: fix the bug when the new list added
     setState(() {
       if (hasDeadline) {

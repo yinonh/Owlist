@@ -4,6 +4,7 @@ import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
+import 'package:to_do/Models/to_do_list.dart';
 
 import '../Models/notification.dart';
 import '../Models/to_do_item.dart';
@@ -189,8 +190,7 @@ class ItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleItemDone(
-      String itemId, String listId, bool isDone, BuildContext context) async {
+  Future<void> toggleItemDone(ToDoList list, BuildContext context) async {
     try {
       // Open or create the SQLite database
       final Database db = await database;
@@ -200,7 +200,7 @@ class ItemProvider extends ChangeNotifier {
         'todo_items',
         columns: ['done'],
         where: 'id = ?',
-        whereArgs: [itemId],
+        whereArgs: [list.id],
       );
 
       if (result.isNotEmpty) {
@@ -211,7 +211,7 @@ class ItemProvider extends ChangeNotifier {
           'todo_items',
           {'done': currentDoneValue ? 0 : 1},
           where: 'id = ?',
-          whereArgs: [itemId],
+          whereArgs: [list.id],
         );
 
         // Fetch the list data to update 'accomplishedItems'
@@ -219,7 +219,7 @@ class ItemProvider extends ChangeNotifier {
           'todo_lists',
           columns: ['accomplishedItems', 'totalItems'],
           where: 'id = ?',
-          whereArgs: [listId],
+          whereArgs: [list.id],
         );
 
         if (listResult.isNotEmpty) {
@@ -235,9 +235,9 @@ class ItemProvider extends ChangeNotifier {
             NotificationProvider notificationProvider =
                 Provider.of<NotificationProvider>(context, listen: false);
             List<Notifications> notifications =
-                await notificationProvider.getNotificationsByListId(listId);
+                await notificationProvider.getNotificationsByListId(list.id);
             notifications.forEach((notification) {
-              notificationProvider.disableNotificationById(notification);
+              notificationProvider.disableNotificationById(notification, list);
             });
           }
 
@@ -246,7 +246,7 @@ class ItemProvider extends ChangeNotifier {
             'todo_lists',
             {'accomplishedItems': accomplishedItems},
             where: 'id = ?',
-            whereArgs: [listId],
+            whereArgs: [list.id],
           );
 
           notifyListeners();

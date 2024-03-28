@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/home_page.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -41,7 +42,6 @@ class _SingleListScreenState extends State<SingleListScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<ListsProvider>(context, listen: false).initialization(context);
     initListDate();
     editMode = false;
   }
@@ -194,13 +194,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
     toggleEditMode();
   }
 
-  void checkItem(String id, String listId, bool done) {
+  void checkItem(ToDoList list) {
     Provider.of<ItemProvider>(context, listen: false)
-        .toggleItemDone(id, listId, done, context);
+        .toggleItemDone(list, context);
     List<ToDoItem> temp = List.from(currentList);
 
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].id == id) {
+      if (temp[i].id == list.id) {
         temp[i].done = !temp[i].done;
         break;
       }

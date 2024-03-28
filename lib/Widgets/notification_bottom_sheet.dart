@@ -215,7 +215,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       leading: IconButton(
         onPressed: !list.isAchieved
             ? () => Provider.of<NotificationProvider>(context, listen: false)
-                .toggleNotificationDisabled(notification)
+                .toggleNotificationDisabled(notification, list)
             : null,
         icon: Icon(
           notification.disabled

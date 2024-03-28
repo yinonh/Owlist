@@ -160,8 +160,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                       value: widget.item.done,
                       onChanged: (value) {
                         setState(() {
-                          widget.checkItem(widget.item.id, widget.item.listId,
-                              widget.item.done);
+                          widget.checkItem(widget.item);
                         });
                       },
                     ),
