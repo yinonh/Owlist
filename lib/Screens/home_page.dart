@@ -123,10 +123,10 @@ class _HomePageState extends State<HomePage> {
             if (result.success) {
               showMessage(context.translate(Strings.scheduleNotification),
                   Icons.notification_add_rounded);
-              if (result.data != null) {
-                Navigator.pushNamed(context, SingleListScreen.routeName,
-                    arguments: result.data);
-              }
+            }
+            if (result.data != null) {
+              Navigator.pushNamed(context, SingleListScreen.routeName,
+                  arguments: result.data);
             }
             return provider.getActiveItems();
           });

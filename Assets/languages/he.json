@@ -74,5 +74,6 @@
   "Time": "בשעה",
   "Set a reminder one day before the deadline" :"קבע התראה יום לפני התאריך האחרון",
   "Edit list": "ערוך רשימה",
-  "There is no deadline": "אין תאריך אחרון"
+  "There is no deadline": "אין תאריך אחרון",
+  "List must have a title": "הוסף כותרת לרשימה"
 }

@@ -74,5 +74,6 @@
   "Time": "Time",
   "Set a reminder one day before the deadline": "Set a reminder one day before the deadline",
   "Edit list": "Edit list",
-  "There is no deadline": "There is no deadline"
+  "There is no deadline": "There is no deadline",
+  "List must have a title": "List must have a title"
 }

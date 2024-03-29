@@ -66,6 +66,7 @@ class Strings {
   static String enterListTitle = "Enter list title";
   static String checkForAddingDeadline = "Check for adding deadline";
   static String save = "Save";
+  static String listMustHaveTitle = "List must have a title";
 
   // Settings widget
   static String allTheChangesWillTakeEffectFromNowOnOnly =

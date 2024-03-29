@@ -15,6 +15,7 @@ class DiamondBottomNavigation extends StatelessWidget {
   final Color bgColor;
   final Function addItem;
   bool hasDeadline = true;
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   DiamondBottomNavigation({
     Key? key,
@@ -186,24 +187,37 @@ class DiamondBottomNavigation extends StatelessWidget {
                             return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                TextFormField(
-                                  style:
-                                      Theme.of(context).textTheme.headlineSmall,
-                                  autofocus: true,
-                                  controller: newTitle,
-                                  maxLength: 25,
-                                  decoration: InputDecoration(
-                                    hintText: context.translate(Strings.title),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Theme.of(context).dividerColor),
+                                Form(
+                                  key: _formKey,
+                                  child: TextFormField(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                    autofocus: true,
+                                    controller: newTitle,
+                                    maxLength: 25,
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          context.translate(Strings.title),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).dividerColor),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).dividerColor),
+                                      ),
                                     ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Theme.of(context).dividerColor),
-                                    ),
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return context.translate(
+                                            Strings.listMustHaveTitle);
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ),
                                 FittedBox(
@@ -268,11 +282,12 @@ class DiamondBottomNavigation extends StatelessWidget {
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
                                   onPressed: () {
-                                    if (newTitle.text.trim().isNotEmpty) {
+                                    if (_formKey.currentState != null &&
+                                        _formKey.currentState!.validate()) {
                                       addItem(newTitle.text.trim(), newDeadline,
                                           hasDeadline);
+                                      Navigator.of(context).pop();
                                     }
-                                    Navigator.of(context).pop();
                                   },
                                 ),
                               ],
