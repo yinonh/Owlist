@@ -325,7 +325,8 @@ class _SettingsState extends State<Settings> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15.0),
                           child: ElevatedButton(
-                            onPressed: _notificationsActive
+                            onPressed: _notificationsActive &&
+                                    _autoNotificationsActive
                                 ? () {
                                     Navigator.of(context).push(
                                       showPicker(
@@ -348,7 +349,8 @@ class _SettingsState extends State<Settings> {
                                 : null,
                             child: Text(
                               context.translate(Strings.chooseTime),
-                              style: _notificationsActive
+                              style: _notificationsActive &&
+                                      _autoNotificationsActive
                                   ? Theme.of(context)
                                       .primaryTextTheme
                                       .titleMedium!

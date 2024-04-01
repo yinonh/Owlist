@@ -144,7 +144,7 @@ class ListsProvider extends ChangeNotifier {
               'listId': list.id,
               'notificationIndex': map['notificationIndex'],
               'notificationDateTime': notificationDateTime,
-              'disabled': 0,
+              'disabled': 1,
             });
           }
           // Remove notificationIndex from todo_lists
@@ -155,17 +155,6 @@ class ListsProvider extends ChangeNotifier {
           ''');
           await db.execute('DROP TABLE todo_lists;');
           await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists;');
-        }
-        final List<Map<String, dynamic>> lists = await db.rawQuery('''
-    SELECT *
-    FROM todo_lists
-    WHERE hasDeadline = 1
-      AND (accomplishedItems < totalItems OR totalItems = 0)
-      AND deadline > ?
-  ''', [DateTime.now().toIso8601String()]);
-        for (final map in lists) {
-          ToDoList list = ToDoList.fromMap(map);
-          notificationProvider.scheduleNotification(list);
         }
       },
       version: int.parse(dotenv.env['DBVERSION']!),

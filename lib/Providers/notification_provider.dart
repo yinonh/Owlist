@@ -311,8 +311,7 @@ class NotificationProvider with ChangeNotifier {
           android: AndroidNotificationDetails(
             'main_channel_id',
             'Deadline notifications',
-            channelDescription:
-                'Notification scheduled for one day before the deadline',
+            channelDescription: 'Notification for the lists',
             channelShowBadge: false,
           ),
         ),
