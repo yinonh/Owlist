@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
@@ -33,6 +35,12 @@ class _ContentScreenState extends State<ContentScreen> {
     super.initState();
     titleEditMode = false;
     _getItem();
+    if (ShowCaseHelper.instance.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 400),
+            () => ShowCaseHelper.instance.startShowCaseContentAdded(context));
+      });
+    }
   }
 
   void _getItem() async {

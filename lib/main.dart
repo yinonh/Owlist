@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../Providers/notification_provider.dart';
 import './Providers/item_provider.dart';
@@ -18,6 +19,7 @@ import './Screens/statistics_screen.dart';
 import './Utils/l10n/app_localizations.dart';
 import './Utils/shared_preferences_helper.dart';
 import './Utils/themes.dart';
+import 'Utils/show_case_helper.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -175,8 +177,15 @@ class _OwlistAppState extends State<OwlistApp> {
             case SingleListScreen.routeName:
               {
                 return MaterialPageRoute(builder: (context) {
-                  return SingleListScreen(
-                    listId: settings.arguments as String,
+                  return ShowCaseWidget(
+                    onComplete: (_, __) {
+                      ShowCaseHelper.instance.listShowCaseSteps++;
+                    },
+                    builder: Builder(builder: (context) {
+                      return SingleListScreen(
+                        listId: settings.arguments as String,
+                      );
+                    }),
                   );
                 });
               }
@@ -187,7 +196,11 @@ class _OwlistAppState extends State<OwlistApp> {
                     settings.arguments as Map<String, dynamic>;
 
                 return MaterialPageRoute(builder: (context) {
-                  return ContentScreen(id: args['id'] as String);
+                  return ShowCaseWidget(onComplete: (_, __) {
+                    ShowCaseHelper.instance.contentShowCaseSteps++;
+                  }, builder: Builder(builder: (context) {
+                    return ContentScreen(id: args['id'] as String);
+                  }));
                 });
               }
           }

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Screens/single_list_screen.dart';
+import 'package:to_do/Utils/show_case_helper.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -15,6 +17,7 @@ import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Widgets/settigns_widget.dart';
+import '../main.dart';
 
 enum SortBy {
   creationNTL,
@@ -42,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
+  final keyOne = GlobalKey();
 
   @override
   void didChangeDependencies() {
@@ -112,7 +116,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> addItem(
       String title, DateTime deadline, bool hasDeadline) async {
-    // TODO: fix the bug when the new list added
     setState(() {
       if (hasDeadline) {
         onItemTapped(0);
@@ -172,226 +175,264 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     provider = Provider.of<ListsProvider>(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      bottomNavigationBar: DiamondBottomNavigation(
-        itemIcons: const [
-          Icons.checklist_rounded,
-          Icons.archive_rounded,
-          Icons.watch_off_rounded,
-          Icons.settings_rounded,
-        ],
-        addItem: addItem,
-        selectedIndex: currentIndex,
-        onItemPressed: onItemTapped,
-        bgColor: Theme.of(context).primaryColor,
-        selectedColor: Theme.of(context).focusColor,
-        unselectedColor: Theme.of(context).unselectedWidgetColor,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).primaryColorLight,
-              Theme.of(context).primaryColorDark
-            ],
+    return ShowCaseWidget(
+      builder: Builder(builder: (cnx) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
+          bottomNavigationBar: ShowCaseHelper.instance.customShowCase(
+            key: ShowCaseHelper.instance.addListKey,
+            description: ShowCaseHelper.instance.addListDescription,
+            context: context,
+            child: DiamondBottomNavigation(
+              itemIcons: const [
+                Icons.checklist_rounded,
+                Icons.archive_rounded,
+                Icons.watch_off_rounded,
+                Icons.settings_rounded,
+              ],
+              addItem: addItem,
+              selectedIndex: currentIndex,
+              onItemPressed: onItemTapped,
+              bgColor: Theme.of(context).primaryColor,
+              selectedColor: Theme.of(context).focusColor,
+              unselectedColor: Theme.of(context).unselectedWidgetColor,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                child: Row(
-                  textDirection: TextDirection.ltr,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Center(
-                      child: SvgPicture.asset(
-                        'Assets/appName.svg',
-                        fit: BoxFit.contain,
-                        width: 170,
-                      ),
-                    ),
-                    currentIndex == 3
-                        ? const Text(
-                            " ",
-                            style: TextStyle(fontSize: 33),
-                          )
-                        : PopupMenuButton<SortBy>(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10.0),
-                              ),
-                            ),
-                            icon: const Icon(Icons.filter_list_rounded),
-                            onSelected: (value) async {
-                              provider.selectedOptionVal = value;
-                              await SharedPreferencesHelper.instance
-                                  .setSortByIndex(SortBy.values.indexOf(value));
-                              await refreshLists();
-                            },
-                            itemBuilder: (BuildContext cnx) => [
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.creationNTL,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.creationNTL,
-                                child: Text(
-                                  context.translate(
-                                      Strings.creationDateNewestToOldest),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.creationLTN,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.creationLTN,
-                                child: Text(
-                                  context.translate(
-                                      Strings.creationDateOldestToNewest),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.deadlineLTN,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.deadlineLTN,
-                                child: Text(
-                                  context
-                                      .translate(Strings.deadlineLaterToSooner),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.deadlineNTL,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.deadlineNTL,
-                                child: Text(
-                                  context
-                                      .translate(Strings.deadlineSoonerToLater),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.progressBTS,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.progressBTS,
-                                child: Text(
-                                  context.translate(Strings.progressHighToLow),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              CheckedPopupMenuItem<SortBy>(
-                                value: SortBy.progressSTB,
-                                checked: provider.selectedOptionVal ==
-                                    SortBy.progressSTB,
-                                child: Text(
-                                  context.translate(Strings.progressLowToHigh),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                            ],
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).primaryColorLight,
+                  Theme.of(context).primaryColorDark
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+                    child: Row(
+                      textDirection: TextDirection.ltr,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Center(
+                          child: SvgPicture.asset(
+                            'Assets/appName.svg',
+                            fit: BoxFit.contain,
+                            width: 170,
                           ),
-                  ],
-                ),
+                        ),
+                        currentIndex == 3
+                            ? Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: IconButton(
+                                  icon: Icon(
+                                    ShowCaseHelper.instance.isActive
+                                        ? Icons.pause_circle_outline_rounded
+                                        : Icons.help_outline_rounded,
+                                  ),
+                                  onPressed: () {
+                                    if (ShowCaseHelper.instance.isActive) {
+                                      setState(() {
+                                        ShowCaseHelper.instance.isActive =
+                                            false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        ShowCaseHelper.instance.isActive = true;
+                                      });
+                                      ShowCaseHelper.instance
+                                          .startShowCaseBeginning(cnx);
+                                    }
+                                  },
+                                ),
+                              )
+                            : PopupMenuButton<SortBy>(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.filter_list_rounded),
+                                onSelected: (value) async {
+                                  provider.selectedOptionVal = value;
+                                  await SharedPreferencesHelper.instance
+                                      .setSortByIndex(
+                                          SortBy.values.indexOf(value));
+                                  await refreshLists();
+                                },
+                                itemBuilder: (BuildContext cnx) => [
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.creationNTL,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.creationNTL,
+                                    child: Text(
+                                      context.translate(
+                                          Strings.creationDateNewestToOldest),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.creationLTN,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.creationLTN,
+                                    child: Text(
+                                      context.translate(
+                                          Strings.creationDateOldestToNewest),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.deadlineLTN,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.deadlineLTN,
+                                    child: Text(
+                                      context.translate(
+                                          Strings.deadlineLaterToSooner),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.deadlineNTL,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.deadlineNTL,
+                                    child: Text(
+                                      context.translate(
+                                          Strings.deadlineSoonerToLater),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.progressBTS,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.progressBTS,
+                                    child: Text(
+                                      context
+                                          .translate(Strings.progressHighToLow),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                  CheckedPopupMenuItem<SortBy>(
+                                    value: SortBy.progressSTB,
+                                    checked: provider.selectedOptionVal ==
+                                        SortBy.progressSTB,
+                                    child: Text(
+                                      context
+                                          .translate(Strings.progressLowToHigh),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Expanded(
+                    child: PageView(
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                      controller: selectedIndex,
+                      children: [
+                        FutureBuilder<List<ToDoList>>(
+                          key: const PageStorageKey(1),
+                          future: activeItemsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return Text(
+                                context.translate(Strings.errorHasOccurred),
+                                style: const TextStyle(color: Colors.white),
+                              );
+                            } else {
+                              return ItemsScreen(
+                                selectedIndex: 0,
+                                existingItems: snapshot.data!,
+                                deleteItem: deleteList,
+                                refresh: refreshLists,
+                                title: titles[currentIndex],
+                              );
+                            }
+                          },
+                        ),
+                        FutureBuilder<List<ToDoList>>(
+                          key: const PageStorageKey(2),
+                          future: achievedItemsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text(
+                                context.translate(Strings.errorHasOccurred),
+                                style: const TextStyle(color: Colors.white),
+                              );
+                            } else {
+                              return ItemsScreen(
+                                selectedIndex: 1,
+                                existingItems: snapshot.data!,
+                                deleteItem: deleteList,
+                                refresh: refreshLists,
+                                title: titles[currentIndex],
+                              );
+                            }
+                          },
+                        ),
+                        FutureBuilder<List<ToDoList>>(
+                          key: const PageStorageKey(3),
+                          future: withoutDeadlineItemsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text(
+                                context.translate(Strings.errorHasOccurred),
+                                style: const TextStyle(color: Colors.white),
+                              );
+                            } else {
+                              return ItemsScreen(
+                                selectedIndex: 1,
+                                existingItems: snapshot.data!,
+                                deleteItem: deleteList,
+                                refresh: refreshLists,
+                                title: titles[currentIndex],
+                              );
+                            }
+                          },
+                        ),
+                        const Settings(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16.0),
-              Expanded(
-                child: PageView(
-                  onPageChanged: (index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                  controller: selectedIndex,
-                  children: [
-                    FutureBuilder<List<ToDoList>>(
-                      key: const PageStorageKey(1),
-                      future: activeItemsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          print(snapshot.error);
-                          return Text(
-                            context.translate(Strings.errorHasOccurred),
-                            style: const TextStyle(color: Colors.white),
-                          );
-                        } else {
-                          return ItemsScreen(
-                            selectedIndex: 0,
-                            existingItems: snapshot.data!,
-                            deleteItem: deleteList,
-                            refresh: refreshLists,
-                            title: titles[currentIndex],
-                          );
-                        }
-                      },
-                    ),
-                    FutureBuilder<List<ToDoList>>(
-                      key: const PageStorageKey(2),
-                      future: achievedItemsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            context.translate(Strings.errorHasOccurred),
-                            style: const TextStyle(color: Colors.white),
-                          );
-                        } else {
-                          return ItemsScreen(
-                            selectedIndex: 1,
-                            existingItems: snapshot.data!,
-                            deleteItem: deleteList,
-                            refresh: refreshLists,
-                            title: titles[currentIndex],
-                          );
-                        }
-                      },
-                    ),
-                    FutureBuilder<List<ToDoList>>(
-                      key: const PageStorageKey(3),
-                      future: withoutDeadlineItemsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            context.translate(Strings.errorHasOccurred),
-                            style: const TextStyle(color: Colors.white),
-                          );
-                        } else {
-                          return ItemsScreen(
-                            selectedIndex: 1,
-                            existingItems: snapshot.data!,
-                            deleteItem: deleteList,
-                            refresh: refreshLists,
-                            title: titles[currentIndex],
-                          );
-                        }
-                      },
-                    ),
-                    const Settings(),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

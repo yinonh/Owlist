@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:to_do/Screens/home_page.dart';
+import 'package:to_do/Utils/show_case_helper.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -43,6 +45,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
     super.initState();
     initListDate();
     editMode = false;
+    if (ShowCaseHelper.instance.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 400),
+            () => ShowCaseHelper.instance.startShowCaseListAdded(context));
+      });
+    }
   }
 
   void initListDate() async {
@@ -193,13 +201,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
     toggleEditMode();
   }
 
-  void checkItem(ToDoList list) {
+  void checkItem(ToDoItem item) async {
     Provider.of<ItemProvider>(context, listen: false)
-        .toggleItemDone(list, context);
+        .toggleItemDone(item, context);
     List<ToDoItem> temp = List.from(currentList);
 
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].id == list.id) {
+      if (temp[i].id == item.id) {
         temp[i].done = !temp[i].done;
         break;
       }
@@ -220,8 +228,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return NotificationBottomSheet(
-          listId: list!.id,
+        return ShowCaseWidget(
+          builder: Builder(builder: (context) {
+            return NotificationBottomSheet(
+              listId: list!.id,
+            );
+          }),
         );
       },
     );
@@ -277,26 +289,33 @@ class _SingleListScreenState extends State<SingleListScreen> {
                   : () {},
               finalButtonIcon: Icon(Icons.close_rounded),
             )
-          : UnicornDialer(
-              backgroundColor: Colors.transparent,
-              parentButton: Icon(
-                Icons.add_rounded,
-                color: Theme.of(context).primaryColor,
-                size: MediaQuery.of(context).size.width * 0.13,
-              ),
-              childButtons:
-                  (SharedPreferencesHelper.instance.notificationActive ?? true)
-                      ? childButtons
-                      : [],
-              onMainButtonPressed:
-                  (SharedPreferencesHelper.instance.notificationActive ?? true)
-                      ? () {}
-                      : () {
-                          _showNewItemDialog(context);
-                        },
-              finalButtonIcon: Icon(
-                Icons.close_rounded,
-                color: Theme.of(context).primaryColor,
+          : ShowCaseHelper.instance.customShowCase(
+              key: ShowCaseHelper.instance.addItemKey,
+              description: ShowCaseHelper.instance.addItemDescription,
+              showArrow: false,
+              context: context,
+              overlayOpacity: 0,
+              child: UnicornDialer(
+                backgroundColor: Colors.transparent,
+                parentButton: Icon(
+                  Icons.add_rounded,
+                  color: Theme.of(context).primaryColor,
+                  size: MediaQuery.of(context).size.width * 0.13,
+                ),
+                childButtons:
+                    (SharedPreferencesHelper.instance.notificationActive)
+                        ? childButtons
+                        : [],
+                onMainButtonPressed:
+                    (SharedPreferencesHelper.instance.notificationActive)
+                        ? () {}
+                        : () {
+                            _showNewItemDialog(context);
+                          },
+                finalButtonIcon: Icon(
+                  Icons.close_rounded,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -401,9 +420,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                         _save();
                                       },
                               )
-                            : IconButton(
-                                icon: const Icon(Icons.edit_rounded),
-                                onPressed: toggleEditMode,
+                            : ShowCaseHelper.instance.customShowCase(
+                                key: ShowCaseHelper.instance.editList,
+                                description:
+                                    ShowCaseHelper.instance.editListDescription,
+                                targetShapeBorder: CircleBorder(),
+                                context: context,
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit_rounded),
+                                  onPressed: toggleEditMode,
+                                ),
                               ),
                       ],
                     ),

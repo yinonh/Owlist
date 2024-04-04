@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
+import '../Utils/show_case_helper.dart';
 import '../Widgets/custom_floationg_action_button.dart';
 
 class UnicornButton {
@@ -202,9 +204,6 @@ class _UnicornDialer extends State<UnicornDialer>
                   child: widget.childButtons[index].currentButton.child);
 
               return Positioned(
-                // right:
-                //     widget.childButtons[index].currentButton.mini ? 4.0 : 0.0,
-                // bottom: ((widget.childButtons.length - index) * 55.0) + 15,
                 bottom: MediaQuery.of(context).size.height * 0.1,
                 right: MediaQuery.of(context).size.width / 2 -
                     24.0 -
@@ -235,8 +234,8 @@ class _UnicornDialer extends State<UnicornDialer>
 
       var unicornDialWidget = Container(
         margin: null,
-        height: double.infinity,
-        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.3,
+        width: MediaQuery.of(context).size.height * 0.5,
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: childButtonsList.cast<Widget>().toList()

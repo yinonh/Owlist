@@ -9,6 +9,7 @@ import 'package:to_do/Models/to_do_list.dart';
 import '../Models/notification.dart';
 import '../Models/to_do_item.dart';
 import '../Providers/notification_provider.dart';
+import '../Providers/lists_provider.dart';
 
 class ItemProvider extends ChangeNotifier {
   Database? _database;
@@ -190,8 +191,11 @@ class ItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleItemDone(ToDoList list, BuildContext context) async {
+  Future<void> toggleItemDone(ToDoItem item, BuildContext context) async {
     try {
+      ToDoList? list = await Provider.of<ListsProvider>(context, listen: false)
+          .getListById(item.listId);
+      if (list == null) return;
       // Open or create the SQLite database
       final Database db = await database;
 
@@ -200,7 +204,7 @@ class ItemProvider extends ChangeNotifier {
         'todo_items',
         columns: ['done'],
         where: 'id = ?',
-        whereArgs: [list.id],
+        whereArgs: [item.id],
       );
 
       if (result.isNotEmpty) {
@@ -211,7 +215,7 @@ class ItemProvider extends ChangeNotifier {
           'todo_items',
           {'done': currentDoneValue ? 0 : 1},
           where: 'id = ?',
-          whereArgs: [list.id],
+          whereArgs: [item.id],
         );
 
         // Fetch the list data to update 'accomplishedItems'
