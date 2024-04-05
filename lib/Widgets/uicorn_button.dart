@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-import '../Utils/show_case_helper.dart';
 import '../Widgets/custom_floationg_action_button.dart';
 
 class UnicornButton {

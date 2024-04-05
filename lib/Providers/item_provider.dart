@@ -8,8 +8,8 @@ import 'package:to_do/Models/to_do_list.dart';
 
 import '../Models/notification.dart';
 import '../Models/to_do_item.dart';
-import '../Providers/notification_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../Providers/notification_provider.dart';
 
 class ItemProvider extends ChangeNotifier {
   Database? _database;

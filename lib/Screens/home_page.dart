@@ -17,7 +17,6 @@ import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Widgets/settigns_widget.dart';
-import '../main.dart';
 
 enum SortBy {
   creationNTL,
@@ -236,18 +235,11 @@ class _HomePageState extends State<HomePage> {
                                         : Icons.help_outline_rounded,
                                   ),
                                   onPressed: () {
-                                    if (ShowCaseHelper.instance.isActive) {
-                                      setState(() {
-                                        ShowCaseHelper.instance.isActive =
-                                            false;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        ShowCaseHelper.instance.isActive = true;
-                                      });
-                                      ShowCaseHelper.instance
-                                          .startShowCaseBeginning(cnx);
-                                    }
+                                    setState(() {
+                                      ShowCaseHelper.instance.toggleIsActive();
+                                    });
+                                    ShowCaseHelper.instance
+                                        .startShowCaseBeginning(cnx);
                                   },
                                 ),
                               )

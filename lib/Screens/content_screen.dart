@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:showcaseview/showcaseview.dart';
 
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
@@ -218,14 +217,22 @@ class _ContentScreenState extends State<ContentScreen> {
                               GestureDetector(
                                 onLongPress: toggleTextEditMode,
                                 onDoubleTap: toggleTextEditMode,
-                                child: EditableTextView(
-                                  initialText: _item.content.trim().isEmpty
-                                      ? context
-                                          .translate(Strings.addSomeContent)
-                                      : _item.content.trim(),
-                                  isEditMode: textEditMode,
-                                  toggleEditMode: toggleTextEditMode,
-                                  controller: textEditingController,
+                                child: ShowCaseHelper.instance.customShowCase(
+                                  key: ShowCaseHelper.instance.addContentKey,
+                                  description: ShowCaseHelper
+                                      .instance.contentDescription,
+                                  context: context,
+                                  overlayOpacity: 0,
+                                  showArrow: false,
+                                  child: EditableTextView(
+                                    initialText: _item.content.trim().isEmpty
+                                        ? context
+                                            .translate(Strings.addSomeContent)
+                                        : _item.content.trim(),
+                                    isEditMode: textEditMode,
+                                    toggleEditMode: toggleTextEditMode,
+                                    controller: textEditingController,
+                                  ),
                                 ),
                               )
                             ],

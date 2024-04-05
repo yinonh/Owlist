@@ -229,6 +229,13 @@ class _SingleListScreenState extends State<SingleListScreen> {
       context: context,
       builder: (BuildContext context) {
         return ShowCaseWidget(
+          onComplete: (index, __) {
+            ShowCaseHelper.instance.notificationsShowCaseSteps++;
+          },
+          onFinish: () {
+            ShowCaseHelper.instance.notificationsShowCaseSteps++;
+            ShowCaseHelper.instance.isShowCaseDone();
+          },
           builder: Builder(builder: (context) {
             return NotificationBottomSheet(
               listId: list!.id,
@@ -424,6 +431,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                 key: ShowCaseHelper.instance.editList,
                                 description:
                                     ShowCaseHelper.instance.editListDescription,
+                                onTargetClick: () {},
+                                disposeOnTap: true,
                                 targetShapeBorder: CircleBorder(),
                                 context: context,
                                 child: IconButton(

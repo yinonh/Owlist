@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:showcaseview/showcaseview.dart';
-import 'package:to_do/Utils/show_case_helper.dart';
 
 class DiamondButton extends StatelessWidget {
   final Icon icon;
@@ -19,11 +17,11 @@ class DiamondButton extends StatelessWidget {
       : super(key: key);
 
   double getRelativeHeight(double percentage) {
-    return percentage * screenHeight;
+    return 50; //percentage * screenHeight;
   }
 
   double getRelativeWidth(double percentage) {
-    return percentage * screenWidth;
+    return 50; //percentage * screenWidth;
   }
 
   @override
@@ -61,8 +59,8 @@ class DiamondButton extends StatelessWidget {
                   ],
                 ),
               ),
-              height: getRelativeWidth(0.15),
-              width: getRelativeWidth(0.15),
+              height: 50, //getRelativeWidth(0.15),
+              width: 50, //getRelativeWidth(0.15),
               child: Center(
                 child: Transform.rotate(
                   angle: math.pi / 4,

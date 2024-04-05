@@ -176,18 +176,26 @@ class _OwlistAppState extends State<OwlistApp> {
           switch (settings.name) {
             case SingleListScreen.routeName:
               {
-                return MaterialPageRoute(builder: (context) {
-                  return ShowCaseWidget(
-                    onComplete: (_, __) {
-                      ShowCaseHelper.instance.listShowCaseSteps++;
-                    },
-                    builder: Builder(builder: (context) {
-                      return SingleListScreen(
-                        listId: settings.arguments as String,
-                      );
-                    }),
-                  );
-                });
+                return MaterialPageRoute(
+                  builder: (context) {
+                    return ShowCaseWidget(
+                      onComplete: (index, __) {
+                        ShowCaseHelper.instance.listShowCaseSteps++;
+                      },
+                      onFinish: () {
+                        ShowCaseHelper.instance.listShowCaseSteps++;
+                        ShowCaseHelper.instance.isShowCaseDone();
+                      },
+                      builder: Builder(
+                        builder: (context) {
+                          return SingleListScreen(
+                            listId: settings.arguments as String,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
               }
             case ContentScreen.routeName:
               {
@@ -196,11 +204,23 @@ class _OwlistAppState extends State<OwlistApp> {
                     settings.arguments as Map<String, dynamic>;
 
                 return MaterialPageRoute(builder: (context) {
-                  return ShowCaseWidget(onComplete: (_, __) {
-                    ShowCaseHelper.instance.contentShowCaseSteps++;
-                  }, builder: Builder(builder: (context) {
-                    return ContentScreen(id: args['id'] as String);
-                  }));
+                  return ShowCaseWidget(
+                    onStart: (_, __) {
+                      ShowCaseHelper.instance.contentShowCaseSteps = 0;
+                    },
+                    onComplete: (index, __) {
+                      ShowCaseHelper.instance.contentShowCaseSteps++;
+                    },
+                    onFinish: () {
+                      ShowCaseHelper.instance.contentShowCaseSteps++;
+                      ShowCaseHelper.instance.isShowCaseDone();
+                    },
+                    builder: Builder(
+                      builder: (context) {
+                        return ContentScreen(id: args['id'] as String);
+                      },
+                    ),
+                  );
                 });
               }
           }
