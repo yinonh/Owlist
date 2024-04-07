@@ -44,8 +44,10 @@ class ShowCaseHelper {
     );
   }
 
-  void toggleIsActive() {
-    if (instance.isActive) {
+  void toggleIsActive([bool? state]) {
+    if (state != null) {
+      instance.isActive = state;
+    } else if (instance.isActive) {
       instance.isActive = false;
     } else {
       instance.isActive = true;
@@ -54,7 +56,6 @@ class ShowCaseHelper {
     instance.listShowCaseSteps = 0;
     instance.notificationsShowCaseSteps = 0;
     instance.contentShowCaseSteps = 0;
-    print("#######${instance.listShowCaseSteps}");
   }
 
   void isShowCaseDone() {
@@ -62,7 +63,6 @@ class ShowCaseHelper {
         instance.notificationsShowCaseSteps +
         instance.contentShowCaseSteps;
     const totalSteps = 8;
-    print("########## $stepsDone");
     if (stepsDone == totalSteps) {
       instance.isActive = false;
     }
@@ -84,13 +84,16 @@ class ShowCaseHelper {
       "Here you can add text, links and phone numbers content to your items.";
 
   void startShowCaseBeginning(BuildContext context) {
-    ShowCaseWidget.of(context).startShowCase([addListKey]);
+    if (instance.isActive) {
+      ShowCaseWidget.of(context).startShowCase([addListKey]);
+    }
   }
 
   void startShowCaseListAdded(BuildContext context) {
     final listAddedShowCaseList = [editList, addItemKey];
     print("#####${instance.listShowCaseSteps}");
-    if (instance.listShowCaseSteps < listAddedShowCaseList.length) {
+    if (instance.isActive &&
+        instance.listShowCaseSteps < listAddedShowCaseList.length) {
       ShowCaseWidget.of(context).startShowCase(
         listAddedShowCaseList.sublist(instance.listShowCaseSteps),
       );
@@ -102,8 +105,9 @@ class ShowCaseHelper {
       notificationsKey,
       notificationsStatusKey
     ];
-    if (instance.notificationsShowCaseSteps <
-        notificationsShowCaseList.length) {
+    if (instance.isActive &&
+        instance.notificationsShowCaseSteps <
+            notificationsShowCaseList.length) {
       ShowCaseWidget.of(context).startShowCase(
         notificationsShowCaseList.sublist(instance.notificationsShowCaseSteps),
       );
@@ -112,7 +116,8 @@ class ShowCaseHelper {
 
   void startShowCaseContentAdded(BuildContext context) {
     final contentShowCaseList = [addContentKey];
-    if (instance.contentShowCaseSteps < contentShowCaseList.length) {
+    if (instance.isActive &&
+        instance.contentShowCaseSteps < contentShowCaseList.length) {
       ShowCaseWidget.of(context).startShowCase(contentShowCaseList);
     }
   }

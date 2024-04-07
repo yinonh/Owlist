@@ -226,7 +226,22 @@ class _OwlistAppState extends State<OwlistApp> {
           }
         },
         home: selectedNotificationPayload != null
-            ? SingleListScreen(listId: selectedNotificationPayload!)
+            ? ShowCaseWidget(
+                onComplete: (index, __) {
+                  ShowCaseHelper.instance.listShowCaseSteps++;
+                },
+                onFinish: () {
+                  ShowCaseHelper.instance.listShowCaseSteps++;
+                  ShowCaseHelper.instance.isShowCaseDone();
+                },
+                builder: Builder(
+                  builder: (context) {
+                    return SingleListScreen(
+                      listId: selectedNotificationPayload!,
+                    );
+                  },
+                ),
+              )
             : HomePage(),
       ),
     );
