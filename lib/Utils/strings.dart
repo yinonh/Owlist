@@ -114,4 +114,16 @@ class Strings {
   static String notifications = "Notifications";
   static String date = "Date";
   static String time = "Time";
+
+  // ShowCase Helper
+  static String homePageShowCaseDescription = "Home page show case description";
+  static String singleListScreenEditListShowCaseDescription =
+      "Single list screen edit list show case description";
+  static String singleListScreenAddItemShowCaseDescription =
+      "Single list screen add item show case description";
+  static String notificationsShowCaseDescription =
+      "Notifications show case description";
+  static String notificationsStateShowCaseDescription =
+      "Notifications state show case description";
+  static String contentShowCaseDescription = "Content show case description";
 }

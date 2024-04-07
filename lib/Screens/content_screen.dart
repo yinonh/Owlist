@@ -28,6 +28,7 @@ class _ContentScreenState extends State<ContentScreen> {
   bool _isLoading = false;
   bool textEditMode = false;
   bool newTextEmpty = false;
+  final GlobalKey<ScaffoldState> addContentKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -36,8 +37,11 @@ class _ContentScreenState extends State<ContentScreen> {
     _getItem();
     if (ShowCaseHelper.instance.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(milliseconds: 400),
-            () => ShowCaseHelper.instance.startShowCaseContentAdded(context));
+        Future.delayed(
+          Duration(milliseconds: 400),
+          () => ShowCaseHelper.instance
+              .startShowCaseContentAdded(context, [addContentKey]),
+        );
       });
     }
   }
@@ -218,9 +222,9 @@ class _ContentScreenState extends State<ContentScreen> {
                                 onLongPress: toggleTextEditMode,
                                 onDoubleTap: toggleTextEditMode,
                                 child: ShowCaseHelper.instance.customShowCase(
-                                  key: ShowCaseHelper.instance.addContentKey,
-                                  description: ShowCaseHelper
-                                      .instance.contentDescription,
+                                  key: addContentKey,
+                                  description: context.translate(ShowCaseHelper
+                                      .instance.contentShowCaseDescription),
                                   context: context,
                                   overlayOpacity: 0,
                                   showArrow: false,

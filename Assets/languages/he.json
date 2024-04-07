@@ -75,5 +75,11 @@
   "Set a reminder one day before the deadline" :"קבע התראה יום לפני התאריך האחרון",
   "Edit list": "ערוך רשימה",
   "There is no deadline": "אין תאריך אחרון",
-  "List must have a title": "הוסף כותרת לרשימה"
+  "List must have a title": "הוסף כותרת לרשימה",
+  "Home page show case description": "צור רשימה חדשה בקלות. פשוט הקש על כפתור ה+ , הזן כותרת, הגדר תאריך יעד באמצעות סמל התאריך, ושמור.",
+  "Single list screen edit list show case description": "לחץ כאן כדי לערוך את הרשימה. תוכל לערוך את הכותרת, לשנות את מועד הסיום, ולשנות את סדר הפריטים. אל תשכח לשמור את השינויים.",
+  "Single list screen add item show case description": "ניתן להוסיף פריט חדש לרשימה או להגדיר התראות בלחיצה על כפתור ה+.",
+  "Notifications show case description": "כאן תוכל לראות את כל ההתראות שלך לרשימה זו, אפשר להוסיף התראה חדשה ולערוך את הקיימות.",
+  "Notifications state show case description": "לחיצה על אייקון הפעמון תפעיל ותכבה התראה ובנוסף אפשר לראות האם התראה כבר בארכיון.",
+  "Content show case description": "כאן תוכל להוסיף טקסט, לינקים ומספרי טלפון לפריט"
 }

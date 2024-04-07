@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
-  final keyOne = GlobalKey();
+  final GlobalKey<ScaffoldState> addListKey = GlobalKey<ScaffoldState>();
 
   @override
   void didChangeDependencies() {
@@ -179,8 +179,9 @@ class _HomePageState extends State<HomePage> {
         return Scaffold(
           backgroundColor: Theme.of(context).primaryColor,
           bottomNavigationBar: ShowCaseHelper.instance.customShowCase(
-            key: ShowCaseHelper.instance.addListKey,
-            description: ShowCaseHelper.instance.addListDescription,
+            key: addListKey,
+            description: context
+                .translate(ShowCaseHelper.instance.homePageShowCaseDescription),
             context: context,
             child: DiamondBottomNavigation(
               itemIcons: const [
@@ -239,7 +240,8 @@ class _HomePageState extends State<HomePage> {
                                       ShowCaseHelper.instance.toggleIsActive();
                                     });
                                     ShowCaseHelper.instance
-                                        .startShowCaseBeginning(cnx);
+                                        .startShowCaseBeginning(
+                                            cnx, [addListKey]);
                                   },
                                 ),
                               )

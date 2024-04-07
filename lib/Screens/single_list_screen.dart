@@ -39,6 +39,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
   late List<ToDoItem> currentList;
   late List<ToDoItem> editList;
   AnimatedListController itemListController = AnimatedListController();
+  final GlobalKey<ScaffoldState> addItemKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> editItemKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -47,8 +49,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
     editMode = false;
     if (ShowCaseHelper.instance.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(milliseconds: 400),
-            () => ShowCaseHelper.instance.startShowCaseListAdded(context));
+        Future.delayed(
+          Duration(milliseconds: 400),
+          () => ShowCaseHelper.instance
+              .startShowCaseListAdded(context, [editItemKey, addItemKey]),
+        );
       });
     }
   }
@@ -297,8 +302,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
               finalButtonIcon: Icon(Icons.close_rounded),
             )
           : ShowCaseHelper.instance.customShowCase(
-              key: ShowCaseHelper.instance.addItemKey,
-              description: ShowCaseHelper.instance.addItemDescription,
+              key: addItemKey,
+              description: context.translate(ShowCaseHelper
+                  .instance.singleListScreenAddItemShowCaseDescription),
               showArrow: false,
               context: context,
               overlayOpacity: 0,
@@ -428,9 +434,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                       },
                               )
                             : ShowCaseHelper.instance.customShowCase(
-                                key: ShowCaseHelper.instance.editList,
-                                description:
-                                    ShowCaseHelper.instance.editListDescription,
+                                key: editItemKey,
+                                description: context.translate(ShowCaseHelper
+                                    .instance
+                                    .singleListScreenEditListShowCaseDescription),
                                 onTargetClick: () {},
                                 disposeOnTap: true,
                                 targetShapeBorder: CircleBorder(),

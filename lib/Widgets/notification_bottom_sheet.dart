@@ -28,21 +28,29 @@ class NotificationBottomSheet extends StatefulWidget {
 }
 
 class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
+  final GlobalKey<ScaffoldState> notificationsKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> notificationsStatusKey =
+      GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(milliseconds: 400),
-          () => ShowCaseHelper.instance.startShowCaseNotifications(context));
+      Future.delayed(
+        Duration(milliseconds: 400),
+        () => ShowCaseHelper.instance.startShowCaseNotifications(
+            context, [notificationsKey, notificationsStatusKey]),
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return ShowCaseHelper.instance.customShowCase(
-      key: ShowCaseHelper.instance.notificationsKey,
-      description: ShowCaseHelper.instance.notificationsDescription,
+      key: notificationsKey,
+      description: context
+          .translate(ShowCaseHelper.instance.notificationsShowCaseDescription),
       context: context,
       child: Container(
         width: double.infinity,
@@ -134,9 +142,10 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                                     if (index == 0) {
                                       return ShowCaseHelper.instance
                                           .customShowCase(
-                                        key: ShowCaseHelper
-                                            .instance.notificationsStatusKey,
-                                        description: 'hello',
+                                        key: notificationsStatusKey,
+                                        description: context.translate(
+                                            ShowCaseHelper.instance
+                                                .notificationsStateShowCaseDescription),
                                         context: context,
                                         child: _buildNotificationItem(
                                             context, notification, list),
