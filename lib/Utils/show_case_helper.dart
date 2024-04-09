@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'package:to_do/Utils/strings.dart';
+
+import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 
 class ShowCaseHelper {
   ShowCaseHelper._();
+
   bool isActive = false;
   int listShowCaseSteps = 0;
   int notificationsShowCaseSteps = 0;
@@ -56,8 +59,10 @@ class ShowCaseHelper {
     final stepsDone = instance.listShowCaseSteps +
         instance.notificationsShowCaseSteps +
         instance.contentShowCaseSteps;
-    const totalSteps = 8;
-    if (stepsDone == totalSteps) {
+    final totalSteps =
+        SharedPreferencesHelper.instance.notificationActive ? 8 : 5;
+    print("####### $stepsDone $totalSteps");
+    if (stepsDone >= totalSteps) {
       instance.isActive = false;
     }
   }

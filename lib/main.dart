@@ -19,7 +19,7 @@ import './Screens/statistics_screen.dart';
 import './Utils/l10n/app_localizations.dart';
 import './Utils/shared_preferences_helper.dart';
 import './Utils/themes.dart';
-import 'Utils/show_case_helper.dart';
+import './Utils/show_case_helper.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();

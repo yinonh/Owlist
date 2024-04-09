@@ -226,7 +226,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               )
             : IconButton(
                 onPressed: () {
-                  showPopup("אי אפשר להוסיף תזכורת לרשימה זו");
+                  showPopup(context
+                      .translate(Strings.youCantAddNotificationsToThisList));
                 },
                 icon: Icon(
                   Icons.add_rounded,
@@ -345,7 +346,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       context: context,
       initialDate: initialDate,
       firstDate: DateTime.now(),
-      lastDate: list.deadline,
+      lastDate: list.hasDeadline
+          ? list.deadline
+          : DateTime.now().add(
+              const Duration(days: 3650),
+            ),
     );
 
     if (selectedDate != null) {

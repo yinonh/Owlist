@@ -114,6 +114,8 @@ class Strings {
   static String notifications = "Notifications";
   static String date = "Date";
   static String time = "Time";
+  static String youCantAddNotificationsToThisList =
+      "You can't add notifications to this list";
 
   // ShowCase Helper
   static String homePageShowCaseDescription = "Home page show case description";

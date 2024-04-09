@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'package:to_do/Providers/notification_provider.dart';
-import 'package:to_do/Screens/single_list_screen.dart';
-import 'package:to_do/Utils/show_case_helper.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
+import '../Providers/notification_provider.dart';
+import '../Screens/single_list_screen.dart';
+import '../Utils/show_case_helper.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
@@ -417,7 +417,7 @@ class _HomePageState extends State<HomePage> {
                             }
                           },
                         ),
-                        const Settings(),
+                        Settings(refresh: refreshLists),
                       ],
                     ),
                   ),

@@ -81,5 +81,6 @@
   "Single list screen add item show case description": "Quickly add items to your list or set reminders with a simple tap on the + button.",
   "Notifications show case description": "Explore, manage, and customize your notifications all in one place. Add new notifications and edit existing ones.",
   "Notifications state show case description": "Enhance your notification management effortlessly. Toggle between active and disabled statuses with a single tap on the bell icon, while conveniently checking if notifications are already archived.",
-  "Content show case description": "Manage your content by adding text, links, and phone numbers to your items."
+  "Content show case description": "Manage your content by adding text, links, and phone numbers to your items.",
+  "You can't add notifications to this list" : "You can't add notifications to this list"
 }

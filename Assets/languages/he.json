@@ -81,5 +81,6 @@
   "Single list screen add item show case description": "ניתן להוסיף פריט חדש לרשימה או להגדיר התראות בלחיצה על כפתור ה+.",
   "Notifications show case description": "כאן תוכל לראות את כל ההתראות שלך לרשימה זו, אפשר להוסיף התראה חדשה ולערוך את הקיימות.",
   "Notifications state show case description": "לחיצה על אייקון הפעמון תפעיל ותכבה התראה ובנוסף אפשר לראות האם התראה כבר בארכיון.",
-  "Content show case description": "כאן תוכל להוסיף טקסט, לינקים ומספרי טלפון לפריט"
+  "Content show case description": "כאן תוכל להוסיף טקסט, לינקים ומספרי טלפון לפריט",
+  "You can't add notifications to this list" : "אי אפשר להוסיף תזכורת לרשימה זו"
 }

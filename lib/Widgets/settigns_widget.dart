@@ -8,13 +8,16 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Screens/statistics_screen.dart';
+import '../Utils/show_case_helper.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
 import '../main.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  final Function refresh;
+
+  const Settings({required this.refresh, Key? key}) : super(key: key);
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -258,6 +261,10 @@ class _SettingsState extends State<Settings> {
                         child: Switch(
                           onChanged: (val) {
                             notificationProvider.saveActive(val);
+                            setState(() {
+                              ShowCaseHelper.instance.toggleIsActive(false);
+                              widget.refresh();
+                            });
                           },
                           value: _notificationsActive,
                           trackColor: MaterialStateProperty.all<Color>(

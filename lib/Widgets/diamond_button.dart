@@ -59,8 +59,10 @@ class DiamondButton extends StatelessWidget {
                   ],
                 ),
               ),
-              height: 50, //getRelativeWidth(0.15),
-              width: 50, //getRelativeWidth(0.15),
+              height: 50,
+              //getRelativeWidth(0.15),
+              width: 50,
+              //getRelativeWidth(0.15),
               child: Center(
                 child: Transform.rotate(
                   angle: math.pi / 4,

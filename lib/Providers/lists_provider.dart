@@ -7,8 +7,6 @@ import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
-import 'package:to_do/Utils/notification_time.dart';
-import 'package:to_do/Utils/pair_result.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Models/notification.dart';
@@ -17,6 +15,8 @@ import '../Providers/notification_provider.dart';
 import '../Screens/home_page.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/strings.dart';
+import '../Utils/notification_time.dart';
+import '../Utils/pair_result.dart';
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;

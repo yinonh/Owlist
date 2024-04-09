@@ -8,9 +8,9 @@ import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:to_do/Screens/single_list_screen.dart';
 import 'package:uuid/uuid.dart';
 
+import '../Screens/single_list_screen.dart';
 import '../Models/notification.dart';
 import '../Models/to_do_list.dart';
 import '../Utils/notification_time.dart';
