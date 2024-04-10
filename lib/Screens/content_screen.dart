@@ -5,13 +5,15 @@ import 'package:provider/provider.dart';
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../Widgets/diamond_button.dart';
 import '../Widgets/editable_text_view.dart';
 
 class ContentScreen extends StatefulWidget {
-  static const routeName = '/content';
+  static const routeName = Keys.contentScreenRouteName;
   final String id;
 
   const ContentScreen({Key? key, required this.id}) : super(key: key);
@@ -176,12 +178,12 @@ class _ContentScreenState extends State<ContentScreen> {
                                         maxLength: 50,
                                         // Set the maximum length
                                         decoration: const InputDecoration(
-                                          counterText:
-                                              "", // Hide the character counter
+                                          counterText: Keys
+                                              .emptyChar, // Hide the character counter
                                         ),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.deny(
-                                              new RegExp(r"\n"))
+                                              new RegExp(Keys.filterFormat))
                                         ],
                                         onSubmitted: (_) {
                                           _save();

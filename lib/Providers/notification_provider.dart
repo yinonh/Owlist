@@ -10,9 +10,10 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:uuid/uuid.dart';
 
-import '../Screens/single_list_screen.dart';
 import '../Models/notification.dart';
 import '../Models/to_do_list.dart';
+import '../Screens/single_list_screen.dart';
+import '../Utils/keys.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../main.dart';
@@ -35,7 +36,7 @@ class NotificationProvider with ChangeNotifier {
 
   initDB() async {
     return await sql.openDatabase(
-      path.join(await sql.getDatabasesPath(), 'to_do.db'),
+      path.join(await sql.getDatabasesPath(), Keys.toDoTable),
       version: int.parse(dotenv.env['DBVERSION']!),
     );
   }
@@ -101,7 +102,7 @@ class NotificationProvider with ChangeNotifier {
     // this.context = context;
     await _configureLocalTimeZone();
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings(Keys.appIcon);
 
     const InitializationSettings initializationSettings =
         InitializationSettings(
@@ -309,9 +310,9 @@ class NotificationProvider with ChangeNotifier {
         tz.TZDateTime.from(scheduledDateTime, tz.local),
         const NotificationDetails(
           android: AndroidNotificationDetails(
-            'main_channel_id',
-            'Deadline notifications',
-            channelDescription: 'Notification for the lists',
+            Keys.mainChannelId,
+            Keys.mainChannelName,
+            channelDescription: Keys.mainChannelDescription,
             channelShowBadge: false,
           ),
         ),

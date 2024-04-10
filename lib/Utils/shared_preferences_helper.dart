@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Utils/keys.dart';
+
 class SharedPreferencesHelper {
   SharedPreferencesHelper._();
 
@@ -10,9 +12,9 @@ class SharedPreferencesHelper {
 
   Future<void> initialise() async {
     prefs = await SharedPreferences.getInstance();
-    language = prefs.getString('selectedLanguage');
-    themePref = prefs.getString('selectedTheme');
-    notificationActive = prefs.getBool('notification_active') ?? true;
+    language = prefs.getString(Keys.selectedLanguage);
+    themePref = prefs.getString(Keys.selectedTheme);
+    notificationActive = prefs.getBool(Keys.notificationActive) ?? true;
   }
 
   static final SharedPreferencesHelper instance = SharedPreferencesHelper._();
@@ -21,48 +23,48 @@ class SharedPreferencesHelper {
 
   set selectedLanguage(String? value) {
     language = value;
-    prefs.setString('selectedLanguage', value ?? '');
+    prefs.setString(Keys.selectedLanguage, value ?? Keys.emptyChar);
   }
 
   String? get selectedTheme => themePref;
 
   set selectedTheme(String? value) {
     themePref = value;
-    prefs.setString('selectedTheme', value ?? '');
+    prefs.setString(Keys.selectedTheme, value ?? Keys.emptyChar);
   }
 
   bool get notificationsActive => notificationActive;
 
   set notificationsActive(bool active) {
     notificationActive = active;
-    prefs.setBool('notification_active', active);
+    prefs.setBool(Keys.notificationActive, active);
   }
 
   Future<void> removeSelectedTheme() async {
-    await prefs.remove('selectedTheme');
+    await prefs.remove(Keys.selectedTheme);
   }
 
   Future<int> getNotificationTime() async {
-    return prefs.getInt('notification_time') ?? 120000;
+    return prefs.getInt(Keys.notificationTime) ?? 120000;
   }
 
   Future<void> setNotificationTime(int time) async {
-    await prefs.setInt('notification_time', time);
+    await prefs.setInt(Keys.notificationTime, time);
   }
 
   Future<bool> isAutoNotification() async {
-    return prefs.getBool('auto_notification') ?? true;
+    return prefs.getBool(Keys.autoNotification) ?? true;
   }
 
   Future<void> setAutoNotification(bool status) async {
-    await prefs.setBool('auto_notification', status);
+    await prefs.setBool(Keys.autoNotification, status);
   }
 
   Future<int> sortByIndex() async {
-    return prefs.getInt('sortByIndex') ?? 0;
+    return prefs.getInt(Keys.sortByIndex) ?? 0;
   }
 
   Future<void> setSortByIndex(int index) async {
-    await prefs.setInt('sortByIndex', index);
+    await prefs.setInt(Keys.sortByIndex, index);
   }
 }

@@ -6,6 +6,8 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
 import '../Screens/content_screen.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/strings.dart';
 import '../Widgets/dog_ear_list_tile.dart';
 
@@ -142,7 +144,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                       Navigator.of(context).pushNamed(
                         ContentScreen.routeName,
                         arguments: {
-                          'id': widget.item.id,
+                          Keys.id: widget.item.id,
                         },
                       ).then((value) => widget.updateSingleListScreen());
                     },

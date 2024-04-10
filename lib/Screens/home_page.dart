@@ -11,8 +11,10 @@ import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/notification_provider.dart';
 import '../Screens/single_list_screen.dart';
-import '../Utils/show_case_helper.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/shared_preferences_helper.dart';
+import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
@@ -28,7 +30,7 @@ enum SortBy {
 }
 
 class HomePage extends StatefulWidget {
-  static const routeName = '/home_page';
+  static const routeName = Keys.homePageRouteName;
 
   const HomePage({super.key});
 
@@ -221,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Center(
                           child: SvgPicture.asset(
-                            'Assets/appName.svg',
+                            Keys.appNameSvg,
                             fit: BoxFit.contain,
                             width: 170,
                           ),

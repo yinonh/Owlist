@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import '../Utils/keys.dart';
+
 class Notifications {
   String id;
   String listId;
@@ -18,24 +20,24 @@ class Notifications {
   // Convert Notifications object to a Map object
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'listId': listId,
-      'notificationIndex': notificationIndex,
-      'notificationDateTime':
-          DateFormat('yyyy-MM-dd HH:mm').format(notificationDateTime),
-      'disabled': disabled ? 1 : 0,
+      Keys.id: id,
+      Keys.listId: listId,
+      Keys.notificationIndex: notificationIndex,
+      Keys.notificationDateTime: DateFormat(Keys.notificationDateTimeFormat)
+          .format(notificationDateTime),
+      Keys.disabled: disabled ? 1 : 0,
     };
   }
 
   // Convert Map object to a Notifications object
   static Notifications fromMap(Map<String, dynamic> map) {
     return Notifications(
-      id: map['id'],
-      listId: map['listId'],
-      notificationIndex: map['notificationIndex'],
-      notificationDateTime:
-          DateFormat('yyyy-MM-dd HH:mm').parse(map['notificationDateTime']),
-      disabled: map['disabled'] == 1,
+      id: map[Keys.id],
+      listId: map[Keys.listId],
+      notificationIndex: map[Keys.notificationIndex],
+      notificationDateTime: DateFormat(Keys.notificationDateTimeFormat)
+          .parse(map[Keys.notificationDateTime]),
+      disabled: map[Keys.disabled] == 1,
     );
   }
 

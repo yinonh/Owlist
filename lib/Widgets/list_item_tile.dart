@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'date_picker.dart';
 
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Screens/single_list_screen.dart';
+import '../Utils/context_extensions.dart';
 import '../Utils/strings.dart';
+import 'date_picker.dart';
 
 class ToDoItemTile extends StatefulWidget {
   final ToDoList item;
@@ -101,7 +102,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
   }
 
   String formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
+    return DateFormat(context.translate(Strings.dateFormat)).format(date);
   }
 
   String getDeadlineDiff(DateTime deadline) {
@@ -173,7 +174,11 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                       children: [
                         hasDeadline
                             ? DatePickerWidget(
-                                initialDate: newDeadline,
+                                initialDate: newDeadline.isBefore(DateTime.now()
+                                        .add(const Duration(days: 1)))
+                                    ? DateTime.now()
+                                        .add(const Duration(days: 1))
+                                    : newDeadline,
                                 firstDate:
                                     DateTime.now().add(const Duration(days: 1)),
                                 lastDate: DateTime.now()
@@ -251,142 +256,147 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, SingleListScreen.routeName,
-                arguments: widget.item.id)
-            .then((value) {
-          setState(() {
-            widget.refresh();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, SingleListScreen.routeName,
+                  arguments: widget.item.id)
+              .then((value) {
+            setState(() {
+              widget.refresh();
+            });
           });
-        });
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).hintColor,
-              offset: Offset.fromDirection(3.7),
-              spreadRadius: -0.4,
-              //Use negative value above for the inner shadow effect
-              blurRadius: 2.0,
-            ),
-          ],
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    child: Text(
-                      widget.item.title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      overflow: TextOverflow.ellipsis,
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).hintColor,
+                offset: Offset.fromDirection(3.7),
+                spreadRadius: -0.4,
+                //Use negative value above for the inner shadow effect
+                blurRadius: 2.0,
+              ),
+            ],
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    FittedBox(
+                      child: Text(
+                        widget.item.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: editItem,
-                    icon: Icon(Icons.edit_rounded,
-                        color: Theme.of(context).highlightColor),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _showDeleteConfirmation(context);
-                    },
-                    icon: Icon(Icons.delete_rounded,
-                        color: Theme.of(context).highlightColor),
-                  ),
-                ],
+                    const Spacer(),
+                    IconButton(
+                      onPressed: editItem,
+                      icon: Icon(Icons.edit_rounded,
+                          color: Theme.of(context).highlightColor),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _showDeleteConfirmation(context);
+                      },
+                      icon: Icon(Icons.delete_rounded,
+                          color: Theme.of(context).highlightColor),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  widget.item.hasDeadline
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  formatDate(widget.item
-                                      .creationDate), // Format creationDate
-                                ),
-                                Text(
-                                  formatDate(
-                                      widget.item.deadline), // Format deadline
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            LinearProgressIndicator(
-                              minHeight: 13.0,
-                              borderRadius: BorderRadius.circular(5),
-                              value: remainingHours <= 0
-                                  ? 1
-                                  : (totalHours - remainingHours) / totalHours,
-                            ),
-                            const SizedBox(height: 8.0),
-                            Text(
-                              getDeadlineDiff(widget.item.deadline),
-                              // style: TextStyle(fontSize: 16.0),
-                            ),
-                          ],
-                        )
-                      : Text(
-                          context.translate(Strings.creationDate) +
-                              formatDate(widget
-                                  .item.creationDate), // Format creationDate
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    widget.item.hasDeadline
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    formatDate(widget.item
+                                        .creationDate), // Format creationDate
+                                  ),
+                                  Text(
+                                    formatDate(widget
+                                        .item.deadline), // Format deadline
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8.0),
+                              LinearProgressIndicator(
+                                minHeight: 13.0,
+                                borderRadius: BorderRadius.circular(5),
+                                value: remainingHours <= 0
+                                    ? 1
+                                    : (totalHours - remainingHours) /
+                                        totalHours,
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                getDeadlineDiff(widget.item.deadline),
+                                // style: TextStyle(fontSize: 16.0),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            context.translate(Strings.creationDate) +
+                                formatDate(widget
+                                    .item.creationDate), // Format creationDate
+                          ),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${context.translate(Strings.totalItems)} ${widget.item.totalItems}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${context.translate(Strings.totalItems)} ${widget.item.totalItems}',
-                          overflow: TextOverflow.ellipsis,
+                        Expanded(
+                          child: Text(
+                            '${context.translate(Strings.accomplishedItems)} ${widget.item.accomplishedItems}',
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.end,
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '${context.translate(Strings.accomplishedItems)} ${widget.item.accomplishedItems}',
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.end,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0),
-                  widget.item.totalItems > 0
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            LinearProgressIndicator(
-                              borderRadius: BorderRadius.circular(5),
-                              minHeight: 13.0,
-                              value: progressPercentage,
-                            ),
-                            const SizedBox(height: 8.0),
-                            Text(
-                              '${context.translate(Strings.progress)} ${(progressPercentage * 100).toStringAsFixed(0)}%',
-                            ),
-                          ],
-                        )
-                      : const SizedBox(height: 0),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 8.0),
+                    widget.item.totalItems > 0
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              LinearProgressIndicator(
+                                borderRadius: BorderRadius.circular(5),
+                                minHeight: 13.0,
+                                value: progressPercentage,
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                '${context.translate(Strings.progress)} ${(progressPercentage * 100).toStringAsFixed(0)}%',
+                              ),
+                            ],
+                          )
+                        : const SizedBox(height: 0),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

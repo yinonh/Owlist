@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/strings.dart';
 
 class StatisticsGraphs extends StatefulWidget {
@@ -55,7 +57,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
               color: Colors.white,
             ),
           ),
-          widget.statistics['totalLists'] != 0
+          widget.statistics[Keys.totalLists] != 0
               ? FadeTransition(
                   opacity: _animation,
                   child: Padding(
@@ -66,17 +68,18 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                         children: [
                           _buildProgressBar(
                               title: context.translate(Strings.archivedLists),
-                              value: widget.statistics['listsDone']!.toInt(),
-                              total: widget.statistics['totalLists']!),
+                              value: widget.statistics[Keys.listsDone]!.toInt(),
+                              total: widget.statistics[Keys.totalLists]!),
                           _buildProgressBar(
                               title: context.translate(Strings.activeLists),
-                              value: widget.statistics['activeLists']!.toInt(),
-                              total: widget.statistics['totalLists']!),
+                              value:
+                                  widget.statistics[Keys.activeLists]!.toInt(),
+                              total: widget.statistics[Keys.totalLists]!),
                           _buildProgressBar(
                               title: context.translate(Strings.withoutDeadline),
-                              value:
-                                  widget.statistics['withoutDeadline']!.toInt(),
-                              total: widget.statistics['totalLists']!),
+                              value: widget.statistics[Keys.withoutDeadline]!
+                                  .toInt(),
+                              total: widget.statistics[Keys.totalLists]!),
                         ],
                       ),
                     ),
@@ -85,7 +88,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
               : const SizedBox(
                   height: 0,
                 ),
-          widget.statistics['totalLists'] == 0
+          widget.statistics[Keys.totalLists] == 0
               ? SizedBox(
                   height: 250,
                   width: double.infinity,
@@ -121,7 +124,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
               color: Colors.white,
             ),
           ),
-          widget.statistics['totalItems'] != 0
+          widget.statistics[Keys.totalItems] != 0
               ? FadeTransition(
                   opacity: _animation,
                   child: Padding(
@@ -132,16 +135,18 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
                         children: [
                           _buildProgressBar(
                               title: context.translate(Strings.itemsDone),
-                              value: widget.statistics['itemsDone']!.toInt(),
-                              total: widget.statistics['totalItems']!),
+                              value: widget.statistics[Keys.itemsDone]!.toInt(),
+                              total: widget.statistics[Keys.totalItems]!),
                           _buildProgressBar(
                               title: context.translate(Strings.itemsDelayed),
-                              value: widget.statistics['itemsDelayed']!.toInt(),
-                              total: widget.statistics['totalItems']!),
+                              value:
+                                  widget.statistics[Keys.itemsDelayed]!.toInt(),
+                              total: widget.statistics[Keys.totalItems]!),
                           _buildProgressBar(
                               title: context.translate(Strings.itemsInProcess),
-                              value: widget.statistics['itemsNotDone']!.toInt(),
-                              total: widget.statistics['totalItems']!),
+                              value:
+                                  widget.statistics[Keys.itemsNotDone]!.toInt(),
+                              total: widget.statistics[Keys.totalItems]!),
                         ],
                       ),
                     ),
@@ -150,7 +155,7 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
               : SizedBox(
                   height: 0,
                 ),
-          widget.statistics['totalItems'] == 0
+          widget.statistics[Keys.totalItems] == 0
               ? SizedBox(
                   height: 250,
                   width: double.infinity,
@@ -231,9 +236,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 0:
           return PieChartSectionData(
             color: Theme.of(context).highlightColor,
-            value: statistics!['withoutDeadline']!.toDouble(),
+            value: statistics![Keys.withoutDeadline]!.toDouble(),
             title:
-                '${context.translate(Strings.withoutDeadline)}\n ${(statistics['withoutDeadline']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.withoutDeadline)}\n ${(statistics[Keys.withoutDeadline]! / statistics[Keys.totalLists]! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -244,9 +249,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 1:
           return PieChartSectionData(
             color: Theme.of(context).focusColor,
-            value: (statistics!['activeLists']!).toDouble(),
+            value: (statistics![Keys.activeLists]!).toDouble(),
             title:
-                '${context.translate(Strings.activeLists)}\n ${(statistics['activeLists']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.activeLists)}\n ${(statistics[Keys.activeLists]! / statistics[Keys.totalLists]! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -257,9 +262,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 2:
           return PieChartSectionData(
             color: Theme.of(context).primaryColorLight,
-            value: statistics!['listsDone']!.toDouble(),
+            value: statistics![Keys.listsDone]!.toDouble(),
             title:
-                '${context.translate(Strings.archivedLists)}\n ${(statistics['listsDone']! / statistics['totalLists']! * 100).toStringAsFixed(1)}%',
+                '${context.translate(Strings.archivedLists)}\n ${(statistics[Keys.listsDone]! / statistics[Keys.totalLists]! * 100).toStringAsFixed(1)}%',
             radius: radius,
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -280,9 +285,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 0:
           return PieChartSectionData(
             color: Theme.of(context).highlightColor,
-            value: widget.statistics['itemsNotDone']!.toDouble(),
+            value: widget.statistics[Keys.itemsNotDone]!.toDouble(),
             title:
-                "${context.translate(Strings.itemsInProcess)}\n ${(widget.statistics['itemsNotDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsInProcess)}\n ${(widget.statistics[Keys.itemsNotDone]! / widget.statistics[Keys.totalItems]! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -293,9 +298,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 1:
           return PieChartSectionData(
             color: Theme.of(context).focusColor,
-            value: widget.statistics['itemsDelayed']!.toDouble(),
+            value: widget.statistics[Keys.itemsDelayed]!.toDouble(),
             title:
-                "${context.translate(Strings.itemsDelayed)}\n ${(widget.statistics['itemsDelayed']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsDelayed)}\n ${(widget.statistics[Keys.itemsDelayed]! / widget.statistics[Keys.totalItems]! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -306,9 +311,9 @@ class _StatisticsGraphsState extends State<StatisticsGraphs>
         case 2:
           return PieChartSectionData(
             color: Theme.of(context).primaryColorLight,
-            value: widget.statistics['itemsDone']!.toDouble(),
+            value: widget.statistics[Keys.itemsDone]!.toDouble(),
             title:
-                "${context.translate(Strings.itemsDone)}\n ${(widget.statistics['itemsDone']! / widget.statistics['totalItems']! * 100).toStringAsFixed(1)}%",
+                "${context.translate(Strings.itemsDone)}\n ${(widget.statistics[Keys.itemsDone]! / widget.statistics[Keys.totalItems]! * 100).toStringAsFixed(1)}%",
             titleStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,

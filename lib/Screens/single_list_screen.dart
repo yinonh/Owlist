@@ -10,10 +10,12 @@ import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
-import '../Utils/shared_preferences_helper.dart';
-import '../Utils/strings.dart';
 import '../Screens/home_page.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
+import '../Utils/shared_preferences_helper.dart';
 import '../Utils/show_case_helper.dart';
+import '../Utils/strings.dart';
 import '../Widgets/edit_item_title_popup.dart';
 import '../Widgets/item_list.dart';
 import '../Widgets/notification_bottom_sheet.dart';
@@ -258,7 +260,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     childButtons.add(
       UnicornButton(
         currentButton: FloatingActionButton(
-            heroTag: "Text",
+            heroTag: Keys.addTextHeroTag,
             backgroundColor: const Color(0xFF635985),
             mini: true,
             onPressed: () {
@@ -271,7 +273,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
     childButtons.add(
       UnicornButton(
         currentButton: FloatingActionButton(
-            heroTag: "notification",
+            heroTag: Keys.addNotificationsHeroTag,
             backgroundColor: Color(0xFF634999),
             mini: true,
             onPressed: () {
@@ -400,12 +402,12 @@ class _SingleListScreenState extends State<SingleListScreen> {
                                   maxLength: 50,
                                   // Set the maximum length
                                   decoration: const InputDecoration(
-                                    counterText:
-                                        "", // Hide the character counter
+                                    counterText: Keys
+                                        .emptyChar, // Hide the character counter
                                   ),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.deny(
-                                        new RegExp(r"\n"))
+                                        RegExp(Keys.filterFormat))
                                   ],
                                   onSubmitted: (_) {
                                     _save();

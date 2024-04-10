@@ -18,8 +18,9 @@ import './Screens/single_list_screen.dart';
 import './Screens/statistics_screen.dart';
 import './Utils/l10n/app_localizations.dart';
 import './Utils/shared_preferences_helper.dart';
-import './Utils/themes.dart';
 import './Utils/show_case_helper.dart';
+import './Utils/themes.dart';
+import 'Utils/keys.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -67,10 +68,10 @@ class OwlistApp extends StatefulWidget {
     final _OwlistAppState state =
         context.findAncestorStateOfType<_OwlistAppState>()!;
     switch (mode) {
-      case "dark":
+      case Keys.darkTheme:
         state.setTheme(ThemeMode.dark);
         break;
-      case "light":
+      case Keys.lightTheme:
         state.setTheme(ThemeMode.light);
         break;
       default:
@@ -119,10 +120,10 @@ class _OwlistAppState extends State<OwlistApp> {
 
     // Set theme
     switch (themePref) {
-      case 'dark':
+      case Keys.darkTheme:
         currentThemeMode = ThemeMode.dark;
         break;
-      case 'light':
+      case Keys.lightTheme:
         currentThemeMode = ThemeMode.light;
         break;
       default:
@@ -217,7 +218,7 @@ class _OwlistAppState extends State<OwlistApp> {
                     },
                     builder: Builder(
                       builder: (context) {
-                        return ContentScreen(id: args['id'] as String);
+                        return ContentScreen(id: args[Keys.id] as String);
                       },
                     ),
                   );

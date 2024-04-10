@@ -61,7 +61,6 @@ class ShowCaseHelper {
         instance.contentShowCaseSteps;
     final totalSteps =
         SharedPreferencesHelper.instance.notificationActive ? 8 : 5;
-    print("####### $stepsDone $totalSteps");
     if (stepsDone >= totalSteps) {
       instance.isActive = false;
     }

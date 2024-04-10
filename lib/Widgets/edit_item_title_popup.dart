@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/strings.dart';
 
 class EditItemDialog extends StatefulWidget {
@@ -13,7 +15,7 @@ class EditItemDialog extends StatefulWidget {
 }
 
 class _EditItemDialogState extends State<EditItemDialog> {
-  String newTitle = '';
+  String newTitle = Keys.emptyChar;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,9 @@ class _EditItemDialogState extends State<EditItemDialog> {
             newTitle = value;
           });
         },
-        inputFormatters: [FilteringTextInputFormatter.deny(new RegExp(r"\n"))],
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(new RegExp(Keys.filterFormat))
+        ],
       ),
       actions: <Widget>[
         Row(

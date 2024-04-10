@@ -8,9 +8,11 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../Providers/notification_provider.dart';
 import '../Screens/statistics_screen.dart';
-import '../Utils/show_case_helper.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
+import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../main.dart';
 
@@ -31,12 +33,12 @@ class _SettingsState extends State<Settings> {
   late bool _autoNotificationsActive;
   List<Widget> languages = <Widget>[
     SvgPicture.asset(
-      'Assets/english.svg',
+      Keys.englishSvg,
       width: 60,
       // height: 45,
     ),
     SvgPicture.asset(
-      'Assets/hebrew.svg',
+      Keys.hebrewSvg,
       width: 60,
       // height: 45,
     )
@@ -190,9 +192,9 @@ class _SettingsState extends State<Settings> {
                         switch (index) {
                           case 0:
                             SharedPreferencesHelper.instance.selectedTheme =
-                                "dark";
+                                Keys.darkTheme;
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              OwlistApp.setTheme(context, "dark");
+                              OwlistApp.setTheme(context, Keys.darkTheme);
                             });
                             break;
                           case 1:
@@ -204,9 +206,9 @@ class _SettingsState extends State<Settings> {
                             break;
                           case 2:
                             SharedPreferencesHelper.instance.selectedTheme =
-                                "light";
+                                Keys.lightTheme;
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              OwlistApp.setTheme(context, "light");
+                              OwlistApp.setTheme(context, Keys.lightTheme);
                             });
                             break;
                         }

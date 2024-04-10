@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
+import '../Utils/keys.dart';
 import '../Widgets/custom_floationg_action_button.dart';
 
 class UnicornButton {
@@ -35,7 +36,7 @@ class UnicornDialer extends StatefulWidget {
       required this.onMainButtonPressed,
       this.hasBackground = true,
       this.backgroundColor = Colors.white30,
-      this.parentHeroTag = "parent",
+      this.parentHeroTag = Keys.parentHeroTag,
       required this.finalButtonIcon,
       this.animationDuration = 180,
       this.mainAnimationDuration = 200,

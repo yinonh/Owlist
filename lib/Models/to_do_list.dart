@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import '../Utils/keys.dart';
+
 class ToDoList {
   final String id;
   final String userID;
@@ -28,27 +30,28 @@ class ToDoList {
 
   factory ToDoList.fromMap(Map<String, dynamic> map) {
     return ToDoList(
-      id: map['id'],
-      userID: map['userID'],
-      hasDeadline: map['hasDeadline'] == 1 ? true : false,
-      title: map['title'],
-      creationDate: DateFormat('yyyy-MM-dd').parse(map['creationDate']),
-      deadline: DateFormat('yyyy-MM-dd').parse(map['deadline']),
-      totalItems: map['totalItems'],
-      accomplishedItems: map['accomplishedItems'],
+      id: map[Keys.id],
+      userID: map[Keys.userID],
+      hasDeadline: map[Keys.hasDeadline] == 1 ? true : false,
+      title: map[Keys.title],
+      creationDate:
+          DateFormat(Keys.listDateFormat).parse(map[Keys.creationDate]),
+      deadline: DateFormat(Keys.listDateFormat).parse(map[Keys.deadline]),
+      totalItems: map[Keys.totalItems],
+      accomplishedItems: map[Keys.accomplishedItems],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'userID': userID,
-      'title': title,
-      'hasDeadline': hasDeadline ? 1 : 0,
-      'creationDate': DateFormat('yyyy-MM-dd').format(creationDate),
-      'deadline': DateFormat('yyyy-MM-dd').format(deadline),
-      'totalItems': totalItems,
-      'accomplishedItems': accomplishedItems,
+      Keys.id: id,
+      Keys.userID: userID,
+      Keys.title: title,
+      Keys.hasDeadline: hasDeadline ? 1 : 0,
+      Keys.creationDate: DateFormat(Keys.listDateFormat).format(creationDate),
+      Keys.deadline: DateFormat(Keys.listDateFormat).format(deadline),
+      Keys.totalItems: totalItems,
+      Keys.accomplishedItems: accomplishedItems,
     };
   }
 

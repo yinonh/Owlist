@@ -5,11 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 
-import '../Models/to_do_list.dart';
 import '../Models/notification.dart';
 import '../Models/to_do_item.dart';
+import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/notification_provider.dart';
+import '../Utils/keys.dart';
 
 class ItemProvider extends ChangeNotifier {
   Database? _database;
@@ -22,7 +23,7 @@ class ItemProvider extends ChangeNotifier {
 
   initDB() async {
     return await sql.openDatabase(
-      path.join(await sql.getDatabasesPath(), 'to_do.db'),
+      path.join(await sql.getDatabasesPath(), Keys.toDoTable),
       version: int.parse(dotenv.env['DBVERSION']!),
     );
   }
@@ -37,12 +38,12 @@ class ItemProvider extends ChangeNotifier {
 
     return List.generate(maps.length, (i) {
       return ToDoItem(
-        id: maps[i]['id'],
-        listId: maps[i]['listId'],
-        title: maps[i]['title'],
-        content: maps[i]['content'],
-        done: maps[i]['done'] == 1,
-        itemIndex: maps[i]['itemIndex'],
+        id: maps[i][Keys.id],
+        listId: maps[i][Keys.listId],
+        title: maps[i][Keys.title],
+        content: maps[i][Keys.content],
+        done: maps[i][Keys.done] == 1,
+        itemIndex: maps[i][Keys.itemIndex],
       );
     });
   }
@@ -55,12 +56,12 @@ class ItemProvider extends ChangeNotifier {
       whereArgs: [id],
     );
     return ToDoItem(
-      id: maps[0]['id'].toString(),
-      listId: maps[0]['listId'],
-      title: maps[0]['title'],
-      content: maps[0]['content'],
-      done: maps[0]['done'] == 1,
-      itemIndex: maps[0]['itemIndex'],
+      id: maps[0][Keys.id].toString(),
+      listId: maps[0][Keys.listId],
+      title: maps[0][Keys.title],
+      content: maps[0][Keys.content],
+      done: maps[0][Keys.done] == 1,
+      itemIndex: maps[0][Keys.itemIndex],
     );
   }
 
@@ -76,16 +77,16 @@ class ItemProvider extends ChangeNotifier {
 
     int newIndex = 0;
     if (maps.isNotEmpty) {
-      newIndex = maps.first['itemIndex'] + 1;
+      newIndex = maps.first[Keys.itemIndex] + 1;
     }
 
     final newItemData = {
-      'id': DateTime.now().toIso8601String(),
-      'listId': listId,
-      'title': title,
-      'content': '',
-      'done': 0,
-      'itemIndex': newIndex,
+      Keys.id: DateTime.now().toIso8601String(),
+      Keys.listId: listId,
+      Keys.title: title,
+      Keys.content: '',
+      Keys.done: 0,
+      Keys.itemIndex: newIndex,
     };
 
     await db.insert(
@@ -101,7 +102,7 @@ class ItemProvider extends ChangeNotifier {
     });
 
     final newItem = ToDoItem(
-      id: newItemData['id'] as String,
+      id: newItemData[Keys.id] as String,
       listId: listId,
       title: title,
       content: '',
@@ -118,12 +119,12 @@ class ItemProvider extends ChangeNotifier {
     final Database db = await database;
 
     final Map<String, dynamic> itemData = {
-      'id': item.id,
-      'listId': item.listId,
-      'title': item.title,
-      'content': item.content,
-      'done': item.done ? 1 : 0,
-      'itemIndex': item.itemIndex,
+      Keys.id: item.id,
+      Keys.listId: item.listId,
+      Keys.title: item.title,
+      Keys.content: item.content,
+      Keys.done: item.done ? 1 : 0,
+      Keys.itemIndex: item.itemIndex,
     };
 
     await db.insert(
@@ -157,7 +158,7 @@ class ItemProvider extends ChangeNotifier {
       );
 
       if (result.isNotEmpty) {
-        String listId = result[0]['listId'];
+        String listId = result[0][Keys.listId];
 
         // Delete the item from the SQLite database
         await db.delete(

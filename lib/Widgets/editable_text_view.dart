@@ -3,6 +3,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Utils/context_extensions.dart';
 import '../Utils/strings.dart';
 
 class EditableTextView extends StatefulWidget {

@@ -11,6 +11,8 @@ import '../Models/notification.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Providers/notification_provider.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/show_case_helper.dart';
@@ -111,8 +113,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                                     child: Lottie.asset(
                                       Theme.of(context).brightness ==
                                               Brightness.dark
-                                          ? 'Assets/empty notifications dark.json'
-                                          : 'Assets/empty notifications light.json',
+                                          ? Keys.emptyNotificationsDark
+                                          : Keys.emptyNotificationsLight,
                                     ),
                                   ),
                                 ),
@@ -240,17 +242,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
   Widget _buildNotificationItem(
       BuildContext context, Notifications notification, ToDoList list) {
-    var dateFormatted =
-        DateFormat('MM/dd/yyyy').format(notification.notificationDateTime);
+    var dateFormatted = DateFormat(context.translate(Strings.dateFormat))
+        .format(notification.notificationDateTime);
 
-    if ((SharedPreferencesHelper.instance.selectedLanguage ??
-            Localizations.localeOf(context).languageCode) ==
-        'he') {
-      dateFormatted =
-          DateFormat('dd/MM/yyyy').format(notification.notificationDateTime);
-    }
     final timeFormatted =
-        DateFormat('HH:mm').format(notification.notificationDateTime);
+        DateFormat(Keys.timeFormat).format(notification.notificationDateTime);
 
     return ListTile(
       leading: IconButton(

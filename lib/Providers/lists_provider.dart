@@ -13,10 +13,12 @@ import '../Models/notification.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/notification_provider.dart';
 import '../Screens/home_page.dart';
-import '../Utils/shared_preferences_helper.dart';
-import '../Utils/strings.dart';
+import '../Utils/context_extensions.dart';
+import '../Utils/keys.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/pair_result.dart';
+import '../Utils/shared_preferences_helper.dart';
+import '../Utils/strings.dart';
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
@@ -51,7 +53,7 @@ class ListsProvider extends ChangeNotifier {
 
   initDB() async {
     return await sql.openDatabase(
-      path.join(await sql.getDatabasesPath(), 'to_do.db'),
+      path.join(await sql.getDatabasesPath(), Keys.toDoTable),
       onCreate: (db, version) async {
         print('Creating tables...');
         await db.execute('''
@@ -127,11 +129,12 @@ class ListsProvider extends ChangeNotifier {
       AND deadline > ?
   ''', [DateTime.now().toIso8601String()]);
           for (var map in lists) {
-            if (map['hasDeadline'] == 0) continue;
+            if (map[Keys.hasDeadline] == 0) continue;
             ToDoList list = ToDoList.fromMap(map);
             DateTime notificationDate =
                 list.deadline.subtract(Duration(days: 1));
-            String notificationDateTime = DateFormat('yyyy-MM-dd HH:mm').format(
+            String notificationDateTime =
+                DateFormat(Keys.notificationDateTimeFormat).format(
               DateTime(
                   notificationDate.year,
                   notificationDate.month,
@@ -222,14 +225,14 @@ class ListsProvider extends ChangeNotifier {
     _activeItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
       return ToDoList(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        creationDate: DateTime.parse(maps[i]['creationDate']),
+        id: maps[i][Keys.id],
+        title: maps[i][Keys.title],
+        creationDate: DateTime.parse(maps[i][Keys.creationDate]),
         deadline: deadline,
-        hasDeadline: maps[i]['hasDeadline'] == 1,
-        totalItems: maps[i]['totalItems'],
-        accomplishedItems: maps[i]['accomplishedItems'],
-        userID: maps[i]['userID'],
+        hasDeadline: maps[i][Keys.hasDeadline] == 1,
+        totalItems: maps[i][Keys.totalItems],
+        accomplishedItems: maps[i][Keys.accomplishedItems],
+        userID: maps[i][Keys.userID],
       );
     });
 
@@ -244,17 +247,17 @@ class ListsProvider extends ChangeNotifier {
       whereArgs: [id],
     );
     final map = maps.first;
-    var deadline = DateTime.parse(map['deadline']);
+    var deadline = DateTime.parse(map[Keys.deadline]);
     if (maps.isNotEmpty) {
       return ToDoList(
-        id: map['id'],
-        title: map['title'],
-        creationDate: DateTime.parse(map['creationDate']),
+        id: map[Keys.id],
+        title: map[Keys.title],
+        creationDate: DateTime.parse(map[Keys.creationDate]),
         deadline: deadline,
-        hasDeadline: map['hasDeadline'] == 1,
-        totalItems: map['totalItems'],
-        accomplishedItems: map['accomplishedItems'],
-        userID: map['userID'],
+        hasDeadline: map[Keys.hasDeadline] == 1,
+        totalItems: map[Keys.totalItems],
+        accomplishedItems: map[Keys.accomplishedItems],
+        userID: map[Keys.userID],
       );
     }
 
@@ -278,14 +281,14 @@ class ListsProvider extends ChangeNotifier {
     _achievedItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
       return ToDoList(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        creationDate: DateTime.parse(maps[i]['creationDate']),
+        id: maps[i][Keys.id],
+        title: maps[i][Keys.title],
+        creationDate: DateTime.parse(maps[i][Keys.creationDate]),
         deadline: deadline,
-        hasDeadline: maps[i]['hasDeadline'] == 1,
-        totalItems: maps[i]['totalItems'],
-        accomplishedItems: maps[i]['accomplishedItems'],
-        userID: maps[i]['userID'],
+        hasDeadline: maps[i][Keys.hasDeadline] == 1,
+        totalItems: maps[i][Keys.totalItems],
+        accomplishedItems: maps[i][Keys.accomplishedItems],
+        userID: maps[i][Keys.userID],
       );
     });
 
@@ -309,14 +312,14 @@ class ListsProvider extends ChangeNotifier {
     _withoutDeadlineItemsCache = List.generate(maps.length, (i) {
       var deadline = DateTime.parse(maps[i]['deadline']);
       return ToDoList(
-        id: maps[i]['id'].toString(),
-        title: maps[i]['title'],
-        creationDate: DateTime.parse(maps[i]['creationDate']),
+        id: maps[i][Keys.id].toString(),
+        title: maps[i][Keys.title],
+        creationDate: DateTime.parse(maps[i][Keys.creationDate]),
         deadline: deadline,
-        hasDeadline: maps[i]['hasDeadline'] == 1,
-        totalItems: maps[i]['totalItems'],
-        accomplishedItems: maps[i]['accomplishedItems'],
-        userID: maps[i]['userID'],
+        hasDeadline: maps[i][Keys.hasDeadline] == 1,
+        totalItems: maps[i][Keys.totalItems],
+        accomplishedItems: maps[i][Keys.accomplishedItems],
+        userID: maps[i][Keys.userID],
       );
     });
 
@@ -450,7 +453,7 @@ class ListsProvider extends ChangeNotifier {
       );
 
       if (result.isNotEmpty) {
-        return result[0]['title'];
+        return result[0][Keys.title];
       } else {
         print('Item with ID $id not found!');
         return null;
@@ -474,9 +477,9 @@ class ListsProvider extends ChangeNotifier {
       );
 
       if (result.isNotEmpty) {
-        int totalItems = result[0]['totalItems'];
-        int accomplishedItems = result[0]['accomplishedItems'];
-        DateTime deadline = DateTime.parse(result[0]['deadline']);
+        int totalItems = result[0][Keys.totalItems];
+        int accomplishedItems = result[0][Keys.accomplishedItems];
+        DateTime deadline = DateTime.parse(result[0][Keys.deadline]);
 
         bool allItemsAccomplished =
             totalItems > 0 && accomplishedItems == totalItems;
@@ -504,7 +507,7 @@ class ListsProvider extends ChangeNotifier {
       await db.update(
         'todo_lists',
         {
-          'deadline': DateFormat('yyyy-MM-dd').format(newDeadline),
+          'deadline': DateFormat(Keys.listDateFormat).format(newDeadline),
         },
         where: 'id = ?',
         whereArgs: [list.id],
@@ -604,16 +607,16 @@ class ListsProvider extends ChangeNotifier {
     final itemsNotDone = totalItems - itemsDone - itemsDelayed;
 
     final statistics = {
-      'totalLists': activeItems.length +
+      Keys.totalLists: activeItems.length +
           achievedItems.length +
           withoutDeadlineLists.length,
-      'listsDone': achievedItems.length,
-      'activeLists': activeItems.length,
-      'withoutDeadline': withoutDeadlineLists.length,
-      'totalItems': totalItems,
-      'itemsDone': itemsDone,
-      'itemsDelayed': itemsDelayed,
-      'itemsNotDone': itemsNotDone
+      Keys.listsDone: achievedItems.length,
+      Keys.activeLists: activeItems.length,
+      Keys.withoutDeadline: withoutDeadlineLists.length,
+      Keys.totalItems: totalItems,
+      Keys.itemsDone: itemsDone,
+      Keys.itemsDelayed: itemsDelayed,
+      Keys.itemsNotDone: itemsNotDone
     };
     return statistics;
   }

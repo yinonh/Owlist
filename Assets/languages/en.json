@@ -76,11 +76,12 @@
   "Edit list": "Edit list",
   "There is no deadline": "There is no deadline",
   "List must have a title": "List must have a title",
-  "Home page show case description": "Create a new list effortlessly. Simply tap the + button, input a title, set a deadline using the date icon, and save.",
-  "Single list screen edit list show case description": "To manage your list effectively, simply tap here. You can edit the title, set deadlines, and rearrange items. Remember to save your changes.",
-  "Single list screen add item show case description": "Quickly add items to your list or set reminders with a simple tap on the + button.",
-  "Notifications show case description": "Explore, manage, and customize your notifications all in one place. Add new notifications and edit existing ones.",
-  "Notifications state show case description": "Enhance your notification management effortlessly. Toggle between active and disabled statuses with a single tap on the bell icon, while conveniently checking if notifications are already archived.",
-  "Content show case description": "Manage your content by adding text, links, and phone numbers to your items.",
-  "You can't add notifications to this list" : "You can't add notifications to this list"
+  "Home page show case description": "Creating a new list is easy. Try it out! Simply tap the + button, enter a title, set a deadline using the date icon, and save.",
+  "Single list screen edit list show case description": "To manage your list efficiently, tap here. You can edit the title the deadlines and rearrange the items. Don't forget to save your changes.",
+  "Single list screen add item show case description": "Easily add items to your list or set reminders with a simple tap on the + button. Give it a go!",
+  "Notifications show case description": "Explore, manage, and customize your notifications all in one place. Add new notifications and edit existing ones with ease.",
+  "Notifications state show case description": "Toggle between active and disabled statuses with a single tap on the bell icon, while conveniently checking if notifications are already archived.",
+  "Content show case description": "Add text, links, and phone numbers to your items. Give it a try!",
+  "You can't add notifications to this list" : "You can't add notifications to this list",
+  "date format": "MM/dd/yyyy"
 }
