@@ -41,9 +41,9 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       CustomSnackBar.success(
         message: context.translate(Strings.itemDeletedPressHereToUndo),
         backgroundColor: Theme.of(context).highlightColor,
-        icon: const Icon(
+        icon: Icon(
           Icons.warning_rounded,
-          color: Color(0x15000000),
+          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
           size: 120,
         ),
       ),

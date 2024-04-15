@@ -16,6 +16,7 @@ class EditItemDialog extends StatefulWidget {
 
 class _EditItemDialogState extends State<EditItemDialog> {
   String newTitle = Keys.emptyChar;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,27 +25,36 @@ class _EditItemDialogState extends State<EditItemDialog> {
         context.translate(Strings.enterNewItemTitle),
         style: Theme.of(context).textTheme.titleMedium,
       ),
-      content: TextField(
-        textCapitalization: TextCapitalization.sentences,
-        maxLength: 50,
-        autofocus: true,
-        decoration: InputDecoration(
-          hintText: context.translate(Strings.title),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).dividerColor),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          textCapitalization: TextCapitalization.sentences,
+          maxLength: 50,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: context.translate(Strings.title),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
           ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).dividerColor),
-          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return context.translate(Strings.itemMustHaveTitle);
+            }
+            return null;
+          },
+          onChanged: (value) {
+            setState(() {
+              newTitle = value;
+            });
+          },
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(new RegExp(Keys.filterFormat))
+          ],
         ),
-        onChanged: (value) {
-          setState(() {
-            newTitle = value;
-          });
-        },
-        inputFormatters: [
-          FilteringTextInputFormatter.deny(new RegExp(Keys.filterFormat))
-        ],
       ),
       actions: <Widget>[
         Row(
@@ -60,8 +70,11 @@ class _EditItemDialogState extends State<EditItemDialog> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                widget.addNewItem(newTitle.trim()); // Use the passed function
+                if (_formKey.currentState != null &&
+                    _formKey.currentState!.validate()) {
+                  Navigator.of(context).pop();
+                  widget.addNewItem(newTitle.trim());
+                }
               },
               child: Text(
                 context.translate(Strings.add),

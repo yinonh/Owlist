@@ -21,6 +21,7 @@ final class Strings {
   // Single list screen
   static const String scheduleNotification = "Schedule notification";
   static const String notificationsUpdated = "Notifications updated";
+  static const String itemMustHaveTitle = "Item must have a title";
 
   // Statistics screen
   static const String statistics = "Statistics";

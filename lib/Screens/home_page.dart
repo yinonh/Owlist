@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           icon,
-          color: const Color(0x15000000),
+          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
           size: 120,
         ),
       ),

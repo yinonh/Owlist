@@ -174,9 +174,9 @@ class _SingleListScreenState extends State<SingleListScreen> {
       CustomSnackBar.success(
         message: text,
         backgroundColor: Theme.of(context).highlightColor,
-        icon: const Icon(
+        icon: Icon(
           Icons.notifications_active_rounded,
-          color: Color(0x15000000),
+          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
           size: 120,
         ),
       ),

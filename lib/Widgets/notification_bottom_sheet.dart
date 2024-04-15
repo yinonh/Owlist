@@ -179,9 +179,9 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       CustomSnackBar.success(
         message: message,
         backgroundColor: Theme.of(context).highlightColor,
-        icon: const Icon(
+        icon: Icon(
           Icons.notifications_off_rounded,
-          color: Color(0x15000000),
+          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
           size: 120,
         ),
       ),
@@ -294,9 +294,9 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             CustomSnackBar.success(
               message: context.translate(Strings.itemDeletedPressHereToUndo),
               backgroundColor: Theme.of(context).highlightColor,
-              icon: const Icon(
+              icon: Icon(
                 Icons.warning_rounded,
-                color: Color(0x15000000),
+                color: Theme.of(context).primaryColorDark.withOpacity(0.2),
                 size: 120,
               ),
             ),
