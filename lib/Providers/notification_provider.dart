@@ -294,13 +294,8 @@ class NotificationProvider with ChangeNotifier {
       if (scheduledDateTime.isBefore(DateTime.now()) || notification.disabled) {
         continue;
       }
-
-      DateTime dayBefore = list.deadline.subtract(Duration(days: 1));
-      if (list.hasDeadline &&
-          dayBefore.year == scheduledDateTime.year &&
-          dayBefore.month == scheduledDateTime.month &&
-          dayBefore.day == scheduledDateTime.day) {
-        notificationText = notificationText ?? '';
+      if (!list.hasDeadline) {
+        notificationText = '';
       }
 
       await flutterLocalNotificationsPlugin.zonedSchedule(

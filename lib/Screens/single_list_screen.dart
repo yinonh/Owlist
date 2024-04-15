@@ -10,6 +10,7 @@ import '../Models/to_do_item.dart';
 import '../Models/to_do_list.dart';
 import '../Providers/item_provider.dart';
 import '../Providers/lists_provider.dart';
+import '../Providers/notification_provider.dart';
 import '../Screens/home_page.dart';
 import '../Utils/context_extensions.dart';
 import '../Utils/keys.dart';
@@ -58,6 +59,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
         );
       });
     }
+    Provider.of<NotificationProvider>(context, listen: false)
+        .setUpNotifications();
   }
 
   void initListDate() async {
@@ -460,15 +463,18 @@ class _SingleListScreenState extends State<SingleListScreen> {
                               height: MediaQuery.of(context).size.height -
                                   MediaQuery.of(context).padding.top -
                                   (110 + 40),
-                              child: ItemList(
-                                toggleEditMode: toggleEditMode,
-                                editMode: editMode,
-                                currentList: currentList,
-                                editList: editList,
-                                reorderItems: reorderItems,
-                                checkItem: checkItem,
-                                controller: itemListController,
-                                updateSingleListScreen: initListDate,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ItemList(
+                                  toggleEditMode: toggleEditMode,
+                                  editMode: editMode,
+                                  currentList: currentList,
+                                  editList: editList,
+                                  reorderItems: reorderItems,
+                                  checkItem: checkItem,
+                                  controller: itemListController,
+                                  updateSingleListScreen: initListDate,
+                                ),
                               ),
                             ),
                             const SizedBox(
