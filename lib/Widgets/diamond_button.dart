@@ -17,11 +17,11 @@ class DiamondButton extends StatelessWidget {
       : super(key: key);
 
   double getRelativeHeight(double percentage) {
-    return 50; //percentage * screenHeight;
+    return 55; //percentage * screenHeight;
   }
 
   double getRelativeWidth(double percentage) {
-    return 50; //percentage * screenWidth;
+    return 55; // percentage * screenWidth;
   }
 
   @override
@@ -59,10 +59,8 @@ class DiamondButton extends StatelessWidget {
                   ],
                 ),
               ),
-              height: 50,
-              //getRelativeWidth(0.15),
-              width: 50,
-              //getRelativeWidth(0.15),
+              height: getRelativeWidth(0.15),
+              width: getRelativeWidth(0.15),
               child: Center(
                 child: Transform.rotate(
                   angle: math.pi / 4,

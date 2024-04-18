@@ -263,9 +263,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
           Navigator.pushNamed(context, SingleListScreen.routeName,
                   arguments: widget.item.id)
               .then((value) {
-            setState(() {
-              widget.refresh();
-            });
+            widget.refresh();
           });
         },
         child: Container(
@@ -289,26 +287,31 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    FittedBox(
+                    Expanded(
                       child: Text(
                         widget.item.title,
                         style: Theme.of(context).textTheme.titleMedium,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: editItem,
-                      icon: Icon(Icons.edit_rounded,
-                          color: Theme.of(context).highlightColor),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        _showDeleteConfirmation(context);
-                      },
-                      icon: Icon(Icons.delete_rounded,
-                          color: Theme.of(context).highlightColor),
-                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: editItem,
+                            icon: Icon(Icons.edit_rounded,
+                                color: Theme.of(context).highlightColor),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _showDeleteConfirmation(context);
+                            },
+                            icon: Icon(Icons.delete_rounded,
+                                color: Theme.of(context).highlightColor),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),

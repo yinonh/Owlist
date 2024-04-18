@@ -101,10 +101,9 @@ class _ItemsScreenState extends State<ItemsScreen> {
       builder: (context, orientation) {
         if (_currentOrientation != orientation) {
           _currentOrientation = orientation;
-          _loadAd(); // Load the ad only when orientation changes
+          _loadAd();
         }
 
-        // Return the ad widget if loaded and orientation matches
         if (_inlineAdaptiveAd != null && _isLoaded && _adSize != null) {
           return Align(
             child: SizedBox(
@@ -117,7 +116,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
           );
         }
 
-        return Container(); // Return an empty container if ad is not loaded or orientation doesn't match
+        return Container();
       },
     );
   }

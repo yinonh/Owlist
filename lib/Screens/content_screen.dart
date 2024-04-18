@@ -176,10 +176,8 @@ class _ContentScreenState extends State<ContentScreen> {
                                           color: Colors.white,
                                         ),
                                         maxLength: 50,
-                                        // Set the maximum length
                                         decoration: const InputDecoration(
-                                          counterText: Keys
-                                              .emptyChar, // Hide the character counter
+                                          counterText: Keys.emptyChar,
                                         ),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.deny(

@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       if (hasDeadline) {
         onItemTapped(0);
-        activeItemsFuture = activeItemsFuture.then((activeItems) {
+        activeItemsFuture.then((activeItems) {
           return provider
               .createNewList(title, deadline, hasDeadline)
               .then((result) {
@@ -130,21 +130,22 @@ class _HomePageState extends State<HomePage> {
             }
             if (result.data != null) {
               Navigator.pushNamed(context, SingleListScreen.routeName,
-                  arguments: result.data);
+                      arguments: result.data)
+                  .then((value) => refreshLists());
             }
             return provider.getActiveItems();
           });
         });
       } else {
         onItemTapped(2);
-        withoutDeadlineItemsFuture =
-            withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
+        withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
           return provider
               .createNewList(title, deadline, hasDeadline)
               .then((result) {
             if (result.data != null) {
               Navigator.pushNamed(context, SingleListScreen.routeName,
-                  arguments: result.data);
+                      arguments: result.data)
+                  .then((value) => refreshLists());
             }
             return provider.getWithoutDeadlineItems();
           });
@@ -192,12 +193,19 @@ class _HomePageState extends State<HomePage> {
                 Icons.watch_off_rounded,
                 Icons.settings_rounded,
               ],
-              addItem: addItem,
+              addItem:
+                  (String title, DateTime deadline, bool hasDeadline) async {
+                await addItem(title, deadline, hasDeadline);
+                setState(() {
+                  refreshLists();
+                });
+              },
               selectedIndex: currentIndex,
               onItemPressed: onItemTapped,
               bgColor: Theme.of(context).primaryColor,
               selectedColor: Theme.of(context).focusColor,
               unselectedColor: Theme.of(context).unselectedWidgetColor,
+              height: 50,
             ),
           ),
           body: Container(
