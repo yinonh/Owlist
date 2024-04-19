@@ -108,16 +108,20 @@ class _ContentScreenState extends State<ContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      resizeToAvoidBottomInset: false,
-      floatingActionButton: DiamondButton(
-        icon: Icon(
-          Icons.text_fields_rounded,
-          color: textEditMode ? Colors.grey : Theme.of(context).primaryColor,
-          size: MediaQuery.of(context).size.width * 0.1,
+      resizeToAvoidBottomInset: true,
+      floatingActionButton: Visibility(
+        maintainState: true,
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        child: DiamondButton(
+          icon: Icon(
+            Icons.text_fields_rounded,
+            color: textEditMode ? Colors.grey : Theme.of(context).primaryColor,
+            size: MediaQuery.of(context).size.width * 0.1,
+          ),
+          onTap: textEditMode ? null : toggleTextEditMode,
+          screenWidth: MediaQuery.of(context).size.width,
+          screenHeight: MediaQuery.of(context).size.height,
         ),
-        onTap: textEditMode ? null : toggleTextEditMode,
-        screenWidth: MediaQuery.of(context).size.width,
-        screenHeight: MediaQuery.of(context).size.height,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Container(
@@ -181,7 +185,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                         ),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.deny(
-                                              new RegExp(Keys.filterFormat))
+                                              RegExp(Keys.filterFormat))
                                         ],
                                         onSubmitted: (_) {
                                           _save();

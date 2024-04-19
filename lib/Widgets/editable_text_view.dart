@@ -54,7 +54,7 @@ class _EditableTextViewState extends State<EditableTextView> {
                 color: Colors.white,
               ),
               controller: widget.controller,
-              maxLines: 8,
+              maxLines: 12,
               textAlign: TextAlign.start,
               // Align the text to the start (left)
               decoration: const InputDecoration(

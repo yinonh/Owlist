@@ -14,11 +14,12 @@ class ToDoItemTile extends StatefulWidget {
   final Function(ToDoList) onDelete;
   final Function refresh;
 
-  const ToDoItemTile(
-      {super.key,
-      required this.item,
-      required this.refresh,
-      required this.onDelete});
+  const ToDoItemTile({
+    super.key,
+    required this.item,
+    required this.refresh,
+    required this.onDelete,
+  });
 
   @override
   State<ToDoItemTile> createState() => _ToDoItemTileState();
@@ -294,23 +295,21 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Container(
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: editItem,
-                            icon: Icon(Icons.edit_rounded,
-                                color: Theme.of(context).highlightColor),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              _showDeleteConfirmation(context);
-                            },
-                            icon: Icon(Icons.delete_rounded,
-                                color: Theme.of(context).highlightColor),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: editItem,
+                          icon: Icon(Icons.edit_rounded,
+                              color: Theme.of(context).highlightColor),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _showDeleteConfirmation(context);
+                          },
+                          icon: Icon(Icons.delete_rounded,
+                              color: Theme.of(context).highlightColor),
+                        ),
+                      ],
                     )
                   ],
                 ),

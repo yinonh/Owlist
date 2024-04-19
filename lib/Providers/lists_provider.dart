@@ -500,7 +500,7 @@ class ListsProvider extends ChangeNotifier {
     if (newDeadline == null) {
       return false;
     }
-    bool notificationDisabled = false;
+    bool notificationDeleted = false;
     try {
       final Database db = await database;
 
@@ -519,15 +519,15 @@ class ListsProvider extends ChangeNotifier {
           await notificationProvider.getNotificationsByListId(list.id);
       for (var notification in notifications) {
         if (newDeadline.isBefore(notification.notificationDateTime)) {
-          notificationProvider.disableNotificationById(notification, list);
-          notificationDisabled = true;
+          notificationProvider.deleteNotification(notification, list);
+          notificationDeleted = true;
         }
       }
       notificationProvider.scheduleNotification(list);
     } catch (e) {
       print('Error updating the deadline: $e');
     }
-    return notificationDisabled;
+    return notificationDeleted;
   }
 
   Future<void> editTitle(ToDoList list, String? newTitle) async {
