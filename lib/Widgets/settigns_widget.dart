@@ -1,6 +1,8 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -50,7 +52,7 @@ class _SettingsState extends State<Settings> {
     _loadSharedPreferences();
     notificationProvider = Provider.of<NotificationProvider>(context);
     _time = notificationProvider.notificationTime;
-    _notificationsActive = notificationProvider.isActive;
+    _notificationsActive = SharedPreferencesHelper.instance.notificationsActive;
     _autoNotificationsActive = notificationProvider.autoNotification;
   }
 
@@ -79,6 +81,10 @@ class _SettingsState extends State<Settings> {
         ),
       ),
       snackBarPosition: SnackBarPosition.bottom,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 80,
+      ),
       displayDuration: const Duration(seconds: 2),
     );
 
@@ -261,7 +267,21 @@ class _SettingsState extends State<Settings> {
                       child: Transform.scale(
                         scale: 1,
                         child: Switch(
-                          onChanged: (val) {
+                          onChanged: (val) async {
+                            if (val) {
+                              if (await Permission.notification.request() ==
+                                  PermissionStatus.permanentlyDenied) {
+                                AppSettings.openAppSettings();
+                                return;
+                              } else {
+                                await notificationProvider
+                                    .requestPermissions(true);
+                                if (!await notificationProvider
+                                    .isAndroidPermissionGranted()) {
+                                  return;
+                                }
+                              }
+                            }
                             notificationProvider.saveActive(val);
                             setState(() {
                               ShowCaseHelper.instance.toggleIsActive(false);
@@ -269,7 +289,7 @@ class _SettingsState extends State<Settings> {
                             });
                           },
                           value: _notificationsActive,
-                          trackColor: MaterialStateProperty.all<Color>(
+                          trackColor: WidgetStateProperty.all<Color>(
                               _notificationsActive
                                   ? Theme.of(context).primaryColorLight
                                   : Colors.black),
@@ -303,7 +323,7 @@ class _SettingsState extends State<Settings> {
                           },
                           value:
                               _notificationsActive && _autoNotificationsActive,
-                          trackColor: MaterialStateProperty.all<Color>(
+                          trackColor: WidgetStateProperty.all<Color>(
                               _notificationsActive && _autoNotificationsActive
                                   ? Theme.of(context).primaryColorLight
                                   : Colors.black),

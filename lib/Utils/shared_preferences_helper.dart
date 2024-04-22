@@ -1,4 +1,6 @@
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do/Providers/notification_provider.dart';
 
 import '../Utils/keys.dart';
 
@@ -8,13 +10,13 @@ class SharedPreferencesHelper {
   late SharedPreferences prefs;
   late String? language;
   late String? themePref;
-  late bool notificationActive;
+  late bool _notificationActive;
 
   Future<void> initialise() async {
     prefs = await SharedPreferences.getInstance();
     language = prefs.getString(Keys.selectedLanguage);
     themePref = prefs.getString(Keys.selectedTheme);
-    notificationActive = prefs.getBool(Keys.notificationActive) ?? true;
+    _notificationActive = prefs.getBool(Keys.notificationActive) ?? true;
   }
 
   static final SharedPreferencesHelper instance = SharedPreferencesHelper._();
@@ -33,10 +35,10 @@ class SharedPreferencesHelper {
     prefs.setString(Keys.selectedTheme, value ?? Keys.emptyChar);
   }
 
-  bool get notificationsActive => notificationActive;
+  bool get notificationsActive => _notificationActive;
 
   set notificationsActive(bool active) {
-    notificationActive = active;
+    _notificationActive = active;
     prefs.setBool(Keys.notificationActive, active);
   }
 

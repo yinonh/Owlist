@@ -55,6 +55,10 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         // });
       },
       snackBarPosition: SnackBarPosition.bottom,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 80,
+      ),
       displayDuration: const Duration(seconds: 1, milliseconds: 500),
     );
   }

@@ -181,6 +181,10 @@ class _SingleListScreenState extends State<SingleListScreen> {
         ),
       ),
       snackBarPosition: SnackBarPosition.bottom,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 80,
+      ),
       displayDuration: Duration(seconds: 1),
     );
   }
@@ -321,11 +325,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
                   size: MediaQuery.of(context).size.width * 0.13,
                 ),
                 childButtons:
-                    (SharedPreferencesHelper.instance.notificationActive)
+                    (SharedPreferencesHelper.instance.notificationsActive)
                         ? childButtons
                         : [],
                 onMainButtonPressed:
-                    (SharedPreferencesHelper.instance.notificationActive)
+                    (SharedPreferencesHelper.instance.notificationsActive)
                         ? () {}
                         : () {
                             _showNewItemDialog(context);

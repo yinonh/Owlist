@@ -22,7 +22,6 @@ class NotificationProvider with ChangeNotifier {
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _notificationsEnabled = false;
   late NotificationTime _notificationTime;
-  late bool isActive;
   late bool autoNotification;
   Database? _database;
 
@@ -57,7 +56,6 @@ class NotificationProvider with ChangeNotifier {
     int storedTime =
         await SharedPreferencesHelper.instance.getNotificationTime();
     _notificationTime = NotificationTime.fromInt(storedTime);
-    isActive = SharedPreferencesHelper.instance.notificationActive;
     autoNotification =
         await SharedPreferencesHelper.instance.isAutoNotification();
     notifyListeners();
@@ -73,7 +71,6 @@ class NotificationProvider with ChangeNotifier {
     if (!isActive) {
       cancelAllNotifications();
     }
-    this.isActive = isActive;
     SharedPreferencesHelper.instance.notificationsActive = isActive;
     notifyListeners();
   }
@@ -123,34 +120,38 @@ class NotificationProvider with ChangeNotifier {
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   }
 
-  Future<void> isAndroidPermissionGranted() async {
-    final bool granted = await _flutterLocalNotificationsPlugin
+  Future<bool> isAndroidPermissionGranted() async {
+    _notificationsEnabled = await _flutterLocalNotificationsPlugin
             .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>()
             ?.areNotificationsEnabled() ??
         false;
-    _notificationsEnabled = granted;
     notifyListeners();
+
+    return _notificationsEnabled;
   }
 
-  Future<void> requestPermissions() async {
-    if (isActive) {
+  Future<void> requestPermissions([bool? toActive]) async {
+    if (SharedPreferencesHelper.instance.notificationsActive ||
+        (toActive ?? false)) {
+      final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-          _flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>();
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
 
-      final bool? grantedNotificationPermission =
-          await androidImplementation?.requestPermission();
-
-      _notificationsEnabled = grantedNotificationPermission ?? false;
+      if (androidImplementation != null) {
+        await androidImplementation.requestNotificationsPermission();
+      }
       notifyListeners();
     }
   }
 
   Future<bool> addNotificationDayBeforeDeadline(
       ToDoList list, String notificationText) async {
-    if (!isActive || !autoNotification) return false;
+    if (!SharedPreferencesHelper.instance.notificationsActive ||
+        !autoNotification) return false;
     final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,
@@ -168,7 +169,7 @@ class NotificationProvider with ChangeNotifier {
 
   Future<bool> addNotification(ToDoList list, DateTime notificationDateTime,
       [String? notificationText]) async {
-    if (!isActive) return false;
+    if (!SharedPreferencesHelper.instance.notificationsActive) return false;
 
     final disabled = notificationDateTime.isBefore(DateTime.now());
     final Database db = await database;
@@ -232,7 +233,8 @@ class NotificationProvider with ChangeNotifier {
 
   Future<void> toggleNotificationDisabled(
       Notifications notification, ToDoList list) async {
-    if (!isActive && notification.disabled) return;
+    if (!SharedPreferencesHelper.instance.notificationsActive &&
+        notification.disabled) return;
     final db = await database;
 
     // Toggle the 'disabled' field
@@ -279,7 +281,7 @@ class NotificationProvider with ChangeNotifier {
 
   Future<bool> scheduleNotification(ToDoList list,
       [String? notificationText]) async {
-    if (!isActive) return false;
+    if (!SharedPreferencesHelper.instance.notificationsActive) return false;
 
     // Retrieve notifications with the same listId
     List<Notifications> notifications = await getNotificationsByListId(list.id);

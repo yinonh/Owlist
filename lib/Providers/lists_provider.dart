@@ -376,18 +376,22 @@ class ListsProvider extends ChangeNotifier {
         notifyListeners();
       });
       if (newList.hasDeadline) {
-        notificationProvider.isAndroidPermissionGranted();
-        notificationProvider.requestPermissions();
-        String notificationText = await getRandomNotificationText(
-            (SharedPreferencesHelper.instance.selectedLanguage ??
-                        Localizations.localeOf(context).languageCode) !=
-                    'he'
-                ? 'en'
-                : 'he');
-        return PairResult(
-            await notificationProvider.addNotificationDayBeforeDeadline(
-                newList, notificationText),
-            newListId);
+        await notificationProvider.requestPermissions();
+        if (await notificationProvider.isAndroidPermissionGranted()) {
+          String notificationText = await getRandomNotificationText(
+              (SharedPreferencesHelper.instance.selectedLanguage ??
+                          Localizations.localeOf(context).languageCode) !=
+                      'he'
+                  ? 'en'
+                  : 'he');
+          return PairResult(
+              await notificationProvider.addNotificationDayBeforeDeadline(
+                  newList, notificationText),
+              newListId);
+        } else {
+          SharedPreferencesHelper.instance.notificationsActive = false;
+          PairResult(false, newListId);
+        }
       }
     } catch (error) {
       print("Error adding new item: $error");

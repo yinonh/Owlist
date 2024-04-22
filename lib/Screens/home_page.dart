@@ -90,6 +90,10 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       snackBarPosition: SnackBarPosition.bottom,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 80,
+      ),
       displayDuration: Duration(seconds: 1),
     );
   }
