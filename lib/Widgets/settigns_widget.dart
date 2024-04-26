@@ -271,7 +271,8 @@ class _SettingsState extends State<Settings> {
                             if (val) {
                               if (await Permission.notification.request() ==
                                   PermissionStatus.permanentlyDenied) {
-                                AppSettings.openAppSettings();
+                                AppSettings.openAppSettings(
+                                    type: AppSettingsType.notification);
                                 return;
                               } else {
                                 await notificationProvider

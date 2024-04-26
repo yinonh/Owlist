@@ -191,6 +191,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                                 Form(
                                   key: _formKey,
                                   child: TextFormField(
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall,

@@ -153,6 +153,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
+                    textCapitalization: TextCapitalization.sentences,
                     style: Theme.of(context).textTheme.headlineSmall,
                     autofocus: true,
                     controller: newTitle,
