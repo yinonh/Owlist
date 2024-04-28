@@ -17,6 +17,7 @@ import '../Utils/shared_preferences_helper.dart';
 import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../main.dart';
+import 'dropdown_language_item.dart';
 
 class Settings extends StatefulWidget {
   final Function refresh;
@@ -28,23 +29,25 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  List<bool> _selectedLanguages = [true, false];
+  String? _selectedLanguages = "en";
   late NotificationProvider notificationProvider;
   late NotificationTime _time;
   late bool _notificationsActive;
   late bool _autoNotificationsActive;
-  List<Widget> languages = <Widget>[
-    SvgPicture.asset(
+  Map<String, Widget> languages = {
+    "en": SvgPicture.asset(
       Keys.englishSvg,
       width: 60,
-      // height: 45,
     ),
-    SvgPicture.asset(
+    "he": SvgPicture.asset(
       Keys.hebrewSvg,
       width: 60,
-      // height: 45,
-    )
-  ];
+    ),
+    "fr": SvgPicture.asset(
+      Keys.franceSvg,
+      width: 60,
+    ),
+  };
 
   @override
   void didChangeDependencies() {
@@ -62,8 +65,7 @@ class _SettingsState extends State<Settings> {
             Localizations.localeOf(context).languageCode;
 
     setState(() {
-      _selectedLanguages =
-          selectedLanguage == 'he' ? [false, true] : [true, false];
+      _selectedLanguages = selectedLanguage;
     });
   }
 
@@ -104,7 +106,7 @@ class _SettingsState extends State<Settings> {
         slivers: <Widget>[
           SliverAppBar(
             title: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 context.translate(Strings.settings),
                 style: const TextStyle(
@@ -119,54 +121,84 @@ class _SettingsState extends State<Settings> {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          context.translate(Strings.chooseLanguage),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        context.translate(Strings.chooseLanguage),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                     ),
-                    Expanded(
-                      child: ToggleButtons(
-                        onPressed: (int index) async {
-                          setState(() {
-                            _selectedLanguages = List.generate(
-                                _selectedLanguages.length, (i) => i == index);
-                          });
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonHideUnderline(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: DropdownButton<String>(
+                                    value: _selectedLanguages,
+                                    isExpanded: true,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    dropdownColor:
+                                        Theme.of(context).primaryColorDark,
+                                    onChanged: (String? newValue) async {
+                                      if (newValue == null) return;
+                                      setState(() {
+                                        _selectedLanguages = newValue;
+                                      });
 
-                          String newLanguageCode = index == 0 ? 'en' : 'he';
-                          SharedPreferencesHelper.instance.selectedLanguage =
-                              newLanguageCode;
+                                      SharedPreferencesHelper
+                                          .instance.selectedLanguage = newValue;
 
-                          Locale newLocale = Locale(newLanguageCode);
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            OwlistApp.setLocale(context, newLocale);
-                          });
-                        },
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
-                        selectedColor: Theme.of(context).primaryColor,
-                        fillColor: Theme.of(context).primaryColorLight,
-                        constraints: const BoxConstraints(
-                          minHeight: 40.0,
-                          minWidth: 80.0,
+                                      Locale newLocale = Locale(newValue);
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        OwlistApp.setLocale(context, newLocale);
+                                      });
+                                    },
+                                    items: [
+                                      DropdownLanguageItem(
+                                        value: 'en',
+                                        text: 'English',
+                                        svgPath: Keys.englishSvg,
+                                      ),
+                                      DropdownLanguageItem(
+                                        value: 'he',
+                                        text: 'Hebrew',
+                                        svgPath: Keys.hebrewSvg,
+                                      ),
+                                      DropdownLanguageItem(
+                                        value: 'fr',
+                                        text: 'French',
+                                        svgPath: Keys.franceSvg,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        isSelected: _selectedLanguages,
-                        children: languages,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10),
                   child: Text(
                     context.translate(Strings.switchThemeMode),
                     style: const TextStyle(
@@ -249,7 +281,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -300,7 +332,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -334,7 +366,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -397,7 +429,7 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -419,7 +451,7 @@ class _SettingsState extends State<Settings> {
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
               ],
             ),

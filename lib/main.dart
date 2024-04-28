@@ -103,21 +103,11 @@ class _OwlistAppState extends State<OwlistApp> {
   late Widget initialScreen;
 
   Future<void> setPreferences(BuildContext context) async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
     String? language = SharedPreferencesHelper.instance.selectedLanguage;
     String? themePref = SharedPreferencesHelper.instance.selectedTheme;
 
     // Set locale
-    switch (language) {
-      case 'en':
-        _locale = const Locale('en', 'IL');
-        break;
-      case 'he':
-        _locale = const Locale('he', 'US');
-        break;
-      default:
-        _locale = null;
-    }
+    _locale = AppLocalizations.supportedLanguage[language ?? 'en'];
 
     // Set theme
     switch (themePref) {
@@ -163,10 +153,7 @@ class _OwlistAppState extends State<OwlistApp> {
           ...GlobalMaterialLocalizations.delegates,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('he', 'IL'),
-        ],
+        supportedLocales: AppLocalizations.supportedLanguage.values,
         themeMode: currentThemeMode,
         theme: lightTheme,
         darkTheme: darkTheme,

@@ -54,6 +54,7 @@ final class Keys {
   static const String appNameSvg = 'Assets/appName.svg';
   static const String englishSvg = 'Assets/english.svg';
   static const String hebrewSvg = 'Assets/hebrew.svg';
+  static const String franceSvg = 'Assets/france.svg';
   static const String emptyNotificationsDark =
       'Assets/empty notifications dark.json';
   static const String emptyNotificationsLight =
