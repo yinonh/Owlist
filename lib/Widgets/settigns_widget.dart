@@ -1,7 +1,6 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -17,7 +16,6 @@ import '../Utils/shared_preferences_helper.dart';
 import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../main.dart';
-import 'dropdown_language_item.dart';
 
 class Settings extends StatefulWidget {
   final Function refresh;
@@ -34,19 +32,10 @@ class _SettingsState extends State<Settings> {
   late NotificationTime _time;
   late bool _notificationsActive;
   late bool _autoNotificationsActive;
-  Map<String, Widget> languages = {
-    "en": SvgPicture.asset(
-      Keys.englishSvg,
-      width: 60,
-    ),
-    "he": SvgPicture.asset(
-      Keys.hebrewSvg,
-      width: 60,
-    ),
-    "fr": SvgPicture.asset(
-      Keys.franceSvg,
-      width: 60,
-    ),
+  Map<String, String> languages = {
+    "en": Keys.english,
+    "he": Keys.hebrew,
+    "fr": Keys.french,
   };
 
   @override
@@ -121,8 +110,8 @@ class _SettingsState extends State<Settings> {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -143,50 +132,47 @@ class _SettingsState extends State<Settings> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
                           children: [
-                            Expanded(
-                              child: DropdownButtonHideUnderline(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: DropdownButton<String>(
-                                    value: _selectedLanguages,
-                                    isExpanded: true,
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    dropdownColor:
-                                        Theme.of(context).primaryColorDark,
-                                    onChanged: (String? newValue) async {
-                                      if (newValue == null) return;
-                                      setState(() {
-                                        _selectedLanguages = newValue;
-                                      });
+                            DropdownButtonHideUnderline(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: DropdownButton<String>(
+                                  value: _selectedLanguages,
+                                  isExpanded: false,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  dropdownColor:
+                                      Theme.of(context).primaryColorDark,
+                                  onChanged: (String? newValue) async {
+                                    if (newValue == null) return;
+                                    setState(() {
+                                      _selectedLanguages = newValue;
+                                    });
 
-                                      SharedPreferencesHelper
-                                          .instance.selectedLanguage = newValue;
+                                    SharedPreferencesHelper
+                                        .instance.selectedLanguage = newValue;
 
-                                      Locale newLocale = Locale(newValue);
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                        OwlistApp.setLocale(context, newLocale);
-                                      });
+                                    Locale newLocale = Locale(newValue);
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      OwlistApp.setLocale(context, newLocale);
+                                    });
+                                  },
+                                  items: languages.entries.map(
+                                    (entry) {
+                                      String languageCode = entry.key;
+                                      String languageName = entry.value;
+                                      return DropdownMenuItem(
+                                        value: languageCode,
+                                        child: Text(
+                                          languageName,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
                                     },
-                                    items: [
-                                      DropdownLanguageItem(
-                                        value: 'en',
-                                        text: 'English',
-                                        svgPath: Keys.englishSvg,
-                                      ),
-                                      DropdownLanguageItem(
-                                        value: 'he',
-                                        text: 'Hebrew',
-                                        svgPath: Keys.hebrewSvg,
-                                      ),
-                                      DropdownLanguageItem(
-                                        value: 'fr',
-                                        text: 'French',
-                                        svgPath: Keys.franceSvg,
-                                      ),
-                                    ],
-                                  ),
+                                  ).toList(),
                                 ),
                               ),
                             ),
@@ -421,6 +407,7 @@ class _SettingsState extends State<Settings> {
                                       .primaryTextTheme
                                       .titleMedium!
                                       .copyWith(color: Colors.grey),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),

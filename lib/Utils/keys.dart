@@ -52,13 +52,15 @@ final class Keys {
 
   // Assets
   static const String appNameSvg = 'Assets/appName.svg';
-  static const String englishSvg = 'Assets/english.svg';
-  static const String hebrewSvg = 'Assets/hebrew.svg';
-  static const String franceSvg = 'Assets/france.svg';
   static const String emptyNotificationsDark =
       'Assets/empty notifications dark.json';
   static const String emptyNotificationsLight =
       'Assets/empty notifications light.json';
+
+  // Languages
+  static const String english = "English";
+  static const String hebrew = "עברית";
+  static const String french = "française";
 
   // Unicorn button
   static const String addTextHeroTag = 'Text';
