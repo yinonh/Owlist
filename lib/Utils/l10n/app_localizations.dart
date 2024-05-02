@@ -7,9 +7,13 @@ import 'package:flutter/services.dart' show rootBundle;
 class AppLocalizations {
   final Locale locale;
   static const Map<String, Locale> supportedLanguage = {
-    'en': Locale('en', 'IL'),
-    'he': Locale('he', 'US'),
-    'fr': Locale('fr', 'FR')
+    'en': Locale('en', 'US'), // English (United States)
+    'he': Locale('he', 'IL'), // Hebrew (Israel)
+    'fr': Locale('fr', 'FR'), // French (France)
+    'hi': Locale('hi', 'IN'), // Hindi (India)
+    'ru': Locale('ru', 'RU'), // Russian (Russia)
+    'zh': Locale('zh', 'CN'), // Chinese (China)
+    'es': Locale('es', 'ES'), // Spanish (Spain)
   };
 
   AppLocalizations(this.locale);

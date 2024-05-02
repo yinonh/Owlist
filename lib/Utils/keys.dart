@@ -60,7 +60,11 @@ final class Keys {
   // Languages
   static const String english = "English";
   static const String hebrew = "עברית";
-  static const String french = "française";
+  static const String french = "Français";
+  static const String russian = "Русский";
+  static const String hindi = "हिन्दी";
+  static const String mandarin = "普通话";
+  static const String spanish = "Español";
 
   // Unicorn button
   static const String addTextHeroTag = 'Text';

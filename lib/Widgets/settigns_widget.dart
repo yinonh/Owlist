@@ -34,8 +34,12 @@ class _SettingsState extends State<Settings> {
   late bool _autoNotificationsActive;
   Map<String, String> languages = {
     "en": Keys.english,
+    "zh": Keys.mandarin,
+    "hi": Keys.hindi,
+    "es": Keys.spanish,
     "he": Keys.hebrew,
     "fr": Keys.french,
+    "ru": Keys.russian,
   };
 
   @override
@@ -266,59 +270,57 @@ class _SettingsState extends State<Settings> {
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          context.translate(Strings.enableNotifications),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            context.translate(Strings.enableNotifications),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Transform.scale(
-                        scale: 1,
-                        child: Switch(
-                          onChanged: (val) async {
-                            if (val) {
-                              if (await Permission.notification.request() ==
-                                  PermissionStatus.permanentlyDenied) {
-                                AppSettings.openAppSettings(
-                                    type: AppSettingsType.notification);
-                                return;
-                              } else {
-                                await notificationProvider
-                                    .requestPermissions(true);
-                                if (!await notificationProvider
-                                    .isAndroidPermissionGranted()) {
+                      Expanded(
+                        child: Transform.scale(
+                          scale: 1,
+                          child: Switch(
+                            onChanged: (val) async {
+                              if (val) {
+                                if (await Permission.notification.request() ==
+                                    PermissionStatus.permanentlyDenied) {
+                                  AppSettings.openAppSettings(
+                                      type: AppSettingsType.notification);
                                   return;
+                                } else {
+                                  await notificationProvider
+                                      .requestPermissions(true);
+                                  if (!await notificationProvider
+                                      .isAndroidPermissionGranted()) {
+                                    return;
+                                  }
                                 }
                               }
-                            }
-                            notificationProvider.saveActive(val);
-                            setState(() {
-                              ShowCaseHelper.instance.toggleIsActive(false);
-                              widget.refresh();
-                            });
-                          },
-                          value: _notificationsActive,
-                          trackColor: WidgetStateProperty.all<Color>(
-                              _notificationsActive
-                                  ? Theme.of(context).primaryColorLight
-                                  : Colors.black),
+                              notificationProvider.saveActive(val);
+                              setState(() {
+                                ShowCaseHelper.instance.toggleIsActive(false);
+                                widget.refresh();
+                              });
+                            },
+                            value: _notificationsActive,
+                            trackColor: WidgetStateProperty.all<Color>(
+                                _notificationsActive
+                                    ? Theme.of(context).primaryColorLight
+                                    : Colors.black),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
+                    ],
+                  ),
                 ),
                 Row(
                   children: [
@@ -350,9 +352,6 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(
-                  height: 10,
                 ),
                 Row(
                   children: [
