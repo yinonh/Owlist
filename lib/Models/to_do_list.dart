@@ -35,7 +35,7 @@ class ToDoList {
       hasDeadline: map[Keys.hasDeadline] == 1 ? true : false,
       title: map[Keys.title],
       creationDate:
-          DateFormat(Keys.listDateFormat).parse(map[Keys.creationDate]),
+          DateFormat(Keys.creationDateFormat).parse(map[Keys.creationDate]),
       deadline: DateFormat(Keys.listDateFormat).parse(map[Keys.deadline]),
       totalItems: map[Keys.totalItems],
       accomplishedItems: map[Keys.accomplishedItems],
@@ -48,7 +48,8 @@ class ToDoList {
       Keys.userID: userID,
       Keys.title: title,
       Keys.hasDeadline: hasDeadline ? 1 : 0,
-      Keys.creationDate: DateFormat(Keys.listDateFormat).format(creationDate),
+      Keys.creationDate:
+          DateFormat(Keys.creationDateFormat).format(creationDate),
       Keys.deadline: DateFormat(Keys.listDateFormat).format(deadline),
       Keys.totalItems: totalItems,
       Keys.accomplishedItems: accomplishedItems,

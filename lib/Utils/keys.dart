@@ -23,6 +23,7 @@ final class Keys {
   static const String totalItems = 'totalItems';
   static const String accomplishedItems = 'accomplishedItems';
   static const String listDateFormat = 'yyyy-MM-dd';
+  static const String creationDateFormat = 'yyyy-MM-dd HH:mm:ss';
 
   // To do item
   static const String content = 'content';
