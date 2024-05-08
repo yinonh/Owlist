@@ -40,7 +40,7 @@ final class Keys {
   static const String itemsNotDone = 'itemsNotDone';
 
   // Notifications provider
-  static const String appIcon = '@mipmap/ic_launcher';
+  static const String appIcon = 'notification_icon';
   static const String mainChannelId = 'main_channel_id';
   static const String mainChannelName = 'Deadline notifications';
   static const String mainChannelDescription = 'Notification for the lists';
