@@ -77,6 +77,7 @@ final class Strings {
   static const String chooseTime = "Choose time";
   static const String setReminderDayBeforeDeadline =
       "Set a reminder one day before the deadline";
+  static const String sendFeedback = "sendFeedback";
 
   // Statistics graphs
   static const String listData = "List Data:";

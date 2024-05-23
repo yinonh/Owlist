@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -89,6 +95,14 @@ class _SettingsState extends State<Settings> {
     );
     Provider.of<NotificationProvider>(context, listen: false)
         .saveNotificationTimeToPrefs(newTime);
+  }
+
+  Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
+    final Directory output = await getTemporaryDirectory();
+    final String screenshotFilePath = '${output.path}/feedback.png';
+    final File screenshotFile = File(screenshotFilePath);
+    await screenshotFile.writeAsBytes(feedbackScreenshot);
+    return screenshotFilePath;
   }
 
   @override
@@ -417,27 +431,63 @@ class _SettingsState extends State<Settings> {
                 const SizedBox(
                   height: 10,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed(StatisticsScreen.routeName);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                        context.translate(Strings.statistics),
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .titleMedium!
-                            .copyWith(color: Colors.white),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(StatisticsScreen.routeName);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text(
+                            context.translate(Strings.statistics),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .titleMedium!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
+                    Flexible(
+                      flex: 1,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          BetterFeedback.of(context).show((feedback) async {
+                            // draft an email and send to developer
+                            final screenshotFilePath =
+                                await writeImageToStorage(feedback.screenshot);
+
+                            final Email email = Email(
+                              body: feedback.text,
+                              subject: 'Owlist Feedback',
+                              recipients: ['yinon.h21+owlist@gmail.com'],
+                              attachmentPaths: [screenshotFilePath],
+                              isHTML: false,
+                            );
+                            await FlutterEmailSender.send(email);
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text(
+                            context.translate(Strings.sendFeedback),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .titleMedium!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

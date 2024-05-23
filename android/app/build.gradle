@@ -68,6 +68,15 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    flavorDimensions "version"
+
+    productFlavors {
+        qa {
+            dimension "version"
+            applicationIdSuffix ".qa"
+            versionNameSuffix "-qa"
+        }
+    }
 
 }
 

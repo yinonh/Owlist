@@ -79,5 +79,10 @@
   "Notifications state show case description": "सूचना की सक्रिय और निष्क्रिय स्थिति के बीच स्विच करें।",
   "Content show case description": "अपने आइटमों में टेक्स्ट, लिंक और फोन नंबर जोड़ें।",
   "You can't add notifications to this list": "आप इस सूची में सूचनाएं नहीं जोड़ सकते",
+  "sendFeedback" : "फीडबैक भेजें",
+  "feedbackDraw": "ड्रा",
+  "feedbackNavigate": "नेविगेट करें",
+  "feedbackSubmitButton": "सबमिट करें",
+  "feedbackDescription": "विवरण जोड़ें",
   "date format": "dd/MM/yyyy"
 }

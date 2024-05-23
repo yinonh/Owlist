@@ -79,5 +79,10 @@
   "Notifications state show case description": "Переключайтесь между активным и отключенным состояниями уведомлений.",
   "Content show case description": "Добавьте текст, ссылки и номера телефонов в ваши элементы.",
   "You can't add notifications to this list" : "Вы не можете добавить уведомления в этот список",
+  "sendFeedback" : "Отправить отзыв",
+  "feedbackDraw": "Ничья",
+  "feedbackNavigate": "Навигация",
+  "feedbackSubmitButton": "Отправить",
+  "feedbackDescription": "Добавить описание",
   "date format": "dd/MM/yyyy"
 }

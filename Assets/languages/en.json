@@ -79,5 +79,10 @@
   "Notifications state show case description": "Toggle between active and disabled statuses with a single tap on the bell icon, while conveniently checking if notifications are already archived.",
   "Content show case description": "Add text, links, and phone numbers to your items. Give it a try!",
   "You can't add notifications to this list" : "You can't add notifications to this list",
+  "sendFeedback" : "Send Feedback",
+  "feedbackDraw": "Draw",
+  "feedbackNavigate": "Navigate",
+  "feedbackSubmitButton": "Submit",
+  "feedbackDescription": "Add Description",
   "date format": "MM/dd/yyyy"
 }

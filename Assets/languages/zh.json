@@ -79,5 +79,10 @@
   "Notifications state show case description": "通过轻按铃图标在活动和停用状态之间切换，方便地检查通知是否已归档。",
   "Content show case description": "向您的项目添加文本、链接和电话号码。试试看！",
   "You can't add notifications to this list" : "您无法向此列表添加通知",
+  "sendFeedback" : "发送反馈",
+  "feedbackDraw": "绘制",
+  "feedbackNavigate": "导航",
+  "feedbackSubmitButton": "提交",
+  "feedbackDescription": "新增描述",
   "date format": "yyyy/MM/dd"
 }

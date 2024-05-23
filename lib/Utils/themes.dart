@@ -1,4 +1,13 @@
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
+
+final FeedbackThemeData feedbackDarkTheme = FeedbackThemeData(
+  background: const Color(0xFF42385E),
+);
+
+final FeedbackThemeData feedbackLightTheme = FeedbackThemeData(
+  background: const Color(0xFF635985),
+);
 
 final ThemeData lightTheme = ThemeData(
   textSelectionTheme: const TextSelectionThemeData(

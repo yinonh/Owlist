@@ -79,5 +79,10 @@
   "Notifications state show case description": "לחיצה על אייקון הפעמון תפעיל ותכבה התראה ובנוסף אפשר לראות האם התראה כבר בארכיון.",
   "Content show case description": "כאן תוכל להוסיף טקסט, לינקים ומספרי טלפון לפריט",
   "You can't add notifications to this list" : "אי אפשר להוסיף תזכורת לרשימה זו",
+  "sendFeedback" : "שלח משוב",
+  "feedbackDraw": "צייר",
+  "feedbackNavigate": "נווט באפליקציה",
+  "feedbackSubmitButton": "שלח",
+  "feedbackDescription": "הוסף תאור",
   "date format": "dd/MM/yyyy"
 }

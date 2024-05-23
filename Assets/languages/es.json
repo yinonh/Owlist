@@ -79,5 +79,10 @@
   "Notifications state show case description": "Cambia entre el estado activo e inactivo con un toque. ¡Revisa fácilmente las notificaciones archivadas!",
   "Content show case description": "¡Agrega texto, enlaces y números de teléfono a tus elementos para una mayor organización!",
   "You can't add notifications to this list": "No se pueden agregar notificaciones a esta lista",
+  "sendFeedback" : "Enviar comentarios",
+  "feedbackDraw": "Dibujar",
+  "feedbackNavigate": "Navegar",
+  "feedbackSubmitButton": "Enviar",
+  "feedbackDescription": "Agregar descripción",
   "date format": "MM/dd/yyyy"
 }
