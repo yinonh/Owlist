@@ -20,11 +20,11 @@ With Owlist, effortlessly organize your aspirations, set deadlines, and track yo
 - **Goal Lists:** Create lists of goals or tasks with deadlines or without.
 -  **Checklist Items:** Add items to your lists with descriptions and clickable links.
     - **Item Sorting:** Sort items in your list as you wish. Checked items automatically move to the bottom for easy organization.
-    -  **Item Content:** Add detailed descriptions, notes, or instructions to each checklist item.
-    -  **Clickable Links:** Include URLs within item descriptions that become clickable for easy access.
+    -  **Item Content:** Add detailed descriptions, notes, or instructions to each checklist item. 
+    -  **Clickable Links:** Recognizes links and phone numbers, allowing clickable access.
 - **Progress Tracking:** Visualize your progress for each list.
 - **Statistics:** View detailed statistics and data about your progress.
-- **Notifications:** Receive reminders a day before deadlines to stay on track.
+- **Notifications:** Set up to 4 customizable reminders per list, allowing you to stay on track with your deadlines.
 - **Customization:** Choose app themes and notification times.
 - **Language Support:** Supports both Hebrew and English languages.
 
