@@ -1,6 +1,4 @@
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:to_do/Providers/notification_provider.dart';
 
 import '../Utils/keys.dart';
 

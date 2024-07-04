@@ -6,7 +6,7 @@ import '../Utils/keys.dart';
 import '../Utils/strings.dart';
 
 class EditItemDialog extends StatefulWidget {
-  final Function(String) addNewItem; // Function parameter
+  final Function(String) addNewItem;
 
   const EditItemDialog({super.key, required this.addNewItem});
 

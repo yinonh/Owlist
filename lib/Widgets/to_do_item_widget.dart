@@ -50,9 +50,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       onTap: () {
         provider.addExistingItem(widget.item);
         widget.updateSingleListScreen();
-        // setState(() {
         _itemVisible = true;
-        // });
       },
       snackBarPosition: SnackBarPosition.bottom,
       padding: const EdgeInsets.symmetric(
@@ -72,10 +70,10 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       visible: _itemVisible,
       child: AnimatedOpacity(
         opacity: _itemVisible ? 1.0 : 0.0,
-        duration: Duration(milliseconds: 10),
+        duration: const Duration(milliseconds: 10),
         curve: Curves.easeInOut,
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 5),
+          margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: widget.editMode
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(10),

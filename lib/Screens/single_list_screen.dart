@@ -110,7 +110,8 @@ class _SingleListScreenState extends State<SingleListScreen> {
       context: context,
       builder: (BuildContext context) {
         return EditItemDialog(
-            addNewItem: addNewItem); // Pass the function as a parameter
+          addNewItem: addNewItem,
+        );
       },
     );
   }
