@@ -109,7 +109,7 @@ class _OwlistAppState extends State<OwlistApp> {
     String? themePref = SharedPreferencesHelper.instance.selectedTheme;
 
     // Set locale
-    _locale = AppLocalizations.supportedLanguage[language ?? 'en'];
+    _locale = AppLocalizations.supportedLanguage[language];
 
     // Set theme
     switch (themePref) {
