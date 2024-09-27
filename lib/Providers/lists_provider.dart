@@ -326,6 +326,49 @@ class ListsProvider extends ChangeNotifier {
     return sortLists(_withoutDeadlineItemsCache);
   }
 
+  Future<List<ToDoList>> searchListsByTitle(String searchString) async {
+    final Database db = await database;
+
+    List<Map<String, dynamic>> maps;
+
+    if (searchString == "") {
+      maps = await db.rawQuery(
+        '''
+    SELECT *
+    FROM todo_lists
+    ''',
+      );
+    } else {
+      maps = await db.rawQuery(
+        '''
+    SELECT *
+    FROM todo_lists
+    WHERE title LIKE ?
+    ''',
+        [
+          '%$searchString%'
+        ], // Placeholder for the search string, safe from SQL injection
+      );
+    }
+
+    // Generate a list of ToDoList objects from the results
+    List<ToDoList> result = List.generate(maps.length, (i) {
+      var deadline = DateTime.parse(maps[i]['deadline']);
+      return ToDoList(
+        id: maps[i][Keys.id],
+        title: maps[i][Keys.title],
+        creationDate: DateTime.parse(maps[i][Keys.creationDate]),
+        deadline: deadline,
+        hasDeadline: maps[i][Keys.hasDeadline] == 1,
+        totalItems: maps[i][Keys.totalItems],
+        accomplishedItems: maps[i][Keys.accomplishedItems],
+        userID: maps[i][Keys.userID],
+      );
+    });
+
+    return sortLists(result); // Optionally sort the result
+  }
+
   Future<void> addNewList(ToDoList newList) async {
     try {
       final Database db = await database;

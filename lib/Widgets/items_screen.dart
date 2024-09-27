@@ -8,14 +8,12 @@ import '../Models/to_do_list.dart';
 import './list_item_tile.dart';
 
 class ItemsScreen extends StatefulWidget {
-  final int selectedIndex;
   final List<ToDoList> existingItems;
   final Function deleteItem;
   final Function refresh;
   final String title;
 
   const ItemsScreen({
-    required this.selectedIndex,
     required this.existingItems,
     required this.deleteItem,
     required this.refresh,

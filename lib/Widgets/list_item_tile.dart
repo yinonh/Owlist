@@ -253,7 +253,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
             .editTitle(list, newTitle);
       }
     });
-    widget.refresh();
+    widget.refresh(restartSearchMode: true);
   }
 
   @override
@@ -265,7 +265,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
           Navigator.pushNamed(context, SingleListScreen.routeName,
                   arguments: widget.item.id)
               .then((value) {
-            widget.refresh();
+            widget.refresh(restartSearchMode: true);
           });
         },
         child: Container(

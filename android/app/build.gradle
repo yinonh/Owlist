@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId "com.yinonhdev.owlist"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

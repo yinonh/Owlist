@@ -43,9 +43,11 @@ class _HomePageState extends State<HomePage> {
   late Future<List<ToDoList>> activeItemsFuture;
   late Future<List<ToDoList>> achievedItemsFuture;
   late Future<List<ToDoList>> withoutDeadlineItemsFuture;
+  late Future<List<ToDoList>> searchResults;
   late int currentIndex;
   late PageController selectedIndex;
   late List<String> titles;
+  bool searchMode = false;
   final GlobalKey<ScaffoldState> addListKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -75,6 +77,8 @@ class _HomePageState extends State<HomePage> {
     withoutDeadlineItemsFuture =
         Provider.of<ListsProvider>(context, listen: false)
             .getWithoutDeadlineItems();
+    searchResults = Provider.of<ListsProvider>(context, listen: false)
+        .searchListsByTitle("");
   }
 
   void showMessage(String text, IconData icon) {
@@ -116,6 +120,7 @@ class _HomePageState extends State<HomePage> {
           return provider.getWithoutDeadlineItems();
         });
       });
+      searchMode = false;
     });
   }
 
@@ -160,6 +165,7 @@ class _HomePageState extends State<HomePage> {
 
   void onItemTapped(int index) {
     setState(() {
+      searchMode = false;
       selectedIndex.animateToPage(
         index,
         duration: const Duration(milliseconds: 500),
@@ -169,12 +175,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> refreshLists() async {
+  Future<void> refreshLists(
+      {String searchVal = "", bool restartSearchMode = false}) async {
     setState(() {
       provider.invalidateCache();
       activeItemsFuture = provider.getActiveItems();
       achievedItemsFuture = provider.getAchievedItems();
       withoutDeadlineItemsFuture = provider.getWithoutDeadlineItems();
+      searchResults = provider.searchListsByTitle(searchVal);
+      if (restartSearchMode) {
+        searchMode = false;
+      }
     });
   }
 
@@ -185,33 +196,35 @@ class _HomePageState extends State<HomePage> {
       builder: Builder(builder: (cnx) {
         return Scaffold(
           backgroundColor: Theme.of(context).primaryColor,
-          bottomNavigationBar: ShowCaseHelper.instance.customShowCase(
-            key: addListKey,
-            description: context
-                .translate(ShowCaseHelper.instance.homePageShowCaseDescription),
-            context: context,
-            child: DiamondBottomNavigation(
-              itemIcons: const [
-                Icons.checklist_rounded,
-                Icons.archive_rounded,
-                Icons.watch_off_rounded,
-                Icons.settings_rounded,
-              ],
-              addItem:
-                  (String title, DateTime deadline, bool hasDeadline) async {
-                await addItem(title, deadline, hasDeadline);
-                setState(() {
-                  refreshLists();
-                });
-              },
-              selectedIndex: currentIndex,
-              onItemPressed: onItemTapped,
-              bgColor: Theme.of(context).primaryColor,
-              selectedColor: Theme.of(context).focusColor,
-              unselectedColor: Theme.of(context).unselectedWidgetColor,
-              height: 50,
-            ),
-          ),
+          bottomNavigationBar: searchMode
+              ? null
+              : ShowCaseHelper.instance.customShowCase(
+                  key: addListKey,
+                  description: context.translate(
+                      ShowCaseHelper.instance.homePageShowCaseDescription),
+                  context: context,
+                  child: DiamondBottomNavigation(
+                    itemIcons: const [
+                      Icons.checklist_rounded,
+                      Icons.archive_rounded,
+                      Icons.watch_off_rounded,
+                      Icons.settings_rounded,
+                    ],
+                    addItem: (String title, DateTime deadline,
+                        bool hasDeadline) async {
+                      await addItem(title, deadline, hasDeadline);
+                      setState(() {
+                        refreshLists();
+                      });
+                    },
+                    selectedIndex: currentIndex,
+                    onItemPressed: onItemTapped,
+                    bgColor: Theme.of(context).primaryColor,
+                    selectedColor: Theme.of(context).focusColor,
+                    unselectedColor: Theme.of(context).unselectedWidgetColor,
+                    height: 50,
+                  ),
+                ),
           body: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -229,212 +242,297 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                    child: Row(
-                      textDirection: TextDirection.ltr,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Center(
-                          child: SvgPicture.asset(
-                            Keys.appNameSvg,
-                            fit: BoxFit.contain,
-                            width: 170,
-                          ),
-                        ),
-                        currentIndex == 3
-                            ? Directionality(
-                                textDirection: TextDirection.ltr,
-                                child: IconButton(
-                                  icon: Icon(
-                                    ShowCaseHelper.instance.isActive
-                                        ? Icons.pause_circle_outline_rounded
-                                        : Icons.help_outline_rounded,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      ShowCaseHelper.instance.toggleIsActive();
-                                    });
-                                    ShowCaseHelper.instance
-                                        .startShowCaseBeginning(
-                                            cnx, [addListKey]);
-                                  },
+                    child: searchMode
+                        ? TextField(
+                            autofocus: true,
+                            decoration: InputDecoration(
+                              hintText:
+                                  context.translate(Strings.enterListTitle),
+                              suffixIcon: IconButton(
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.white,
                                 ),
-                              )
-                            : PopupMenuButton<SortBy>(
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10.0),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.filter_list_rounded),
-                                onSelected: (value) async {
-                                  provider.selectedOptionVal = value;
-                                  await SharedPreferencesHelper.instance
-                                      .setSortByIndex(
-                                          SortBy.values.indexOf(value));
-                                  await refreshLists();
+                                onPressed: () {
+                                  setState(() {
+                                    searchMode = false;
+                                  });
                                 },
-                                itemBuilder: (BuildContext cnx) => [
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.creationNTL,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.creationNTL,
-                                    child: Text(
-                                      context.translate(
-                                          Strings.creationDateNewestToOldest),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.creationLTN,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.creationLTN,
-                                    child: Text(
-                                      context.translate(
-                                          Strings.creationDateOldestToNewest),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.deadlineLTN,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.deadlineLTN,
-                                    child: Text(
-                                      context.translate(
-                                          Strings.deadlineLaterToSooner),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.deadlineNTL,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.deadlineNTL,
-                                    child: Text(
-                                      context.translate(
-                                          Strings.deadlineSoonerToLater),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.progressBTS,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.progressBTS,
-                                    child: Text(
-                                      context
-                                          .translate(Strings.progressHighToLow),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                  CheckedPopupMenuItem<SortBy>(
-                                    value: SortBy.progressSTB,
-                                    checked: provider.selectedOptionVal ==
-                                        SortBy.progressSTB,
-                                    child: Text(
-                                      context
-                                          .translate(Strings.progressLowToHigh),
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ),
-                                ],
                               ),
-                      ],
-                    ),
+                              border: const OutlineInputBorder(),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                            onChanged: (value) {
+                              refreshLists(searchVal: value);
+                            },
+                          )
+                        : Row(
+                            textDirection: TextDirection.ltr,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: SvgPicture.asset(
+                                  Keys.appNameSvg,
+                                  fit: BoxFit.contain,
+                                  width: 170,
+                                ),
+                              ),
+                              const Spacer(),
+                              if (currentIndex != 3)
+                                IconButton(
+                                  onPressed: () async {
+                                    await refreshLists();
+                                    setState(() {
+                                      searchMode = true;
+                                    });
+                                  },
+                                  icon: const Icon(Icons.search_rounded),
+                                ),
+                              currentIndex == 3
+                                  ? Directionality(
+                                      textDirection: TextDirection.ltr,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          ShowCaseHelper.instance.isActive
+                                              ? Icons
+                                                  .pause_circle_outline_rounded
+                                              : Icons.help_outline_rounded,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            ShowCaseHelper.instance
+                                                .toggleIsActive();
+                                          });
+                                          ShowCaseHelper.instance
+                                              .startShowCaseBeginning(
+                                                  cnx, [addListKey]);
+                                        },
+                                      ),
+                                    )
+                                  : PopupMenuButton<SortBy>(
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0),
+                                        ),
+                                      ),
+                                      icon:
+                                          const Icon(Icons.filter_list_rounded),
+                                      onSelected: (value) async {
+                                        provider.selectedOptionVal = value;
+                                        await SharedPreferencesHelper.instance
+                                            .setSortByIndex(
+                                                SortBy.values.indexOf(value));
+                                        await refreshLists();
+                                      },
+                                      itemBuilder: (BuildContext cnx) => [
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.creationNTL,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.creationNTL,
+                                          child: Text(
+                                            context.translate(Strings
+                                                .creationDateNewestToOldest),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.creationLTN,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.creationLTN,
+                                          child: Text(
+                                            context.translate(Strings
+                                                .creationDateOldestToNewest),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.deadlineLTN,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.deadlineLTN,
+                                          child: Text(
+                                            context.translate(
+                                                Strings.deadlineLaterToSooner),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.deadlineNTL,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.deadlineNTL,
+                                          child: Text(
+                                            context.translate(
+                                                Strings.deadlineSoonerToLater),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.progressBTS,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.progressBTS,
+                                          child: Text(
+                                            context.translate(
+                                                Strings.progressHighToLow),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                        CheckedPopupMenuItem<SortBy>(
+                                          value: SortBy.progressSTB,
+                                          checked: provider.selectedOptionVal ==
+                                              SortBy.progressSTB,
+                                          child: Text(
+                                            context.translate(
+                                                Strings.progressLowToHigh),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ],
+                          ),
                   ),
                   const SizedBox(height: 16.0),
-                  Expanded(
-                    child: PageView(
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                      controller: selectedIndex,
-                      children: [
-                        FutureBuilder<List<ToDoList>>(
-                          key: const PageStorageKey(1),
-                          future: activeItemsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(color: Colors.white),
-                              );
-                            } else {
-                              return ItemsScreen(
-                                selectedIndex: 0,
-                                existingItems: snapshot.data!,
-                                deleteItem: deleteList,
-                                refresh: refreshLists,
-                                title: titles[currentIndex],
-                              );
-                            }
-                          },
+                  searchMode
+                      ? Expanded(
+                          child: FutureBuilder<List<ToDoList>>(
+                            key: const PageStorageKey(1),
+                            future: searchResults,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (snapshot.hasError) {
+                                print(snapshot.error);
+                                return Text(
+                                  context.translate(Strings.errorHasOccurred),
+                                  style: const TextStyle(color: Colors.white),
+                                );
+                              } else {
+                                return ItemsScreen(
+                                  existingItems: snapshot.data!,
+                                  deleteItem: deleteList,
+                                  refresh: refreshLists,
+                                  title:
+                                      context.translate(Strings.searchResults),
+                                );
+                              }
+                            },
+                          ),
+                        )
+                      : Expanded(
+                          child: PageView(
+                            onPageChanged: (index) {
+                              setState(() {
+                                currentIndex = index;
+                                searchMode = false;
+                                refreshLists();
+                              });
+                            },
+                            controller: selectedIndex,
+                            children: [
+                              FutureBuilder<List<ToDoList>>(
+                                key: const PageStorageKey(1),
+                                future: activeItemsFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    print(snapshot.error);
+                                    return Text(
+                                      context
+                                          .translate(Strings.errorHasOccurred),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    );
+                                  } else {
+                                    return ItemsScreen(
+                                      existingItems: snapshot.data!,
+                                      deleteItem: deleteList,
+                                      refresh: refreshLists,
+                                      title: titles[currentIndex],
+                                    );
+                                  }
+                                },
+                              ),
+                              FutureBuilder<List<ToDoList>>(
+                                key: const PageStorageKey(2),
+                                future: achievedItemsFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return Text(
+                                      context
+                                          .translate(Strings.errorHasOccurred),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    );
+                                  } else {
+                                    return ItemsScreen(
+                                      existingItems: snapshot.data!,
+                                      deleteItem: deleteList,
+                                      refresh: refreshLists,
+                                      title: titles[currentIndex],
+                                    );
+                                  }
+                                },
+                              ),
+                              FutureBuilder<List<ToDoList>>(
+                                key: const PageStorageKey(3),
+                                future: withoutDeadlineItemsFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return Text(
+                                      context
+                                          .translate(Strings.errorHasOccurred),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    );
+                                  } else {
+                                    return ItemsScreen(
+                                      existingItems: snapshot.data!,
+                                      deleteItem: deleteList,
+                                      refresh: refreshLists,
+                                      title: titles[currentIndex],
+                                    );
+                                  }
+                                },
+                              ),
+                              Settings(refresh: refreshLists),
+                            ],
+                          ),
                         ),
-                        FutureBuilder<List<ToDoList>>(
-                          key: const PageStorageKey(2),
-                          future: achievedItemsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(color: Colors.white),
-                              );
-                            } else {
-                              return ItemsScreen(
-                                selectedIndex: 1,
-                                existingItems: snapshot.data!,
-                                deleteItem: deleteList,
-                                refresh: refreshLists,
-                                title: titles[currentIndex],
-                              );
-                            }
-                          },
-                        ),
-                        FutureBuilder<List<ToDoList>>(
-                          key: const PageStorageKey(3),
-                          future: withoutDeadlineItemsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(color: Colors.white),
-                              );
-                            } else {
-                              return ItemsScreen(
-                                selectedIndex: 1,
-                                existingItems: snapshot.data!,
-                                deleteItem: deleteList,
-                                refresh: refreshLists,
-                                title: titles[currentIndex],
-                              );
-                            }
-                          },
-                        ),
-                        Settings(refresh: refreshLists),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),

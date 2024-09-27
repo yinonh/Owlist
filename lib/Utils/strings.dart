@@ -17,6 +17,7 @@ final class Strings {
   static const String deadlineSoonerToLater = "Deadline: Sooner to Later";
   static const String progressHighToLow = "Progress: High to Low";
   static const String progressLowToHigh = "Progress: Low to High";
+  static const String searchResults = "Search results";
 
   // Single list screen
   static const String scheduleNotification = "Schedule notification";
