@@ -243,20 +243,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return ShowCaseWidget(
-          onComplete: (index, __) {
-            ShowCaseHelper.instance.notificationsShowCaseSteps++;
-          },
-          onFinish: () {
-            ShowCaseHelper.instance.notificationsShowCaseSteps++;
-            ShowCaseHelper.instance.isShowCaseDone();
-          },
-          builder: Builder(builder: (context) {
-            return NotificationBottomSheet(
-              listId: list!.id,
-            );
-          }),
-        );
+        return ShowCaseWidget(onComplete: (index, __) {
+          ShowCaseHelper.instance.notificationsShowCaseSteps++;
+        }, onFinish: () {
+          ShowCaseHelper.instance.notificationsShowCaseSteps++;
+          ShowCaseHelper.instance.isShowCaseDone();
+        }, builder: (context) {
+          return NotificationBottomSheet(
+            listId: list!.id,
+          );
+        });
       },
     );
   }
