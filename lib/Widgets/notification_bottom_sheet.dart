@@ -206,86 +206,135 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
   }
 
   Widget _buildPeriodicSettingsSection(ToDoList list) {
-    // Placeholder for periodic settings UI
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(context.translate(Strings.periodicSettings), style: Theme.of(context).textTheme.titleMedium),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ChoiceChip(
-              label: Text(context.translate(Strings.daily)),
+    ThemeData theme = Theme.of(context);
+    TextTheme textTheme = theme.textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.translate(Strings.periodicSettings),
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Text(context.translate(Strings.interval), style: textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Centered chips
+            children: [
+              ChoiceChip(
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: Text(context.translate(Strings.daily)),
+                ),
               selected: _selectedPeriodicInterval == Keys.daily,
               onSelected: (selected) {
                 if (selected) setState(() => _selectedPeriodicInterval = Keys.daily);
               },
-               selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
-               labelStyle: TextStyle(
+              selectedColor: theme.colorScheme.primaryContainer,
+              labelStyle: TextStyle(
                 color: _selectedPeriodicInterval == Keys.daily
-                    ? Theme.of(context).colorScheme.onPrimary
-                    : Theme.of(context).textTheme.bodyLarge?.color,
+                    ? theme.colorScheme.onPrimaryContainer
+                    : textTheme.bodyLarge?.color,
               ),
             ),
+            const SizedBox(width: 16), // Spacing between chips
             ChoiceChip(
-              label: Text(context.translate(Strings.weekly)),
+              label: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Text(context.translate(Strings.weekly)),
+              ),
               selected: _selectedPeriodicInterval == Keys.weekly,
               onSelected: (selected) {
                 if (selected) setState(() => _selectedPeriodicInterval = Keys.weekly);
               },
-              selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
+              selectedColor: theme.colorScheme.primaryContainer,
               labelStyle: TextStyle(
                 color: _selectedPeriodicInterval == Keys.weekly
-                    ? Theme.of(context).colorScheme.onPrimary
-                    : Theme.of(context).textTheme.bodyLarge?.color,
+                    ? theme.colorScheme.onPrimaryContainer
+                    : textTheme.bodyLarge?.color,
               ),
             ),
-            // Monthly ChoiceChip removed
           ],
         ),
-        if (_currentPeriodicNotification != null)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(
-                  // Display interval, ensure it's not "monthly" if it was forced to default
-                  "${context.translate(Strings.currentPeriodicSetting)}: ${(_currentPeriodicNotification!.periodicInterval == Keys.monthly ? Keys.daily : _currentPeriodicNotification!.periodicInterval)} ${context.translate(Strings.startingFrom)} ${DateFormat(context.translate(Strings.dateFormat)).format(_currentPeriodicNotification!.notificationDateTime)}",
-                ),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.delete_outline_rounded),
-                  label: Text(context.translate(Strings.removePeriodic)),
-                  onPressed: () async {
-                    await Provider.of<NotificationProvider>(context, listen: false)
-                        .deleteNotification(_currentPeriodicNotification!, list);
-                    _loadNotificationsData(); // Refresh
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                ),
-              ],
+        const SizedBox(height: 24),
+        if (_currentPeriodicNotification != null) ...[
+          Text(context.translate(Strings.currentSetting), style: textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Card( // Using a Card for better visual grouping of current setting
+            elevation: 2.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible( // To prevent overflow if text is long
+                    child: Text(
+                      "${context.translate(Strings.type)}: ${(_currentPeriodicNotification!.periodicInterval == Keys.monthly ? Keys.daily : _currentPeriodicNotification!.periodicInterval)?.capitalize() ?? ''}\n${context.translate(Strings.startingAnchorDate)}: ${DateFormat(context.translate(Strings.dateFormat)).format(_currentPeriodicNotification!.notificationDateTime)}",
+                      style: textTheme.bodyLarge,
+                    ),
+                  ),
+                  TextButton.icon(
+                    icon: Icon(Icons.delete_outline_rounded, color: theme.colorScheme.error),
+                    label: Text(
+                      context.translate(Strings.remove),
+                      style: TextStyle(color: theme.colorScheme.error)
+                    ),
+                    onPressed: () async {
+                      await Provider.of<NotificationProvider>(context, listen: false)
+                          .deleteNotification(_currentPeriodicNotification!, list);
+                      _loadNotificationsData(); // Refresh
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ElevatedButton.icon(
-          icon: Icon(_currentPeriodicNotification == null ? Icons.add_alarm_rounded : Icons.update_rounded),
-          label: Text(_currentPeriodicNotification == null ? context.translate(Strings.setPeriodic) : context.translate(Strings.updatePeriodic)),
-          onPressed: list.isAchieved ? null : () async {
-            DateTime anchorDate = DateTime.now(); // Default anchor
-            // Optionally allow user to pick a start date for periodic
-            // DateTime? pickedDate = await _openDateTimePicker(context, list, isPeriodic: true);
-            // if (pickedDate != null) anchorDate = pickedDate;
+          const SizedBox(height: 24),
+        ],
+        SizedBox(
+          width: double.infinity, // Make button full width
+          child: ElevatedButton.icon(
+            icon: Icon(_currentPeriodicNotification == null ? Icons.add_alarm_rounded : Icons.update_rounded),
+            label: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                _currentPeriodicNotification == null
+                  ? context.translate(Strings.setPeriodicReminder)
+                  : context.translate(Strings.updatePeriodicReminder),
+                style: textTheme.labelLarge?.copyWith(color: theme.colorScheme.onPrimary)
+              ),
+            ),
+            onPressed: list.isAchieved ? null : () async {
+              DateTime anchorDate = DateTime.now();
+              // Anchor date for periodic notifications is now always DateTime.now()
+              // as per the current NotificationProvider logic for periodicallyShow.
+              // The time component is taken from user preferences (_notificationTime) in the provider.
 
-            await Provider.of<NotificationProvider>(context, listen: false)
-                .addNotification(
-                    list,
-                    anchorDate, // This is the start date/anchor for periodic
-                    Strings.periodicReminder, // Generic title for periodic
-                    Keys.periodic,
-                    _selectedPeriodicInterval);
-            _loadNotificationsData(); // Refresh
-          },
+              await Provider.of<NotificationProvider>(context, listen: false)
+                  .addNotification(
+                      list,
+                      anchorDate,
+                      Strings.periodicReminder,
+                      Keys.periodic,
+                      _selectedPeriodicInterval);
+              _loadNotificationsData();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary, // For text and icon color
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            ),
+          ),
         ),
+        const SizedBox(height: 16), // Some bottom padding
       ],
     );
   }
@@ -494,75 +543,71 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
   Future<DateTime?> _openDateTimePicker(BuildContext context, ToDoList list,
       {Notifications? notification, bool isPeriodic = false}) async { // Added isPeriodic flag
-    late DateTime initialDate;
-    late NotificationTime newTime;
-    if (notification == null || isPeriodic) { // For new periodic, default to now, or for new fixed
-      initialDate = DateTime.now();
-      newTime = NotificationTime.fromInt(
+    late DateTime initialDateForDatePicker;
+    late TimeOfDay initialTimeForTimePicker;
+
+    if (notification == null || isPeriodic) {
+      initialDateForDatePicker = DateTime.now();
+      // Default to user's preference or current time for the time picker
+      NotificationTime prefTime = NotificationTime.fromInt(
           await SharedPreferencesHelper.instance.getNotificationTime());
+      initialTimeForTimePicker = TimeOfDay(hour: prefTime.hour, minute: prefTime.minute);
     } else { // Editing existing fixed notification
-      initialDate = notification.notificationDateTime;
-      newTime =
-          NotificationTime(hour: initialDate.hour, minute: initialDate.minute);
+      initialDateForDatePicker = notification.notificationDateTime;
+      initialTimeForTimePicker = TimeOfDay(hour: notification.notificationDateTime.hour, minute: notification.notificationDateTime.minute);
     }
 
-    // Check if initialDate is before the firstDate allowed
+    // Ensure initialDateForDatePicker is not before the first selectable date
     DateTime firstSelectableDate = DateTime.now();
     if (!isPeriodic && list.hasDeadline && list.deadline.isBefore(firstSelectableDate)) {
-        // This case should ideally be prevented by disabling the add button if deadline is past for fixed.
         firstSelectableDate = list.deadline;
     }
-     if (initialDate.isBefore(firstSelectableDate)) {
-      initialDate = firstSelectableDate;
+     if (initialDateForDatePicker.isBefore(firstSelectableDate)) {
+      initialDateForDatePicker = firstSelectableDate;
     }
 
-
-    final selectedDate = await showDatePicker(
+    final DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: firstSelectableDate, // Use dynamic first selectable date
-      lastDate: list.hasDeadline && !isPeriodic // For fixed, respect deadline
+      initialDate: initialDateForDatePicker,
+      firstDate: firstSelectableDate,
+      lastDate: list.hasDeadline && !isPeriodic
           ? list.deadline
-          : DateTime.now().add(const Duration(days: 3650), // For periodic or no deadline, allow far future
-            ),
+          : DateTime.now().add(const Duration(days: 3650)),
     );
 
     if (selectedDate != null) {
-      // If it's for a periodic notification's start date, time might not be as critical
-      // or could be set to a default (e.g., user's preferred notification time for the day)
-      // For now, we keep the time picker for both.
-      TimeOfDay? tod = await Navigator.of(context)
-          .push(
+      // Use the TimeOfDay for the 'value' parameter of showPicker
+      final TimeOfDay? pickedTime = await Navigator.of(context).push<TimeOfDay?>(
         showPicker(
-          height: 350,
+          context: context,
+          value: initialTimeForTimePicker, // Pass TimeOfDay here
           is24HrFormat: true,
           accentColor: Theme.of(context).highlightColor,
-          context: context,
-          showSecondSelector: false,
-          value: newTime, // This is NotificationTime, needs conversion for TimeOfDay if picker expects that
-          onChange: (time) { // time here is TimeOfDay
-            newTime = NotificationTime(hour: time.hour, minute: time.minute);
-          },
           minuteInterval: TimePickerInterval.FIVE,
           okText: context.translate(Strings.ok),
           cancelText: context.translate(Strings.cancel),
+          showSecondSelector: false,
+          // onChange is optional if we use the returned value from push.
+          // If used for live updates, ensure it handles TimeOfDay.
+          // onChange: (newSelectedTime) { /* newSelectedTime is TimeOfDay */ },
         ),
       );
 
-      if (tod != null) { // Check if time picking was confirmed (tod is TimeOfDay returned by picker)
-         DateTime selectedDateTime = DateTime(
+      if (pickedTime != null) {
+        DateTime finalDateTime = DateTime(
           selectedDate.year,
           selectedDate.month,
           selectedDate.day,
-          newTime.hour, // newTime was updated in onChange
-          newTime.minute,
+          pickedTime.hour,
+          pickedTime.minute,
         );
-        // Ensure the selected date time is not in the past, especially for fixed ones
-        if (!isPeriodic && selectedDateTime.isBefore(DateTime.now())) {
-          // show a message or adjust to now?
-          // For now, let it pass, addNotification will disable it if it's past.
+        // Ensure the selected date time is not in the past for fixed notifications.
+        // For periodic, this check might be less strict as it's an anchor.
+        if (!isPeriodic && finalDateTime.isBefore(DateTime.now())) {
+          // Optionally, show a message or adjust.
+          // For now, we allow it; addNotification will disable if it's still in the past.
         }
-        return selectedDateTime;
+        return finalDateTime;
       }
     }
     return null;
