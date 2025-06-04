@@ -34,9 +34,17 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
   final GlobalKey<ScaffoldState> notificationsStatusKey =
       GlobalKey<ScaffoldState>();
 
+  String _selectedNotificationType = Keys.fixed;
+  String _selectedPeriodicInterval = Keys.daily; // Default
+  Notifications? _currentPeriodicNotification;
+  List<Notifications> _fixedNotifications = [];
+  bool _isLoading = true;
+  ToDoList? _currentList; // To store the fetched list
+
   @override
   void initState() {
     super.initState();
+    _loadNotificationsData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(
@@ -45,6 +53,65 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             context, [notificationsKey, notificationsStatusKey]),
       );
     });
+  }
+
+  Future<void> _loadNotificationsData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final listProvider = Provider.of<ListsProvider>(context, listen: false);
+      _currentList = await listProvider.getListById(widget.listId);
+      if (_currentList == null || !mounted) return;
+
+      final notificationProvider =
+          Provider.of<NotificationProvider>(context, listen: false);
+      final allNotifications =
+          await notificationProvider.getNotificationsByListId(widget.listId);
+
+      List<Notifications> fixed = [];
+      Notifications? periodic;
+
+      for (var notif in allNotifications) {
+        if (notif.notificationType == Keys.periodic) {
+          periodic = notif;
+        } else {
+          // Treat null or Keys.fixed as fixed
+          fixed.add(notif);
+        }
+      }
+      fixed.sort((a, b) =>
+          a.notificationDateTime.compareTo(b.notificationDateTime));
+
+      if (!mounted) return;
+      setState(() {
+        _fixedNotifications = fixed;
+        _currentPeriodicNotification = periodic;
+        if (periodic != null) {
+          _selectedNotificationType = Keys.periodic;
+          if (periodic.periodicInterval == Keys.monthly) {
+            // If old data has "monthly", default UI to "daily" as "monthly" is no longer an option.
+            _selectedPeriodicInterval = Keys.daily;
+          } else {
+            _selectedPeriodicInterval = periodic.periodicInterval ?? Keys.daily;
+          }
+        } else {
+          _selectedNotificationType = Keys.fixed;
+          _selectedPeriodicInterval = Keys.daily; // Ensure default if no periodic
+        }
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Handle error, e.g., show a snackbar
+        print("Error loading notifications: $e");
+      }
+    }
   }
 
   @override
@@ -56,20 +123,15 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       context: context,
       child: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.4 + 20,
-        child: FutureBuilder(
-          future:
-              Provider.of<ListsProvider>(context).getListById(widget.listId),
-          builder: (context, futureList) {
-            if (futureList.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (futureList.hasError) {
-              return Text('Error: ${futureList.error}');
-            } else {
-              ToDoList list = futureList.data!;
-              return Column(
+        height: MediaQuery.of(context).size.height * 0.5 + // Increased height slightly
+            MediaQuery.of(context).viewInsets.bottom, // For keyboard
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom), // For keyboard
+        child: _isLoading || _currentList == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column( // Main content structure
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Grabber
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 8),
                     height: 4,
@@ -79,99 +141,190 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                    ),
-                    child: FutureBuilder<List<Notifications>>(
-                      future: Provider.of<NotificationProvider>(context)
-                          .getNotificationsByListId(list.id),
-                      builder: (context, futureNotificationList) {
-                        if (futureNotificationList.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (futureNotificationList.hasError) {
-                          return Text('Error: ${futureNotificationList.error}');
-                        } else if (futureNotificationList.hasData &&
-                            futureNotificationList.data!.isEmpty) {
-                          return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  child: header(list),
-                                ),
-                                Expanded(
-                                  child: Center(
-                                    child: Lottie.asset(
-                                      Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Keys.emptyNotificationsDark
-                                          : Keys.emptyNotificationsLight,
-                                    ),
-                                  ),
-                                ),
-                              ]);
-                        } else {
-                          List<Notifications> notificationsList =
-                              List.from(futureNotificationList.data!);
-                          notificationsList.sort((a, b) => a
-                              .notificationDateTime
-                              .compareTo(b.notificationDateTime));
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: header(list,
-                                    notificationsList: notificationsList),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: notificationsList.length,
-                                  itemBuilder: (context, index) {
-                                    final notification =
-                                        notificationsList[index];
-                                    if (index == 0) {
-                                      return ShowCaseHelper.instance
-                                          .customShowCase(
-                                        key: notificationsStatusKey,
-                                        description: context.translate(
-                                            ShowCaseHelper.instance
-                                                .notificationsStateShowCaseDescription),
-                                        context: context,
-                                        child: _buildNotificationItem(
-                                            context, notification, list),
-                                      );
-                                    }
-                                    return _buildNotificationItem(
-                                        context, notification, list);
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                  // Header (using the existing header but adapted)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: header(_currentList!), // Pass the fetched list
+                  ),
+                  _buildNotificationTypeSelector(),
+                  Expanded( // To make the content scrollable if it overflows
+                    child: SingleChildScrollView(
+                      child: _selectedNotificationType == Keys.periodic
+                          ? _buildPeriodicSettingsSection(_currentList!)
+                          : _buildFixedNotificationsSection(_currentList!),
                     ),
                   ),
                 ],
-              );
-            }
-          },
-        ),
+              ),
       ),
     );
   }
+
+  Widget _buildNotificationTypeSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ChoiceChip(
+            label: Text(context.translate(Strings.fixed)),
+            selected: _selectedNotificationType == Keys.fixed,
+            onSelected: (selected) {
+              if (selected) {
+                setState(() {
+                  _selectedNotificationType = Keys.fixed;
+                });
+              }
+            },
+            selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
+            labelStyle: TextStyle(
+              color: _selectedNotificationType == Keys.fixed
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+          ),
+          ChoiceChip(
+            label: Text(context.translate(Strings.periodic)),
+            selected: _selectedNotificationType == Keys.periodic,
+            onSelected: (selected) {
+              if (selected) {
+                setState(() {
+                  _selectedNotificationType = Keys.periodic;
+                });
+              }
+            },
+            selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
+             labelStyle: TextStyle(
+              color: _selectedNotificationType == Keys.periodic
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeriodicSettingsSection(ToDoList list) {
+    // Placeholder for periodic settings UI
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(context.translate(Strings.periodicSettings), style: Theme.of(context).textTheme.titleMedium),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ChoiceChip(
+              label: Text(context.translate(Strings.daily)),
+              selected: _selectedPeriodicInterval == Keys.daily,
+              onSelected: (selected) {
+                if (selected) setState(() => _selectedPeriodicInterval = Keys.daily);
+              },
+               selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
+               labelStyle: TextStyle(
+                color: _selectedPeriodicInterval == Keys.daily
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
+            ChoiceChip(
+              label: Text(context.translate(Strings.weekly)),
+              selected: _selectedPeriodicInterval == Keys.weekly,
+              onSelected: (selected) {
+                if (selected) setState(() => _selectedPeriodicInterval = Keys.weekly);
+              },
+              selectedColor: Theme.of(context).highlightColor.withOpacity(0.5),
+              labelStyle: TextStyle(
+                color: _selectedPeriodicInterval == Keys.weekly
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
+            // Monthly ChoiceChip removed
+          ],
+        ),
+        if (_currentPeriodicNotification != null)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  // Display interval, ensure it's not "monthly" if it was forced to default
+                  "${context.translate(Strings.currentPeriodicSetting)}: ${(_currentPeriodicNotification!.periodicInterval == Keys.monthly ? Keys.daily : _currentPeriodicNotification!.periodicInterval)} ${context.translate(Strings.startingFrom)} ${DateFormat(context.translate(Strings.dateFormat)).format(_currentPeriodicNotification!.notificationDateTime)}",
+                ),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.delete_outline_rounded),
+                  label: Text(context.translate(Strings.removePeriodic)),
+                  onPressed: () async {
+                    await Provider.of<NotificationProvider>(context, listen: false)
+                        .deleteNotification(_currentPeriodicNotification!, list);
+                    _loadNotificationsData(); // Refresh
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                ),
+              ],
+            ),
+          ),
+        ElevatedButton.icon(
+          icon: Icon(_currentPeriodicNotification == null ? Icons.add_alarm_rounded : Icons.update_rounded),
+          label: Text(_currentPeriodicNotification == null ? context.translate(Strings.setPeriodic) : context.translate(Strings.updatePeriodic)),
+          onPressed: list.isAchieved ? null : () async {
+            DateTime anchorDate = DateTime.now(); // Default anchor
+            // Optionally allow user to pick a start date for periodic
+            // DateTime? pickedDate = await _openDateTimePicker(context, list, isPeriodic: true);
+            // if (pickedDate != null) anchorDate = pickedDate;
+
+            await Provider.of<NotificationProvider>(context, listen: false)
+                .addNotification(
+                    list,
+                    anchorDate, // This is the start date/anchor for periodic
+                    Strings.periodicReminder, // Generic title for periodic
+                    Keys.periodic,
+                    _selectedPeriodicInterval);
+            _loadNotificationsData(); // Refresh
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFixedNotificationsSection(ToDoList list) {
+    if (_fixedNotifications.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Lottie.asset(
+            Theme.of(context).brightness == Brightness.dark
+                ? Keys.emptyNotificationsDark
+                : Keys.emptyNotificationsLight,
+            height: 150, // Adjust size as needed
+          ),
+        ),
+      );
+    }
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(), // If inside SingleChildScrollView
+      itemCount: _fixedNotifications.length,
+      itemBuilder: (context, index) {
+        final notification = _fixedNotifications[index];
+        // Use ShowCase only for the first item if needed
+        if (index == 0 && ShowCaseHelper.instance.showShowCase) { // Check if showcase is active
+          return ShowCaseHelper.instance.customShowCase(
+            key: notificationsStatusKey, // Ensure this key is unique or managed
+            description: context.translate(
+                ShowCaseHelper.instance.notificationsStateShowCaseDescription),
+            context: context,
+            child: _buildNotificationItem(context, notification, list),
+          );
+        }
+        return _buildNotificationItem(context, notification, list);
+      },
+    );
+  }
+
 
   void showPopup(String message) {
     showTopSnackBar(
@@ -190,7 +343,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
     );
   }
 
-  Widget header(ToDoList list, {List<Notifications>? notificationsList}) {
+  Widget header(ToDoList list) { // Removed notificationsList from params, uses state now
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -209,16 +362,15 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
-        (!list.isAchieved &&
-                (notificationsList == null
-                    ? true
-                    : notificationsList.length < 4))
+        // Add button logic now depends on _selectedNotificationType
+        _selectedNotificationType == Keys.fixed && (!list.isAchieved && _fixedNotifications.length < 4)
             ? IconButton(
                 onPressed: () async {
                   DateTime? newTime = await _openDateTimePicker(context, list);
                   if (newTime != null) {
-                    Provider.of<NotificationProvider>(context, listen: false)
-                        .addNotification(list, newTime);
+                    await Provider.of<NotificationProvider>(context, listen: false)
+                        .addNotification(list, newTime, null, Keys.fixed, null);
+                    _loadNotificationsData(); // Refresh
                   }
                 },
                 icon: Icon(
@@ -226,14 +378,22 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   color: Theme.of(context).dialogBackgroundColor,
                 ),
               )
-            : IconButton(
+            : IconButton( // Disabled or different action for periodic / limit reached / achieved
                 onPressed: () {
-                  showPopup(context
+                  if (list.isAchieved) {
+                    showPopup(context
                       .translate(Strings.youCantAddNotificationsToThisList));
+                  } else if (_selectedNotificationType == Keys.fixed && _fixedNotifications.length >=4) {
+                     showPopup(context
+                      .translate(Strings.fixedNotificationsLimitReached));
+                  }
+                  // For periodic, the add button is within its own section.
                 },
                 icon: Icon(
                   Icons.add_rounded,
-                  color: Colors.grey,
+                  color: (_selectedNotificationType == Keys.fixed && !list.isAchieved && _fixedNotifications.length < 4)
+                         ? Theme.of(context).dialogBackgroundColor
+                         : Colors.grey,
                 ),
               ),
       ],
@@ -251,8 +411,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
     return ListTile(
       leading: IconButton(
         onPressed: !list.isAchieved
-            ? () => Provider.of<NotificationProvider>(context, listen: false)
-                .toggleNotificationDisabled(notification, list)
+            ? () async {
+                await Provider.of<NotificationProvider>(context, listen: false)
+                    .toggleNotificationDisabled(notification, list);
+                _loadNotificationsData(); // Refresh
+              }
             : null,
         icon: Icon(
           notification.disabled
@@ -273,10 +436,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               DateTime? newTime = await _openDateTimePicker(context, list,
                   notification: notification);
               if (newTime != null) {
-                Provider.of<NotificationProvider>(context, listen: false)
+                await Provider.of<NotificationProvider>(context, listen: false)
                     .editNotification(
                         notification.copyWith(notificationDateTime: newTime),
                         list);
+                _loadNotificationsData(); // Refresh
               }
             }
           : null,
@@ -288,7 +452,14 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         onPressed: () async {
           var notificationProvider =
               Provider.of<NotificationProvider>(context, listen: false);
-          notificationProvider.deleteNotification(notification, list);
+          // Store details for potential undo before deleting
+          final DateTime originalDateTime = notification.notificationDateTime;
+          final String? originalType = notification.notificationType;
+          final String? originalInterval = notification.periodicInterval;
+
+          await notificationProvider.deleteNotification(notification, list);
+          _loadNotificationsData(); // Refresh immediately
+
           showTopSnackBar(
             Overlay.of(context),
             CustomSnackBar.success(
@@ -300,9 +471,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                 size: 120,
               ),
             ),
-            onTap: () {
-              notificationProvider.addNotification(
-                  list, notification.notificationDateTime);
+            onTap: () async {
+              // Use stored details for undo
+              await notificationProvider.addNotification(
+                  list, originalDateTime, null, originalType ?? Keys.fixed, originalInterval);
+              _loadNotificationsData(); // Refresh after undo
             },
             snackBarPosition: SnackBarPosition.bottom,
             displayDuration: const Duration(seconds: 1, milliseconds: 500),
@@ -320,37 +493,45 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
   }
 
   Future<DateTime?> _openDateTimePicker(BuildContext context, ToDoList list,
-      {Notifications? notification}) async {
+      {Notifications? notification, bool isPeriodic = false}) async { // Added isPeriodic flag
     late DateTime initialDate;
     late NotificationTime newTime;
-    if (notification == null) {
+    if (notification == null || isPeriodic) { // For new periodic, default to now, or for new fixed
       initialDate = DateTime.now();
       newTime = NotificationTime.fromInt(
           await SharedPreferencesHelper.instance.getNotificationTime());
-    } else {
+    } else { // Editing existing fixed notification
       initialDate = notification.notificationDateTime;
       newTime =
           NotificationTime(hour: initialDate.hour, minute: initialDate.minute);
     }
 
-    // Check if initialDate is before the firstDate
-    if (initialDate.isBefore(DateTime.now())) {
-      initialDate = DateTime.now();
+    // Check if initialDate is before the firstDate allowed
+    DateTime firstSelectableDate = DateTime.now();
+    if (!isPeriodic && list.hasDeadline && list.deadline.isBefore(firstSelectableDate)) {
+        // This case should ideally be prevented by disabling the add button if deadline is past for fixed.
+        firstSelectableDate = list.deadline;
     }
+     if (initialDate.isBefore(firstSelectableDate)) {
+      initialDate = firstSelectableDate;
+    }
+
 
     final selectedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime.now(),
-      lastDate: list.hasDeadline
+      firstDate: firstSelectableDate, // Use dynamic first selectable date
+      lastDate: list.hasDeadline && !isPeriodic // For fixed, respect deadline
           ? list.deadline
-          : DateTime.now().add(
-              const Duration(days: 3650),
+          : DateTime.now().add(const Duration(days: 3650), // For periodic or no deadline, allow far future
             ),
     );
 
     if (selectedDate != null) {
-      return Navigator.of(context)
+      // If it's for a periodic notification's start date, time might not be as critical
+      // or could be set to a default (e.g., user's preferred notification time for the day)
+      // For now, we keep the time picker for both.
+      TimeOfDay? tod = await Navigator.of(context)
           .push(
         showPicker(
           height: 350,
@@ -358,29 +539,32 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
           accentColor: Theme.of(context).highlightColor,
           context: context,
           showSecondSelector: false,
-          value: newTime,
-          onChange: (time) {
+          value: newTime, // This is NotificationTime, needs conversion for TimeOfDay if picker expects that
+          onChange: (time) { // time here is TimeOfDay
             newTime = NotificationTime(hour: time.hour, minute: time.minute);
           },
           minuteInterval: TimePickerInterval.FIVE,
           okText: context.translate(Strings.ok),
           cancelText: context.translate(Strings.cancel),
         ),
-      )
-          .then((value) {
-        if (value == null) return null;
+      );
 
-        DateTime selectedDateTime = DateTime(
+      if (tod != null) { // Check if time picking was confirmed (tod is TimeOfDay returned by picker)
+         DateTime selectedDateTime = DateTime(
           selectedDate.year,
           selectedDate.month,
           selectedDate.day,
-          newTime.hour,
+          newTime.hour, // newTime was updated in onChange
           newTime.minute,
         );
+        // Ensure the selected date time is not in the past, especially for fixed ones
+        if (!isPeriodic && selectedDateTime.isBefore(DateTime.now())) {
+          // show a message or adjust to now?
+          // For now, let it pass, addNotification will disable it if it's past.
+        }
         return selectedDateTime;
-      });
+      }
     }
-
     return null;
   }
 }

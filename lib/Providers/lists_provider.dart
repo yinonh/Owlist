@@ -84,12 +84,15 @@ class ListsProvider extends ChangeNotifier {
             listId TEXT,
             notificationIndex INTEGER,
             notificationDateTime TEXT,
-            disabled INTEGER
+            disabled INTEGER,
+            notificationType TEXT, -- New column
+            periodicInterval TEXT -- New column
           );
         ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
+        if (oldVersion < 2) { // This is the existing V1 to V2 migration
+          // ... (existing migration logic for V2 remains unchanged) ...
           await db.execute('''
       CREATE TABLE todo_lists_temp(
         id TEXT PRIMARY KEY, 
@@ -158,6 +161,15 @@ class ListsProvider extends ChangeNotifier {
           ''');
           await db.execute('DROP TABLE todo_lists;');
           await db.execute('ALTER TABLE todo_lists_temp RENAME TO todo_lists;');
+        }
+        // New migration for V3 (adding notificationType and periodicInterval)
+        if (oldVersion < 3) {
+          await db.execute('''
+            ALTER TABLE notifications ADD COLUMN notificationType TEXT DEFAULT 'fixed'
+          ''');
+          await db.execute('''
+            ALTER TABLE notifications ADD COLUMN periodicInterval TEXT
+          ''');
         }
       },
       version: int.parse(dotenv.env['DBVERSION']!),
