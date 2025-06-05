@@ -48,7 +48,7 @@ final ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch(
     accentColor: const Color(0xFF635985),
   ),
-  dialogTheme: DialogTheme(
+  dialogTheme: DialogThemeData(
     backgroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(
@@ -165,7 +165,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     brightness: Brightness.dark,
     accentColor: const Color(0xFF18122B),
   ),
-  dialogTheme: DialogTheme(
+  dialogTheme: DialogThemeData(
     backgroundColor: Colors.black,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(

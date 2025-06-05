@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
@@ -170,48 +169,67 @@ class NotificationProvider with ChangeNotifier {
         list, scheduledTime, notificationText, Keys.fixed, null);
   }
 
-  Future<bool> addNotification(
-      ToDoList list, DateTime notificationDateTime,
+  Future<bool> addNotification(ToDoList list, DateTime notificationDateTime,
       [String? notificationText,
       String notificationType = Keys.fixed,
       String? periodicInterval]) async {
     if (!SharedPreferencesHelper.instance.notificationsActive) return false;
 
     final Database db = await database;
-    List<Notifications> existingNotifications = await getNotificationsByListId(list.id);
+    List<Notifications> existingNotifications =
+        await getNotificationsByListId(list.id);
 
     if (notificationType == Keys.periodic) {
+      // Handle periodic notification - remove existing periodic and disable fixed
       for (var existingNotification in existingNotifications) {
         // Cancel OS notification regardless of type before DB changes
-        await _flutterLocalNotificationsPlugin.cancel(existingNotification.notificationIndex);
+        await _flutterLocalNotificationsPlugin
+            .cancel(existingNotification.notificationIndex);
+
         if (existingNotification.notificationType == Keys.periodic) {
           // Delete any old periodic notification
-          await db.delete('notifications', where: 'id = ?', whereArgs: [existingNotification.id]);
+          await db.delete('notifications',
+              where: 'id = ?', whereArgs: [existingNotification.id]);
         } else {
-          // Disable/delete fixed notifications
-          existingNotification.disabled = true; // Or delete: await db.delete('notifications', where: 'id = ?', whereArgs: [existingNotification.id]);
-          await db.update('notifications', existingNotification.toMap(), where: 'id = ?', whereArgs: [existingNotification.id]);
+          // Disable fixed notifications (don't delete them)
+          existingNotification.disabled = true;
+          await db.update('notifications', existingNotification.toMap(),
+              where: 'id = ?', whereArgs: [existingNotification.id]);
         }
       }
     } else if (notificationType == Keys.fixed) {
-      Notifications? periodicNotification = existingNotifications.firstWhere(
-          (n) => n.notificationType == Keys.periodic,
-          orElse: () => null_placeholder_for_firstWhere); // Replaced with placeholder due to linting rule
-      if (periodicNotification != null) {
-        await _flutterLocalNotificationsPlugin.cancel(periodicNotification.notificationIndex);
-        await db.delete('notifications', where: 'id = ?', whereArgs: [periodicNotification.id]);
+      // Handle fixed notification - remove periodic and check fixed limit
+
+      // First, check if we're at the limit for fixed notifications
+      List<Notifications> fixedNotifications = existingNotifications
+          .where((n) => n.notificationType != Keys.periodic)
+          .toList();
+
+      if (fixedNotifications.length >= 4) {
+        // Return false or throw an exception to indicate limit reached
+        throw Exception("Fixed notifications limit reached (4 max)");
       }
-      // Regarding 4 fixed limit: The UI or a check before calling addNotification should ideally handle this.
-      // If we are to enforce it here, we'd count remaining fixed notifications.
+
+      // Find and remove periodic notification if it exists
+      Notifications? periodicNotification;
+      try {
+        periodicNotification = existingNotifications.firstWhere(
+          (n) => n.notificationType == Keys.periodic,
+        );
+      } catch (e) {
+        // No periodic notification found, which is fine
+        periodicNotification = null;
+      }
+
+      if (periodicNotification != null) {
+        await _flutterLocalNotificationsPlugin
+            .cancel(periodicNotification.notificationIndex);
+        await db.delete('notifications',
+            where: 'id = ?', whereArgs: [periodicNotification.id]);
+      }
     }
 
-    // Fallback for firstWhere if no element is found
-    // This is a common way to handle it when a nullable result is desired.
-    Notifications? null_placeholder_for_firstWhere = null;
-
-
-    // Determine if the notification should be immediately disabled (e.g., for fixed past dates)
-    // For periodic, notificationDateTime is an anchor, actual scheduling time is based on _notificationTime.
+    // Determine if the notification should be immediately disabled
     bool disabled = false;
     if (notificationType == Keys.fixed) {
       disabled = notificationDateTime.isBefore(DateTime.now());
@@ -223,7 +241,7 @@ class NotificationProvider with ChangeNotifier {
     int notificationIndex = (snapshot[0]['maxIndex'] as int? ?? 0) + 1;
 
     final Notifications notification = Notifications(
-      id: Uuid().v4(),
+      id: const Uuid().v4(),
       listId: list.id,
       notificationIndex: notificationIndex,
       notificationDateTime: notificationDateTime,
@@ -241,16 +259,18 @@ class NotificationProvider with ChangeNotifier {
     return scheduleNotification(list, notificationText);
   }
 
-  Future<bool> editNotification(
-      Notifications notification, ToDoList list, [String? notificationText]) async {
+  Future<bool> editNotification(Notifications notification, ToDoList list,
+      [String? notificationText]) async {
     final db = await database;
 
     // If it's a fixed notification, and date is changed to past, it should be disabled.
-    if (notification.notificationType == Keys.fixed || notification.notificationType == null) {
-        notification.disabled = notification.notificationDateTime.isBefore(DateTime.now());
+    if (notification.notificationType == Keys.fixed ||
+        notification.notificationType == null) {
+      notification.disabled =
+          notification.notificationDateTime.isBefore(DateTime.now());
     } else {
-        // For periodic notifications, 'disabled' might be toggled directly via toggleNotificationDisabled.
-        // Editing date for periodic is more like changing its anchor, not typically making it "disabled" unless explicitly set.
+      // For periodic notifications, 'disabled' might be toggled directly via toggleNotificationDisabled.
+      // Editing date for periodic is more like changing its anchor, not typically making it "disabled" unless explicitly set.
     }
 
     await db.update(
@@ -259,7 +279,8 @@ class NotificationProvider with ChangeNotifier {
       where: 'id = ?',
       whereArgs: [notification.id],
     );
-    return await scheduleNotification(list, notificationText); // Ensure await here
+    return await scheduleNotification(
+        list, notificationText); // Ensure await here
   }
 
   Future<bool> deleteNotification(
@@ -271,7 +292,8 @@ class NotificationProvider with ChangeNotifier {
       whereArgs: [notification.id],
     );
     // Explicitly cancel the OS notification.
-    await _flutterLocalNotificationsPlugin.cancel(notification.notificationIndex);
+    await _flutterLocalNotificationsPlugin
+        .cancel(notification.notificationIndex);
     // Reschedule remaining notifications for the list (if any)
     return await scheduleNotification(list); // Ensure await here
   }
@@ -291,29 +313,30 @@ class NotificationProvider with ChangeNotifier {
   }
 
   Future<void> toggleNotificationDisabled(
-    Notifications notification, ToDoList list, {bool forceDisable = false}) async {
-
+      Notifications notification, ToDoList list,
+      {bool forceDisable = false}) async {
     final db = await database;
     bool originalDisabledState = notification.disabled;
 
     if (forceDisable) {
       notification.disabled = true;
     } else {
-      // Regular toggle, but don't allow enabling if global notifications are off (unless it's periodic)
-      if (notification.disabled && // If trying to enable (current state is disabled)
-          !SharedPreferencesHelper.instance.notificationsActive &&
-          notification.notificationType != Keys.periodic) {
-        return; // Prevent enabling fixed notification when global is off
+      // Regular toggle, but don't allow enabling if global notifications are off
+      if (notification
+              .disabled && // If trying to enable (current state is disabled)
+          !SharedPreferencesHelper.instance.notificationsActive) {
+        // Show user feedback that global notifications are disabled
+        return;
       }
       notification.disabled = !notification.disabled;
     }
 
     if (originalDisabledState == notification.disabled && !forceDisable) {
-        // No change in state, and not forced, so no need to update DB or reschedule.
-        // This can happen if trying to enable a fixed notification when global is off.
-        return;
+      // No change in state, and not forced, so no need to update DB or reschedule.
+      return;
     }
 
+    // Update ONLY the disabled field to avoid changing other properties
     await db.update(
       'notifications',
       {'disabled': notification.disabled ? 1 : 0},
@@ -322,18 +345,16 @@ class NotificationProvider with ChangeNotifier {
     );
 
     if (notification.disabled) {
-      // If it's now disabled (either by toggle or force), cancel its OS notification.
-      await _flutterLocalNotificationsPlugin.cancel(notification.notificationIndex);
-    } else {
-      // If it's now enabled, reschedule all notifications for the list.
-      // scheduleNotification will handle the actual OS scheduling.
-      await scheduleNotification(list);
+      // If it's now disabled, cancel its OS notification.
+      await _flutterLocalNotificationsPlugin
+          .cancel(notification.notificationIndex);
     }
-    // No need to call scheduleNotification if disabling, as cancel is specific.
-    // If enabling, scheduleNotification handles it.
-    // However, if other notifications for the list might be affected by this toggle
-    // (e.g. complex rules between fixed/periodic), then always calling scheduleNotification might be safer.
-    // For now, targeted cancel/schedule.
+
+    // Always reschedule all notifications for the list to ensure consistency
+    // This prevents notifications from "moving" between types
+    await scheduleNotification(list);
+
+    notifyListeners();
   }
 
   // disableNotificationById can be removed if toggleNotificationDisabled with forceDisable=true covers its use case.
@@ -358,130 +379,148 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners(); // Added notifyListeners here as it was in the original prompt for cancelAllNotifications
   }
 
-Future<bool> scheduleNotification(ToDoList list, [String? notificationText]) async {
-  if (!SharedPreferencesHelper.instance.notificationsActive) return false;
+  Future<bool> scheduleNotification(ToDoList list,
+      [String? notificationText]) async {
+    if (!SharedPreferencesHelper.instance.notificationsActive) return false;
 
-  List<Notifications> dbNotifications = await getNotificationsByListId(list.id);
-  bool notificationScheduled = false;
+    List<Notifications> dbNotifications =
+        await getNotificationsByListId(list.id);
+    bool notificationScheduled = false;
 
-  final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-  final tz.Location héritageLocation = tz.getLocation(currentTimeZone); // Ensure tz is initialized
+    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    final tz.Location heritageLocation =
+        tz.getLocation(currentTimeZone); // Ensure tz is initialized
 
-  for (var notification in dbNotifications) {
-    // Always cancel previous OS notification before potentially rescheduling
-    await _flutterLocalNotificationsPlugin.cancel(notification.notificationIndex);
+    for (var notification in dbNotifications) {
+      // Always cancel previous OS notification before potentially rescheduling
+      await _flutterLocalNotificationsPlugin
+          .cancel(notification.notificationIndex);
 
-    if (notification.disabled) {
-      continue;
-    }
-
-    // Deadline check for all active notifications
-    if (list.hasDeadline && list.deadline.isBefore(DateTime.now())) {
-      // If deadline has passed, ensure notification is marked as disabled in DB and skip scheduling
-      if (!notification.disabled) { // Avoid redundant DB updates
-        await toggleNotificationDisabled(notification, list, forceDisable: true); // Add a way to force disable
-      }
-      continue;
-    }
-
-    String title = list.title;
-    String body = notificationText ?? ''; // Default body, might need adjustment per type
-
-    if (notification.notificationType == Keys.periodic) {
-      RepeatInterval? interval;
-      if (notification.periodicInterval == Keys.daily) {
-        interval = RepeatInterval.daily;
-        body = "Daily reminder for ${list.title}";
-      } else if (notification.periodicInterval == Keys.weekly) {
-        interval = RepeatInterval.weekly;
-        body = "Weekly reminder for ${list.title}";
-      } else {
-        // Monthly or other unsupported periodic types are no longer actively scheduled here
+      if (notification.disabled) {
         continue;
       }
 
-      // For periodicallyShow, the time component of notification.notificationDateTime is used.
-      // The date part is less critical as it just needs to be a valid TZDateTime.
-      // We'll use the user's preferred time for consistency, applied to today's date for the anchor.
-      final scheduledTime = tz.TZDateTime(
-          héritageLocation,
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          _notificationTime.hour, // User's preferred hour
-          _notificationTime.minute // User's preferred minute
-      );
-
-      // If list has a deadline, and that deadline is BEFORE the first scheduled time, don't schedule.
-      // This specific check might be redundant if the general deadline check above works,
-      // but good for an edge case where preferred time today is already past deadline today.
-      if (list.hasDeadline && list.deadline.isBefore(scheduledTime)) {
-          if (!notification.disabled) {
-            await toggleNotificationDisabled(notification, list, forceDisable: true);
-          }
-          continue;
-      }
-
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-          Keys.mainChannelId, // Use a consistent channel ID
-          Keys.mainChannelName,
-          channelDescription: Keys.mainChannelDescription, // Optional: can be simpler for periodic
-          channelShowBadge: false,
-      );
-      const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
-
-      try {
-        await _flutterLocalNotificationsPlugin.periodicallyShow(
-          notification.notificationIndex,
-          title,
-          body,
-          interval,
-          platformDetails,
-          payload: list.id,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
-        notificationScheduled = true;
-      } catch (e) {
-        print("Error scheduling periodic notification with periodicallyShow: $e");
-      }
-
-    } else { // Fixed notification (notification.notificationType == Keys.fixed or null)
-      if (notification.notificationDateTime.isBefore(DateTime.now())) {
-        // Fixed notification is in the past
-        if (!notification.disabled) { // Avoid redundant DB updates
-            await toggleNotificationDisabled(notification, list, forceDisable: true);
+      // Deadline check for all active notifications
+      if (list.hasDeadline && list.deadline.isBefore(DateTime.now())) {
+        // If deadline has passed, ensure notification is marked as disabled in DB and skip scheduling
+        if (!notification.disabled) {
+          // Avoid redundant DB updates
+          await toggleNotificationDisabled(notification, list,
+              forceDisable: true); // Add a way to force disable
         }
         continue;
       }
 
-      body = notificationText ?? ''; // Use provided text or default for fixed
-      if (!list.hasDeadline) { body = ''; } // Original logic for fixed
+      String title = list.title;
+      String body = notificationText ??
+          ''; // Default body, might need adjustment per type
 
-      try {
-        await _flutterLocalNotificationsPlugin.zonedSchedule(
-          notification.notificationIndex,
-          title,
-          body,
-          tz.TZDateTime.from(notification.notificationDateTime, héritageLocation),
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              Keys.mainChannelId,
-              Keys.mainChannelName,
-              channelDescription: Keys.mainChannelDescription,
-              channelShowBadge: false,
-            ),
-          ),
-          payload: list.id,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      if (notification.notificationType == Keys.periodic) {
+        RepeatInterval? interval;
+        if (notification.periodicInterval == Keys.daily) {
+          interval = RepeatInterval.daily;
+          body = "Daily reminder for ${list.title}";
+        } else if (notification.periodicInterval == Keys.weekly) {
+          interval = RepeatInterval.weekly;
+          body = "Weekly reminder for ${list.title}";
+        } else {
+          // Monthly or other unsupported periodic types are no longer actively scheduled here
+          continue;
+        }
+
+        // For periodicallyShow, the time component of notification.notificationDateTime is used.
+        // The date part is less critical as it just needs to be a valid TZDateTime.
+        // We'll use the user's preferred time for consistency, applied to today's date for the anchor.
+        final scheduledTime = tz.TZDateTime(
+            heritageLocation,
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            _notificationTime.hour, // User's preferred hour
+            _notificationTime.minute // User's preferred minute
+            );
+
+        // If list has a deadline, and that deadline is BEFORE the first scheduled time, don't schedule.
+        // This specific check might be redundant if the general deadline check above works,
+        // but good for an edge case where preferred time today is already past deadline today.
+        if (list.hasDeadline && list.deadline.isBefore(scheduledTime)) {
+          if (!notification.disabled) {
+            await toggleNotificationDisabled(notification, list,
+                forceDisable: true);
+          }
+          continue;
+        }
+
+        const AndroidNotificationDetails androidDetails =
+            AndroidNotificationDetails(
+          Keys.mainChannelId, // Use a consistent channel ID
+          Keys.mainChannelName,
+          channelDescription: Keys
+              .mainChannelDescription, // Optional: can be simpler for periodic
+          channelShowBadge: false,
         );
-        notificationScheduled = true;
-      } catch (e) {
-        print("Error scheduling fixed notification: $e");
+        const NotificationDetails platformDetails =
+            NotificationDetails(android: androidDetails);
+
+        try {
+          await _flutterLocalNotificationsPlugin.periodicallyShow(
+            notification.notificationIndex,
+            title,
+            body,
+            interval,
+            platformDetails,
+            payload: list.id,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          );
+          notificationScheduled = true;
+        } catch (e) {
+          print(
+              "Error scheduling periodic notification with periodicallyShow: $e");
+        }
+      } else {
+        // Fixed notification (notification.notificationType == Keys.fixed or null)
+        if (notification.notificationDateTime.isBefore(DateTime.now())) {
+          // Fixed notification is in the past
+          if (!notification.disabled) {
+            // Avoid redundant DB updates
+            await toggleNotificationDisabled(notification, list,
+                forceDisable: true);
+          }
+          continue;
+        }
+
+        body = notificationText ?? ''; // Use provided text or default for fixed
+        if (!list.hasDeadline) {
+          body = '';
+        } // Original logic for fixed
+
+        try {
+          await _flutterLocalNotificationsPlugin.zonedSchedule(
+            notification.notificationIndex,
+            title,
+            body,
+            tz.TZDateTime.from(
+                notification.notificationDateTime, heritageLocation),
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                Keys.mainChannelId,
+                Keys.mainChannelName,
+                channelDescription: Keys.mainChannelDescription,
+                channelShowBadge: false,
+              ),
+            ),
+            payload: list.id,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+          );
+          notificationScheduled = true;
+        } catch (e) {
+          print("Error scheduling fixed notification: $e");
+        }
       }
     }
+    notifyListeners();
+    return notificationScheduled;
   }
-  notifyListeners();
-  return notificationScheduled;
-}
 }
