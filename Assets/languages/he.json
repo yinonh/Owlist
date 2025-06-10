@@ -85,5 +85,7 @@
   "feedbackSubmitButton": "שלח",
   "feedbackDescription": "הוסף תאור",
   "Search results": "תוצאות החיפוש",
-  "date format": "dd/MM/yyyy"
+  "date format": "dd/MM/yyyy",
+  "startTyping": "התחל להקליד...",
+  "emptyContent": "אין תוכן להצגה."
 }

@@ -85,5 +85,7 @@
   "feedbackSubmitButton": "提交",
   "feedbackDescription": "新增描述",
   "searchResults": "搜索结果",
-  "date format": "yyyy/MM/dd"
+  "date format": "yyyy/MM/dd",
+  "startTyping": "开始输入...",
+  "emptyContent": "无内容可显示。"
 }

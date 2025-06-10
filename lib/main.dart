@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -166,6 +167,7 @@ class _OwlistAppState extends State<OwlistApp> {
             GlobalMaterialLocalizations.delegate,
             ...GlobalMaterialLocalizations.delegates,
             GlobalWidgetsLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLanguage.values,
           themeMode: currentThemeMode,

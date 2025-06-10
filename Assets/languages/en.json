@@ -85,5 +85,7 @@
   "feedbackSubmitButton": "Submit",
   "feedbackDescription": "Add Description",
   "Search results": "Search Results",
-  "date format": "MM/dd/yyyy"
+  "date format": "MM/dd/yyyy",
+  "startTyping": "Start typing...",
+  "emptyContent": "No content to display."
 }

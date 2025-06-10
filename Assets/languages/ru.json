@@ -85,5 +85,7 @@
   "feedbackSubmitButton": "Отправить",
   "feedbackDescription": "Добавить описание",
   "Search results" : "Результаты поиска",
-  "date format": "dd/MM/yyyy"
+  "date format": "dd/MM/yyyy",
+  "startTyping": "Начните печатать...",
+  "emptyContent": "Нет содержимого для отображения."
 }

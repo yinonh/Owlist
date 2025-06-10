@@ -1,6 +1,8 @@
 final class Strings {
   // Content screen
   static const String addSomeContent = "Add some content";
+  static const String startTyping = 'startTyping';
+  static const String emptyContent = 'emptyContent';
 
   // Home page
   static const String activeLists = "Active Lists";

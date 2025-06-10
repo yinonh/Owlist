@@ -33,6 +33,8 @@ dependencies:
   top_snackbar_flutter: ^3.1.0
   uuid: ^4.4.0
   lottie: ^3.1.0
+  flutter_quill: ^11.4.1
+  flutter_quill_extensions: ^11.0.0
   showcaseview: ^3.0.0
   permission_handler: ^11.3.1
   app_settings: ^5.1.1

@@ -2,6 +2,7 @@ class ToDoItem {
   final String id;
   final String listId;
   final String title;
+  // Content will store Quill Delta as a JSON string
   final String content;
   bool done;
   int itemIndex;

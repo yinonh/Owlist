@@ -85,5 +85,7 @@
   "feedbackSubmitButton": "सबमिट करें",
   "feedbackDescription": "विवरण जोड़ें",
   "Search results" : "खोज परिणाम",
-  "date format": "dd/MM/yyyy"
+  "date format": "dd/MM/yyyy",
+  "startTyping": "लिखना शुरू करें...",
+  "emptyContent": "प्रदर्शित करने के लिए कोई सामग्री नहीं है।"
 }

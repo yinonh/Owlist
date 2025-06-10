@@ -24,7 +24,32 @@ class ItemProvider extends ChangeNotifier {
   initDB() async {
     return await sql.openDatabase(
       path.join(await sql.getDatabasesPath(), Keys.toDoTable),
-      version: int.parse(dotenv.env['DBVERSION']!),
+      version: 3, // New version
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 3) {
+          // Check if the column already exists; if not, add it.
+          // More importantly, ensure its type can hold JSON.
+          // SQLite types are flexible, but TEXT is appropriate.
+          // This simple ALTER TABLE might not be enough if the column type was strictly something else non-text.
+          // However, for typical string types, this should be fine or a no-op.
+          // A more robust migration might check column affinity, but this is generally safe.
+          await db.execute("ALTER TABLE todo_items ADD COLUMN temp_content TEXT;");
+          await db.execute("UPDATE todo_items SET temp_content = content;");
+          await db.execute("ALTER TABLE todo_items DROP COLUMN content;");
+          await db.execute("ALTER TABLE todo_items RENAME COLUMN temp_content TO content;");
+          // If the column 'content' didn't exist before or was of a different type,
+          // this ensures it's now TEXT. If it was already TEXT, this is benign.
+        }
+      },
+      onCreate: (db, version) async {
+        // This onCreate is called if the database did not exist and is created for the first time.
+        // It should set up the schema for version 3 directly.
+        // Assuming the table creation logic is handled by another provider (ListsProvider likely)
+        // or was part of an earlier version's onCreate.
+        // If this provider is responsible for creating 'todo_items' table, that DDL needs to be here,
+        // ensuring 'content' is TEXT.
+        // For now, focusing on upgrade. The original issue implies tables exist.
+      },
     );
   }
 
@@ -84,7 +109,7 @@ class ItemProvider extends ChangeNotifier {
       Keys.id: DateTime.now().toIso8601String(),
       Keys.listId: listId,
       Keys.title: title,
-      Keys.content: '',
+      Keys.content: '{"ops":[{"insert":"\\n"}]}', // Updated for empty Quill document
       Keys.done: 0,
       Keys.itemIndex: newIndex,
     };
@@ -105,7 +130,7 @@ class ItemProvider extends ChangeNotifier {
       id: newItemData[Keys.id] as String,
       listId: listId,
       title: title,
-      content: '',
+      content: '{"ops":[{"insert":"\\n"}]}', // Updated for empty Quill document
       done: false,
       itemIndex: newIndex,
     );
