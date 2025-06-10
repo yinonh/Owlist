@@ -177,7 +177,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.notifications_active_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark..withValues(alpha: 0.2),
           size: 120,
         ),
       ),

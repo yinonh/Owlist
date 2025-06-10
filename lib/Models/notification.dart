@@ -8,6 +8,8 @@ class Notifications {
   int notificationIndex;
   DateTime notificationDateTime;
   bool disabled;
+  String? notificationType;
+  String? periodicInterval;
 
   Notifications({
     required this.id,
@@ -15,6 +17,8 @@ class Notifications {
     required this.notificationIndex,
     required this.notificationDateTime,
     required this.disabled,
+    this.notificationType,
+    this.periodicInterval,
   });
 
   // Convert Notifications object to a Map object
@@ -26,6 +30,8 @@ class Notifications {
       Keys.notificationDateTime: DateFormat(Keys.notificationDateTimeFormat)
           .format(notificationDateTime),
       Keys.disabled: disabled ? 1 : 0,
+      Keys.notificationType: notificationType,
+      Keys.periodicInterval: periodicInterval,
     };
   }
 
@@ -38,6 +44,8 @@ class Notifications {
       notificationDateTime: DateFormat(Keys.notificationDateTimeFormat)
           .parse(map[Keys.notificationDateTime]),
       disabled: map[Keys.disabled] == 1,
+      notificationType: map[Keys.notificationType],
+      periodicInterval: map[Keys.periodicInterval],
     );
   }
 
@@ -48,6 +56,8 @@ class Notifications {
     int? notificationIndex,
     DateTime? notificationDateTime,
     bool? disabled,
+    String? notificationType,
+    String? periodicInterval,
   }) {
     return Notifications(
       id: id ?? this.id,
@@ -55,6 +65,8 @@ class Notifications {
       notificationIndex: notificationIndex ?? this.notificationIndex,
       notificationDateTime: notificationDateTime ?? this.notificationDateTime,
       disabled: disabled ?? this.disabled,
+      notificationType: notificationType ?? this.notificationType,
+      periodicInterval: periodicInterval ?? this.periodicInterval,
     );
   }
 }

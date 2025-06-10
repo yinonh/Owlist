@@ -64,7 +64,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                               color: Colors.transparent,
                               child: InkWell(
                                 customBorder: const CircleBorder(),
-                                splashColor: selectedColor.withOpacity(0.5),
+                                splashColor: selectedColor
+                                  ..withValues(alpha: 0.5),
                                 onTap: () {
                                   onItemPressed(0);
                                 },
@@ -84,7 +85,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                               color: Colors.transparent,
                               child: InkWell(
                                 customBorder: const CircleBorder(),
-                                splashColor: selectedColor.withOpacity(0.5),
+                                splashColor: selectedColor
+                                  ..withValues(alpha: 0.5),
                                 onTap: () {
                                   onItemPressed(1);
                                 },
@@ -113,7 +115,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                               color: Colors.transparent,
                               child: InkWell(
                                 customBorder: const CircleBorder(),
-                                splashColor: selectedColor.withOpacity(0.5),
+                                splashColor: selectedColor
+                                  ..withValues(alpha: 0.5),
                                 onTap: () {
                                   onItemPressed(2);
                                 },
@@ -133,7 +136,8 @@ class DiamondBottomNavigation extends StatelessWidget {
                               color: Colors.transparent,
                               child: InkWell(
                                 customBorder: const CircleBorder(),
-                                splashColor: selectedColor.withOpacity(0.5),
+                                splashColor: selectedColor
+                                  ..withValues(alpha: 0.5),
                                 onTap: () {
                                   onItemPressed(3);
                                 },

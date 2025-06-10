@@ -77,7 +77,7 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.warning_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark..withValues(alpha: 0.2),
           size: 120,
         ),
       ),
@@ -391,6 +391,9 @@ class _SettingsState extends State<Settings> {
                                 ? () {
                                     Navigator.of(context).push(
                                       showPicker(
+                                          borderRadius: 30.0,
+                                          backgroundColor:
+                                              Theme.of(context).primaryColor,
                                           height: 350,
                                           is24HrFormat: true,
                                           accentColor:

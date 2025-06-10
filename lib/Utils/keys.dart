@@ -12,6 +12,13 @@ final class Keys {
   static const String notificationDateTime = 'notificationDateTime';
   static const String disabled = 'disabled';
   static const String notificationDateTimeFormat = 'yyyy-MM-dd HH:mm';
+  static const String notificationType = 'notificationType';
+  static const String periodicInterval = 'periodicInterval';
+  static const String fixed = 'fixed';
+  static const String periodic = 'periodic';
+  static const String daily = 'daily';
+  static const String weekly = 'weekly';
+  static const String monthly = 'monthly';
 
   // To do list
   static const String listId = 'listId';
