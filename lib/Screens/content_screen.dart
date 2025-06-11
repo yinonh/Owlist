@@ -1,10 +1,13 @@
+import 'dart:convert'; // For jsonEncode/jsonDecode
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:provider/provider.dart';
 
 import '../Models/to_do_item.dart';
 import '../Providers/item_provider.dart';
-import '../Providers/lists_provider.dart';
+// import '../Providers/lists_provider.dart'; // No longer needed for editItemTitle
 import '../Utils/context_extensions.dart';
 import '../Utils/keys.dart';
 import '../Utils/show_case_helper.dart';
@@ -25,26 +28,57 @@ class ContentScreen extends StatefulWidget {
 class _ContentScreenState extends State<ContentScreen> {
   late bool titleEditMode;
   final TextEditingController _titleController = TextEditingController();
-  TextEditingController textEditingController = TextEditingController();
+  quill.QuillController? _quillController;
   late ToDoItem _item;
   bool _isLoading = false;
   bool textEditMode = false;
-  bool newTextEmpty = false;
+  bool newTextEmpty = false; // For title TextField
   final GlobalKey<ScaffoldState> addContentKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     titleEditMode = false;
+    _quillController = quill.QuillController.basic(); // Initial basic controller
     _getItem();
     if (ShowCaseHelper.instance.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(
-          Duration(milliseconds: 400),
+          const Duration(milliseconds: 400),
           () => ShowCaseHelper.instance
               .startShowCaseContentAdded(context, [addContentKey]),
         );
       });
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _quillController?.dispose();
+    super.dispose();
+  }
+
+  void _initializeQuillController() {
+    _quillController?.dispose(); // Dispose previous controller unconditionally
+
+    try {
+      final content = _item.content.trim();
+      if (content.isEmpty || content == '{"ops":[{"insert":"\\n"}]}') {
+        _quillController = quill.QuillController.basic();
+      } else {
+        final decodedJson = jsonDecode(content);
+        _quillController = quill.QuillController(
+          document: quill.Document.fromJson(decodedJson),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
+    } catch (e) {
+      // If JSON decoding fails, or if it's not JSON, treat as plain text
+      _quillController = quill.QuillController(
+        document: quill.Document()..insert(0, _item.content),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
     }
   }
 
@@ -55,6 +89,9 @@ class _ContentScreenState extends State<ContentScreen> {
     _item = await Provider.of<ItemProvider>(context, listen: false)
         .itemById(widget.id);
     _titleController.text = _item.title.trim();
+
+    _initializeQuillController();
+
     setState(() {
       _isLoading = false;
     });
@@ -63,43 +100,57 @@ class _ContentScreenState extends State<ContentScreen> {
   void _toggleTitleEditMode() {
     setState(() {
       titleEditMode = !titleEditMode;
+      if (titleEditMode) {
+        newTextEmpty = _titleController.text.trim().isEmpty;
+      }
     });
   }
 
   void toggleTextEditMode() {
     setState(() {
-      if (_item.content.trim().isEmpty) {
-        textEditingController.text = '';
-      }
       textEditMode = !textEditMode;
     });
   }
 
   void _save() async {
+    bool titleChanged = false;
     if (titleEditMode) {
-      Provider.of<ListsProvider>(context, listen: false)
-          .editItemTitle(_item.id, _titleController.text.trim());
-      _toggleTitleEditMode();
+      if (_item.title.trim() != _titleController.text.trim() && !_titleController.text.trim().isEmpty) {
+        await Provider.of<ItemProvider>(context, listen: false)
+            .editItemTitle(_item.id, _titleController.text.trim());
+        titleChanged = true;
+      }
     }
-    if (textEditMode) {
-      await Provider.of<ItemProvider>(context, listen: false)
-          .updateItemContent(_item.id, textEditingController.text.trim());
-      toggleTextEditMode();
+
+    bool contentChanged = false;
+    if (textEditMode && _quillController != null) {
+      final newContentJson = jsonEncode(_quillController!.document.toDelta().toJson());
+      if (newContentJson != _item.content) {
+        await Provider.of<ItemProvider>(context, listen: false)
+            .updateItemContent(_item.id, newContentJson);
+        contentChanged = true;
+      }
     }
-    _getItem();
+
+    if (titleChanged || contentChanged) {
+      await _getItem();
+    }
+
+    setState(() {
+      if (titleEditMode) titleEditMode = false;
+      if (textEditMode) textEditMode = false;
+    });
   }
 
   void _discard() {
     setState(() {
       if (titleEditMode) {
         _titleController.text = _item.title.trim();
-        _toggleTitleEditMode();
+        titleEditMode = false;
       }
       if (textEditMode) {
-        textEditingController.text = _item.content.trim().isEmpty
-            ? context.translate(Strings.addSomeContent)
-            : _item.content.trim();
-        toggleTextEditMode();
+        _initializeQuillController(); // Reset content to original
+        textEditMode = false;
       }
     });
   }
@@ -111,7 +162,7 @@ class _ContentScreenState extends State<ContentScreen> {
       resizeToAvoidBottomInset: true,
       floatingActionButton: Visibility(
         maintainState: true,
-        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        visible: MediaQuery.of(context).viewInsets.bottom == 0 && !titleEditMode, // Hide if title is being edited
         child: DiamondButton(
           icon: Icon(
             Icons.text_fields_rounded,
@@ -135,7 +186,7 @@ class _ContentScreenState extends State<ContentScreen> {
             ],
           ),
         ),
-        child: _isLoading
+        child: _isLoading || _quillController == null
             ? const Center(child: CircularProgressIndicator())
             : SafeArea(
                 child: Stack(
@@ -175,56 +226,64 @@ class _ContentScreenState extends State<ContentScreen> {
                                         controller: _titleController,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
-                                          // fontSize: 12.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
                                         maxLength: 50,
                                         decoration: const InputDecoration(
                                           counterText: Keys.emptyChar,
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white54),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white),
+                                          ),
                                         ),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.deny(
                                               RegExp(Keys.filterFormat))
                                         ],
                                         onSubmitted: (_) {
-                                          _save();
+                                           if (!newTextEmpty) _save();
                                         },
                                       ),
                                     )
                                   : Flexible(
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        _titleController.text.trim(),
-                                        style: const TextStyle(
-                                          fontSize: 24.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                      child: GestureDetector(
+                                        onTap: textEditMode ? null : _toggleTitleEditMode, // Allow title edit only if content not in edit mode
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          _titleController.text.trim(),
+                                          style: const TextStyle(
+                                            fontSize: 24.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                               titleEditMode || textEditMode
                                   ? IconButton(
                                       icon: const Icon(Icons.save_as_rounded),
-                                      onPressed: newTextEmpty ? null : _save,
+                                      onPressed: (titleEditMode && newTextEmpty) ? null : _save,
                                     )
                                   : IconButton(
                                       icon: const Icon(Icons.edit_rounded),
-                                      onPressed: _toggleTitleEditMode,
+                                      onPressed: textEditMode ? null : _toggleTitleEditMode, // Allow title edit only if content not in edit mode
                                     ),
                             ],
                           ),
                         ),
                         Expanded(
-                          child: ListView(
+                          child: ListView( // Using ListView to allow potential scrolling if content is very long
                             children: [
-                              const SizedBox(
-                                height: 20,
-                              ),
+                              // SizedBox height might be adjusted or removed if QuillEditor handles all padding
+                              // const SizedBox(height: 20,),
                               GestureDetector(
-                                onLongPress: toggleTextEditMode,
-                                onDoubleTap: toggleTextEditMode,
+                                // Long press/double tap to toggle edit mode is now handled by DiamondButton for content
+                                // onLongPress: toggleTextEditMode,
+                                // onDoubleTap: toggleTextEditMode,
                                 child: ShowCaseHelper.instance.customShowCase(
                                   key: addContentKey,
                                   description: context.translate(ShowCaseHelper
@@ -233,20 +292,15 @@ class _ContentScreenState extends State<ContentScreen> {
                                   overlayOpacity: 0,
                                   showArrow: false,
                                   child: EditableTextView(
-                                    initialText: _item.content.trim().isEmpty
-                                        ? context
-                                            .translate(Strings.addSomeContent)
-                                        : _item.content.trim(),
+                                    quillController: _quillController!,
                                     isEditMode: textEditMode,
-                                    toggleEditMode: toggleTextEditMode,
-                                    controller: textEditingController,
                                   ),
                                 ),
                               )
                             ],
                           ),
                         ),
-                        SizedBox(
+                        SizedBox( // Space for the DiamondButton or general padding
                           height: (MediaQuery.of(context).size.height -
                                   MediaQuery.of(context).padding.top -
                                   MediaQuery.of(context).padding.bottom) *

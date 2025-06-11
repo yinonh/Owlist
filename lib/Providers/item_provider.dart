@@ -315,4 +315,19 @@ class ItemProvider extends ChangeNotifier {
       print("Error updating item's content: $error");
     }
   }
+
+  Future<void> editItemTitle(String itemId, String newTitle) async {
+    try {
+      final Database db = await database;
+      await db.update(
+        'todo_items',
+        {Keys.title: newTitle},
+        where: 'id = ?',
+        whereArgs: [itemId],
+      );
+      notifyListeners();
+    } catch (error) {
+      print("Error updating item's title: $error");
+    }
+  }
 }
