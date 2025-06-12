@@ -208,11 +208,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.notifications_off_rounded,
-          color: Theme.of(context).primaryColorDark..withValues(alpha: 0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       displayDuration: const Duration(seconds: 1, milliseconds: 500),
     );
   }
@@ -278,7 +278,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                           size: 120,
                         ),
                       ),
-                      snackBarPosition: SnackBarPosition.bottom,
+                      snackBarPosition: SnackBarPosition.top,
                       displayDuration: const Duration(seconds: 2),
                     );
 
@@ -685,7 +685,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   null, originalType ?? Keys.fixed, originalInterval);
               _loadNotificationsData(); // Refresh after undo
             },
-            snackBarPosition: SnackBarPosition.bottom,
+            snackBarPosition: SnackBarPosition.top,
             displayDuration: const Duration(seconds: 1, milliseconds: 500),
           );
         },

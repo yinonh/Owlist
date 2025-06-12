@@ -43,7 +43,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.warning_rounded,
-          color: Theme.of(context).primaryColorDark..withValues(alpha: 0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
@@ -52,7 +52,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         widget.updateSingleListScreen();
         _itemVisible = true;
       },
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 80,

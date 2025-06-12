@@ -177,11 +177,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.notifications_active_rounded,
-          color: Theme.of(context).primaryColorDark..withValues(alpha: 0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 80,
