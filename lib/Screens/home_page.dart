@@ -64,7 +64,8 @@ class _HomePageState extends State<HomePage> {
 
   void _handleControllerChanges() {
     // If page index changed in controller, update PageView
-    if (_pageController.page?.round() != _controller.currentPageIndex) {
+    // Ensure PageController is attached to a PageView before accessing .page
+    if (_pageController.hasClients && _pageController.page?.round() != _controller.currentPageIndex) {
       _pageController.animateToPage(
         _controller.currentPageIndex,
         duration: const Duration(milliseconds: 300), // Shorter duration for programmatic changes
@@ -74,7 +75,9 @@ class _HomePageState extends State<HomePage> {
     // HomePage might need to rebuild if other relevant states in controller change (e.g. isLoading)
     // This is implicitly handled if HomePage's build method consumes controller's properties.
     // A selective setState can be called if only specific parts of HomePage (not covered by PageView) need updates.
-    setState(() {});
+    if (mounted) { // Ensure the widget is still in the tree
+      setState(() {});
+    }
   }
 
 
