@@ -7,19 +7,22 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../Controllers/home_page_controller.dart'; // Changed
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
-import '../Providers/notification_provider.dart';
+// import '../Providers/notification_provider.dart'; // No longer directly needed for init
 import '../Screens/single_list_screen.dart';
 import '../Utils/context_extensions.dart';
 import '../Utils/keys.dart';
-import '../Utils/shared_preferences_helper.dart';
+// import '../Utils/shared_preferences_helper.dart'; // Handled by controller
 import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Widgets/settigns_widget.dart';
 
+// SortBy enum is also in home_page_controller.dart, ensure they are compatible or use one from controller
+// For now, assuming it's fine or will be harmonized.
 enum SortBy {
   creationNTL,
   creationLTN,
@@ -39,22 +42,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late ListsProvider provider;
-  late Future<List<ToDoList>> activeItemsFuture;
-  late Future<List<ToDoList>> achievedItemsFuture;
-  late Future<List<ToDoList>> withoutDeadlineItemsFuture;
-  late Future<List<ToDoList>> searchResults;
-  late int currentIndex;
-  late PageController selectedIndex;
-  late List<String> titles;
-  bool searchMode = false;
-  final GlobalKey<ScaffoldState> addListKey = GlobalKey<ScaffoldState>();
+  late HomePageController _controller; // Changed
+  late PageController _pageController; // Renamed from selectedIndex for clarity
+  late List<String> _titles; // Renamed from titles
+  final GlobalKey<ScaffoldState> _addListKey = GlobalKey<ScaffoldState>(); // Renamed
+
+  @override
+  void initState() {
+    super.initState();
+    final listsProvider = Provider.of<ListsProvider>(context, listen: false);
+    _controller = HomePageController(listsProvider: listsProvider, context: context);
+    _pageController = PageController(initialPage: _controller.currentPageIndex);
+
+    // Listener to sync PageController with HomePageController's currentPageIndex
+    _controller.addListener(_handleControllerChanges);
+
+    // Initialization of providers like NotificationProvider if needed directly by HomePage
+    // is now expected to be handled within HomePageController's initialization if it's a prerequisite for its operation.
+    // Provider.of<NotificationProvider>(context, listen: false).setUpNotifications(); // Moved to controller or not needed here
+  }
+
+  void _handleControllerChanges() {
+    // If page index changed in controller, update PageView
+    if (_pageController.page?.round() != _controller.currentPageIndex) {
+      _pageController.animateToPage(
+        _controller.currentPageIndex,
+        duration: const Duration(milliseconds: 300), // Shorter duration for programmatic changes
+        curve: Curves.easeInOut,
+      );
+    }
+    // HomePage might need to rebuild if other relevant states in controller change (e.g. isLoading)
+    // This is implicitly handled if HomePage's build method consumes controller's properties.
+    // A selective setState can be called if only specific parts of HomePage (not covered by PageView) need updates.
+    setState(() {});
+  }
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    titles = [
+    // Initialize titles here as it uses context.translate
+    _titles = [
       context.translate(Strings.activeLists),
       context.translate(Strings.archivedLists),
       context.translate(Strings.withoutDeadline),
@@ -63,25 +91,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    currentIndex = 0;
-    selectedIndex = PageController(initialPage: 0);
-    Provider.of<ListsProvider>(context, listen: false).initialization(context);
-    Provider.of<NotificationProvider>(context, listen: false)
-        .setUpNotifications();
-    activeItemsFuture =
-        Provider.of<ListsProvider>(context, listen: false).getActiveItems();
-    achievedItemsFuture =
-        Provider.of<ListsProvider>(context, listen: false).getAchievedItems();
-    withoutDeadlineItemsFuture =
-        Provider.of<ListsProvider>(context, listen: false)
-            .getWithoutDeadlineItems();
-    searchResults = Provider.of<ListsProvider>(context, listen: false)
-        .searchListsByTitle("");
+  void dispose() {
+    _controller.removeListener(_handleControllerChanges);
+    _pageController.dispose();
+    _controller.dispose(); // Dispose the controller
+    super.dispose();
   }
 
-  void showMessage(String text, IconData icon) {
+  void _showMessage(String text, IconData icon) { // Renamed
     showTopSnackBar(
       Overlay.of(context),
       CustomSnackBar.success(
@@ -98,107 +115,53 @@ class _HomePageState extends State<HomePage> {
         horizontal: 20,
         vertical: 80,
       ),
-      displayDuration: Duration(seconds: 1),
+      displayDuration: const Duration(seconds: 1),
     );
   }
 
-  Future<void> deleteList(ToDoList item) async {
-    setState(() {
-      activeItemsFuture = activeItemsFuture.then((activeItems) {
-        return provider.deleteList(item).then((_) {
-          return provider.getActiveItems();
-        });
-      });
-      achievedItemsFuture = achievedItemsFuture.then((achievedItems) {
-        return provider.deleteList(item).then((_) {
-          return provider.getAchievedItems();
-        });
-      });
-      withoutDeadlineItemsFuture =
-          withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
-        return provider.deleteList(item).then((_) {
-          return provider.getWithoutDeadlineItems();
-        });
-      });
-      searchMode = false;
-    });
+  Future<void> _deleteList(ToDoList item) async { // Renamed
+    await _controller.deleteList(item);
+    // UI update will be handled by controller's notifyListeners
   }
 
-  Future<void> addItem(
-      String title, DateTime deadline, bool hasDeadline) async {
-    setState(() {
-      if (hasDeadline) {
-        onItemTapped(0);
-        activeItemsFuture.then((activeItems) {
-          return provider
-              .createNewList(title, deadline, hasDeadline)
-              .then((result) {
-            if (result.success) {
-              showMessage(context.translate(Strings.scheduleNotification),
-                  Icons.notification_add_rounded);
-            }
-            if (result.data != null) {
-              Navigator.pushNamed(context, SingleListScreen.routeName,
-                      arguments: result.data)
-                  .then((value) => refreshLists());
-            }
-            return provider.getActiveItems();
-          });
-        });
-      } else {
-        onItemTapped(2);
-        withoutDeadlineItemsFuture.then((withoutDeadlineItems) {
-          return provider
-              .createNewList(title, deadline, hasDeadline)
-              .then((result) {
-            if (result.data != null) {
-              Navigator.pushNamed(context, SingleListScreen.routeName,
-                      arguments: result.data)
-                  .then((value) => refreshLists());
-            }
-            return provider.getWithoutDeadlineItems();
-          });
-        });
+  Future<void> _addItem(String title, DateTime deadline, bool hasDeadline) async { // Renamed
+    if (hasDeadline) {
+      _controller.onPageChanged(0); // Switch to active lists page
+    } else {
+      _controller.onPageChanged(2); // Switch to without deadline lists page
+    }
+
+    String? newListId = await _controller.createNewList(title, deadline, hasDeadline);
+
+    if (newListId != null) {
+      // Potentially show message for notification scheduling if createNewList indicates success for it
+      // This logic might need refinement based on what createNewList in controller returns
+      final list = await Provider.of<ListsProvider>(context, listen: false).getListById(newListId);
+      if (list != null && list.hasDeadline && (await Provider.of<ListsProvider>(context, listen: false).notificationProvider.isAndroidPermissionGranted())) {
+         _showMessage(context.translate(Strings.scheduleNotification), Icons.notification_add_rounded);
       }
-    });
+      Navigator.pushNamed(context, SingleListScreen.routeName, arguments: newListId)
+          .then((_) => _controller.refreshAllLists()); // Refresh lists when returning
+    }
+    // UI update will be handled by controller's notifyListeners
   }
 
-  void onItemTapped(int index) {
-    setState(() {
-      searchMode = false;
-      selectedIndex.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-      currentIndex = index;
-    });
-  }
-
-  Future<void> refreshLists(
-      {String searchVal = "", bool restartSearchMode = false}) async {
-    setState(() {
-      provider.invalidateCache();
-      activeItemsFuture = provider.getActiveItems();
-      achievedItemsFuture = provider.getAchievedItems();
-      withoutDeadlineItemsFuture = provider.getWithoutDeadlineItems();
-      searchResults = provider.searchListsByTitle(searchVal);
-      if (restartSearchMode) {
-        searchMode = false;
-      }
-    });
-  }
+  // No longer need refreshLists as a standalone public method in HomePageState.
+  // Controller handles its internal refreshes.
 
   @override
   Widget build(BuildContext context) {
-    provider = Provider.of<ListsProvider>(context);
-    return ShowCaseWidget(builder: (cnx) {
+    // No longer need to get provider here if controller handles it all
+    // provider = Provider.of<ListsProvider>(context);
+    // Instead, we'll use the _controller
+
+    return ShowCaseWidget(builder: (showcaseCnx) { // Renamed context variable
       return Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        bottomNavigationBar: searchMode
+        bottomNavigationBar: _controller.searchMode
             ? null
             : ShowCaseHelper.instance.customShowCase(
-                key: addListKey,
+                key: _addListKey,
                 description: context.translate(
                     ShowCaseHelper.instance.homePageShowCaseDescription),
                 context: context,
@@ -209,15 +172,16 @@ class _HomePageState extends State<HomePage> {
                     Icons.watch_off_rounded,
                     Icons.settings_rounded,
                   ],
-                  addItem: (String title, DateTime deadline,
-                      bool hasDeadline) async {
-                    await addItem(title, deadline, hasDeadline);
-                    setState(() {
-                      refreshLists();
-                    });
+                  addItem: _addItem, // Use the new _addItem
+                  selectedIndex: _controller.currentPageIndex, // From controller
+                  onItemPressed: (index) { // Directly call controller's method
+                    _pageController.animateToPage( // Also animate PageController
+                         index,
+                         duration: const Duration(milliseconds: 500),
+                         curve: Curves.easeInOut,
+                    );
+                    _controller.onPageChanged(index);
                   },
-                  selectedIndex: currentIndex,
-                  onItemPressed: onItemTapped,
                   bgColor: Theme.of(context).primaryColor,
                   selectedColor: Theme.of(context).focusColor,
                   unselectedColor: Theme.of(context).unselectedWidgetColor,
@@ -241,7 +205,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                  child: searchMode
+                  child: _controller.searchMode
                       ? TextField(
                           autofocus: true,
                           decoration: InputDecoration(
@@ -252,9 +216,7 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.white,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  searchMode = false;
-                                });
+                                _controller.setSearchMode(false);
                               },
                             ),
                             border: const OutlineInputBorder(),
@@ -268,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                           ),
                           onChanged: (value) {
-                            refreshLists(searchVal: value);
+                            _controller.searchLists(value);
                           },
                         )
                       : Row(
@@ -283,17 +245,14 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             const Spacer(),
-                            if (currentIndex != 3)
+                            if (_controller.currentPageIndex != 3) // From controller
                               IconButton(
-                                onPressed: () async {
-                                  await refreshLists();
-                                  setState(() {
-                                    searchMode = true;
-                                  });
+                                onPressed: () {
+                                  _controller.setSearchMode(true);
                                 },
                                 icon: const Icon(Icons.search_rounded),
                               ),
-                            currentIndex == 3
+                            _controller.currentPageIndex == 3 // From controller
                                 ? Directionality(
                                     textDirection: TextDirection.ltr,
                                     child: IconButton(
@@ -303,13 +262,13 @@ class _HomePageState extends State<HomePage> {
                                             : Icons.help_outline_rounded,
                                       ),
                                       onPressed: () {
+                                        // Keep setState for purely local UI changes if any
                                         setState(() {
-                                          ShowCaseHelper.instance
-                                              .toggleIsActive();
+                                          ShowCaseHelper.instance.toggleIsActive();
                                         });
                                         ShowCaseHelper.instance
                                             .startShowCaseBeginning(
-                                                cnx, [addListKey]);
+                                                showcaseCnx, [_addListKey]);
                                       },
                                     ),
                                   )
@@ -321,16 +280,12 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     icon: const Icon(Icons.filter_list_rounded),
                                     onSelected: (value) async {
-                                      provider.selectedOptionVal = value;
-                                      await SharedPreferencesHelper.instance
-                                          .setSortByIndex(
-                                              SortBy.values.indexOf(value));
-                                      await refreshLists();
+                                      await _controller.changeSortBy(value);
                                     },
                                     itemBuilder: (BuildContext cnx) => [
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.creationNTL,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.creationNTL,
                                         child: Text(
                                           context.translate(Strings
@@ -342,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.creationLTN,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.creationLTN,
                                         child: Text(
                                           context.translate(Strings
@@ -354,7 +309,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.deadlineLTN,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.deadlineLTN,
                                         child: Text(
                                           context.translate(
@@ -366,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.deadlineNTL,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.deadlineNTL,
                                         child: Text(
                                           context.translate(
@@ -378,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.progressBTS,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.progressBTS,
                                         child: Text(
                                           context.translate(
@@ -390,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.progressSTB,
-                                        checked: provider.selectedOptionVal ==
+                                        checked: _controller.currentSortBy == // From controller
                                             SortBy.progressSTB,
                                         child: Text(
                                           context.translate(
@@ -406,122 +361,46 @@ class _HomePageState extends State<HomePage> {
                         ),
                 ),
                 const SizedBox(height: 16.0),
-                searchMode
-                    ? Expanded(
-                        child: FutureBuilder<List<ToDoList>>(
-                          key: const PageStorageKey(1),
-                          future: searchResults,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text(
-                                context.translate(Strings.errorHasOccurred),
-                                style: const TextStyle(color: Colors.white),
-                              );
-                            } else {
-                              return ItemsScreen(
-                                existingItems: snapshot.data!,
-                                deleteItem: deleteList,
-                                refresh: refreshLists,
-                                title: context.translate(Strings.searchResults),
-                              );
-                            }
-                          },
-                        ),
-                      )
-                    : Expanded(
-                        child: PageView(
-                          onPageChanged: (index) {
-                            setState(() {
-                              currentIndex = index;
-                              searchMode = false;
-                              refreshLists();
-                            });
-                          },
-                          controller: selectedIndex,
-                          children: [
-                            FutureBuilder<List<ToDoList>>(
-                              key: const PageStorageKey(1),
-                              future: activeItemsFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  print(snapshot.error);
-                                  return Text(
-                                    context.translate(Strings.errorHasOccurred),
-                                    style: const TextStyle(color: Colors.white),
-                                  );
-                                } else {
-                                  return ItemsScreen(
-                                    existingItems: snapshot.data!,
-                                    deleteItem: deleteList,
-                                    refresh: refreshLists,
-                                    title: titles[currentIndex],
-                                  );
-                                }
+                Expanded(
+                  child: _controller.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _controller.searchMode
+                          ? ItemsScreen(
+                              existingItems: _controller.searchResults, // From controller
+                              deleteItem: _deleteList, // Use new method
+                              refresh: _controller.refreshAllLists, // Pass controller's refresh
+                              title: context.translate(Strings.searchResults),
+                            )
+                          : PageView(
+                              onPageChanged: (index) {
+                                // Note: This onPageChanged is from user swipe.
+                                // We need to inform the controller.
+                                _controller.onPageChanged(index);
                               },
+                              controller: _pageController, // Use the local PageController
+                              children: [
+                                ItemsScreen(
+                                  existingItems: _controller.activeLists, // From controller
+                                  deleteItem: _deleteList,
+                                  refresh: _controller.refreshAllLists,
+                                  title: _titles[_controller.currentPageIndex], // Use controller's index
+                                ),
+                                ItemsScreen(
+                                  existingItems: _controller.achievedLists, // From controller
+                                  deleteItem: _deleteList,
+                                  refresh: _controller.refreshAllLists,
+                                  title: _titles[_controller.currentPageIndex],
+                                ),
+                                ItemsScreen(
+                                  existingItems: _controller.withoutDeadlineLists, // From controller
+                                  deleteItem: _deleteList,
+                                  refresh: _controller.refreshAllLists,
+                                  title: _titles[_controller.currentPageIndex],
+                                ),
+                                Settings(refresh: _controller.refreshAllLists), // Pass controller's refresh
+                              ],
                             ),
-                            FutureBuilder<List<ToDoList>>(
-                              key: const PageStorageKey(2),
-                              future: achievedItemsFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Text(
-                                    context.translate(Strings.errorHasOccurred),
-                                    style: const TextStyle(color: Colors.white),
-                                  );
-                                } else {
-                                  return ItemsScreen(
-                                    existingItems: snapshot.data!,
-                                    deleteItem: deleteList,
-                                    refresh: refreshLists,
-                                    title: titles[currentIndex],
-                                  );
-                                }
-                              },
-                            ),
-                            FutureBuilder<List<ToDoList>>(
-                              key: const PageStorageKey(3),
-                              future: withoutDeadlineItemsFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Text(
-                                    context.translate(Strings.errorHasOccurred),
-                                    style: const TextStyle(color: Colors.white),
-                                  );
-                                } else {
-                                  return ItemsScreen(
-                                    existingItems: snapshot.data!,
-                                    deleteItem: deleteList,
-                                    refresh: refreshLists,
-                                    title: titles[currentIndex],
-                                  );
-                                }
-                              },
-                            ),
-                            Settings(refresh: refreshLists),
-                          ],
-                        ),
-                      ),
+                ),
               ],
             ),
           ),
