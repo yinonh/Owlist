@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/Utils/shared_preferences_helper.dart'
+    show SharedPreferencesHelper;
 import '../Models/to_do_list.dart';
 import '../Providers/lists_provider.dart';
 import '../Screens/home_page.dart'; // For SortBy enum
 
 class HomePageController extends ChangeNotifier {
   final ListsProvider _listsProvider;
-  BuildContext context; // Needed for initialization and potentially other context-dependent provider actions
+  BuildContext
+      context; // Needed for initialization and potentially other context-dependent provider actions
 
   List<ToDoList> _activeLists = [];
   List<ToDoList> _achievedLists = [];
@@ -26,7 +29,8 @@ class HomePageController extends ChangeNotifier {
   SortBy get currentSortBy => _listsProvider.selectedOptionVal;
   bool get searchMode => _searchMode;
 
-  HomePageController({required ListsProvider listsProvider, required this.context})
+  HomePageController(
+      {required ListsProvider listsProvider, required this.context})
       : _listsProvider = listsProvider {
     // Listen to changes in ListsProvider to refresh data if underlying data changes externally
     // However, the controller will manage when to notify its own listeners.
@@ -67,9 +71,10 @@ class HomePageController extends ChangeNotifier {
     _listsProvider.invalidateCache(); // Ensure fresh data from DB
     await _fetchAllLists();
     if (_searchMode && searchVal.isNotEmpty) {
-        _searchResults = await _listsProvider.searchListsByTitle(searchVal);
+      _searchResults = await _listsProvider.searchListsByTitle(searchVal);
     } else if (_searchMode && searchVal.isEmpty) {
-        _searchResults = []; // Or fetch all lists for search mode if that's the desired UX
+      _searchResults =
+          []; // Or fetch all lists for search mode if that's the desired UX
     }
 
     _isLoading = false;
@@ -79,32 +84,22 @@ class HomePageController extends ChangeNotifier {
   void onPageChanged(int index) {
     if (_currentPageIndex == index) return;
     _currentPageIndex = index;
-    _searchMode = false; // Exit search mode when changing pages
-    // No need to re-fetch all lists here if they are already loaded,
-    // unless a specific page needs fresh data not covered by general refresh.
+    _searchMode = false;
     notifyListeners();
   }
 
   Future<void> deleteList(ToDoList list) async {
     _isLoading = true;
     notifyListeners();
-    await _listsProvider.deleteList(list); // This will call invalidateCache and notifyListeners in ListsProvider
-    // _handleListsProviderChanges will be triggered, which calls refreshAllLists.
-    // So, no need to call _fetchAllLists or notifyListeners here directly if _handleListsProviderChanges is robust.
-    // However, for more immediate feedback, we can update the local cache directly or just rely on the provider's notification.
-    // For now, relying on _handleListsProviderChanges.
-    // If _handleListsProviderChanges is too broad, we might manually update:
-    // _activeLists.remove(list);
-    // _achievedLists.remove(list);
-    // _withoutDeadlineLists.remove(list);
-    // _isLoading = false;
-    // notifyListeners();
+    await _listsProvider.deleteList(list);
   }
 
-  Future<String?> createNewList(String title, DateTime deadline, bool hasDeadline) async {
+  Future<String?> createNewList(
+      String title, DateTime deadline, bool hasDeadline) async {
     _isLoading = true;
     notifyListeners();
-    final result = await _listsProvider.createNewList(title, deadline, hasDeadline);
+    final result =
+        await _listsProvider.createNewList(title, deadline, hasDeadline);
     // _handleListsProviderChanges will refresh the lists.
     // The result.data contains the new list ID.
     _isLoading = false;
@@ -136,14 +131,11 @@ class HomePageController extends ChangeNotifier {
   Future<void> changeSortBy(SortBy newSortBy) async {
     _isLoading = true;
     notifyListeners();
-    _listsProvider.selectedOptionVal = newSortBy; // This should trigger its own notifyListeners
-    await SharedPreferencesHelper.instance.setSortByIndex(SortBy.values.indexOf(newSortBy));
-    // _listsProvider.notifyListeners() will trigger _handleListsProviderChanges, which calls refreshAllLists.
-    // No need to call _fetchAllLists or notifyListeners here directly.
-    // If not, then:
-    // await refreshAllLists();
+    _listsProvider.selectedOptionVal = newSortBy;
+    await SharedPreferencesHelper.instance
+        .setSortByIndex(SortBy.values.indexOf(newSortBy));
+    onPageChanged(0);
     _isLoading = false;
-    // notifyListeners();
   }
 
   void setSearchMode(bool enabled, {String initialSearchVal = ""}) async {
@@ -151,12 +143,13 @@ class HomePageController extends ChangeNotifier {
 
     _searchMode = enabled;
     if (_searchMode) {
-        _isLoading = true;
-        notifyListeners();
-        _searchResults = await _listsProvider.searchListsByTitle(initialSearchVal);
-        _isLoading = false;
+      _isLoading = true;
+      notifyListeners();
+      _searchResults =
+          await _listsProvider.searchListsByTitle(initialSearchVal);
+      _isLoading = false;
     } else {
-        _searchResults = [];
+      _searchResults = [];
     }
     notifyListeners();
   }
@@ -170,7 +163,6 @@ class HomePageController extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
-
 
   @override
   void dispose() {

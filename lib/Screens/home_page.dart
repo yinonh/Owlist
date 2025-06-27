@@ -46,13 +46,15 @@ class _HomePageState extends State<HomePage> {
   late HomePageController _controller; // Changed
   late PageController _pageController; // Renamed from selectedIndex for clarity
   late List<String> _titles; // Renamed from titles
-  final GlobalKey<ScaffoldState> _addListKey = GlobalKey<ScaffoldState>(); // Renamed
+  final GlobalKey<ScaffoldState> _addListKey =
+      GlobalKey<ScaffoldState>(); // Renamed
 
   @override
   void initState() {
     super.initState();
     final listsProvider = Provider.of<ListsProvider>(context, listen: false);
-    _controller = HomePageController(listsProvider: listsProvider, context: context);
+    _controller =
+        HomePageController(listsProvider: listsProvider, context: context);
     _pageController = PageController(initialPage: _controller.currentPageIndex);
 
     // Listener to sync PageController with HomePageController's currentPageIndex
@@ -66,21 +68,23 @@ class _HomePageState extends State<HomePage> {
   void _handleControllerChanges() {
     // If page index changed in controller, update PageView
     // Ensure PageController is attached to a PageView before accessing .page
-    if (_pageController.hasClients && _pageController.page?.round() != _controller.currentPageIndex) {
+    if (_pageController.hasClients &&
+        _pageController.page?.round() != _controller.currentPageIndex) {
       _pageController.animateToPage(
         _controller.currentPageIndex,
-        duration: const Duration(milliseconds: 300), // Shorter duration for programmatic changes
+        duration: const Duration(
+            milliseconds: 300), // Shorter duration for programmatic changes
         curve: Curves.easeInOut,
       );
     }
     // HomePage might need to rebuild if other relevant states in controller change (e.g. isLoading)
     // This is implicitly handled if HomePage's build method consumes controller's properties.
     // A selective setState can be called if only specific parts of HomePage (not covered by PageView) need updates.
-    if (mounted) { // Ensure the widget is still in the tree
+    if (mounted) {
+      // Ensure the widget is still in the tree
       setState(() {});
     }
   }
-
 
   @override
   void didChangeDependencies() {
@@ -102,7 +106,8 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _showMessage(String text, IconData icon) { // Renamed
+  void _showMessage(String text, IconData icon) {
+    // Renamed
     showTopSnackBar(
       Overlay.of(context),
       CustomSnackBar.success(
@@ -123,29 +128,41 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _deleteList(ToDoList item) async { // Renamed
+  Future<void> _deleteList(ToDoList item) async {
+    // Renamed
     await _controller.deleteList(item);
     // UI update will be handled by controller's notifyListeners
   }
 
-  Future<void> _addItem(String title, DateTime deadline, bool hasDeadline) async { // Renamed
+  Future<void> _addItem(
+      String title, DateTime deadline, bool hasDeadline) async {
+    // Renamed
     if (hasDeadline) {
       _controller.onPageChanged(0); // Switch to active lists page
     } else {
       _controller.onPageChanged(2); // Switch to without deadline lists page
     }
 
-    String? newListId = await _controller.createNewList(title, deadline, hasDeadline);
+    String? newListId =
+        await _controller.createNewList(title, deadline, hasDeadline);
 
     if (newListId != null) {
       // Potentially show message for notification scheduling if createNewList indicates success for it
       // This logic might need refinement based on what createNewList in controller returns
-      final list = await Provider.of<ListsProvider>(context, listen: false).getListById(newListId);
-      if (list != null && list.hasDeadline && (await Provider.of<ListsProvider>(context, listen: false).notificationProvider.isAndroidPermissionGranted())) {
-         _showMessage(context.translate(Strings.scheduleNotification), Icons.notification_add_rounded);
+      final list = await Provider.of<ListsProvider>(context, listen: false)
+          .getListById(newListId);
+      if (list != null &&
+          list.hasDeadline &&
+          (await Provider.of<ListsProvider>(context, listen: false)
+              .notificationProvider
+              .isAndroidPermissionGranted())) {
+        _showMessage(context.translate(Strings.scheduleNotification),
+            Icons.notification_add_rounded);
       }
-      Navigator.pushNamed(context, SingleListScreen.routeName, arguments: newListId)
-          .then((_) => _controller.refreshAllLists()); // Refresh lists when returning
+      Navigator.pushNamed(context, SingleListScreen.routeName,
+              arguments: newListId)
+          .then((_) =>
+              _controller.refreshAllLists()); // Refresh lists when returning
     }
     // UI update will be handled by controller's notifyListeners
   }
@@ -159,7 +176,8 @@ class _HomePageState extends State<HomePage> {
     // provider = Provider.of<ListsProvider>(context);
     // Instead, we'll use the _controller
 
-    return ShowCaseWidget(builder: (showcaseCnx) { // Renamed context variable
+    return ShowCaseWidget(builder: (showcaseCnx) {
+      // Renamed context variable
       return Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         bottomNavigationBar: _controller.searchMode
@@ -177,12 +195,15 @@ class _HomePageState extends State<HomePage> {
                     Icons.settings_rounded,
                   ],
                   addItem: _addItem, // Use the new _addItem
-                  selectedIndex: _controller.currentPageIndex, // From controller
-                  onItemPressed: (index) { // Directly call controller's method
-                    _pageController.animateToPage( // Also animate PageController
-                         index,
-                         duration: const Duration(milliseconds: 500),
-                         curve: Curves.easeInOut,
+                  selectedIndex:
+                      _controller.currentPageIndex, // From controller
+                  onItemPressed: (index) {
+                    // Directly call controller's method
+                    _pageController.animateToPage(
+                      // Also animate PageController
+                      index,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
                     );
                     _controller.onPageChanged(index);
                   },
@@ -249,7 +270,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             const Spacer(),
-                            if (_controller.currentPageIndex != 3) // From controller
+                            if (_controller.currentPageIndex !=
+                                3) // From controller
                               IconButton(
                                 onPressed: () {
                                   _controller.setSearchMode(true);
@@ -268,7 +290,8 @@ class _HomePageState extends State<HomePage> {
                                       onPressed: () {
                                         // Keep setState for purely local UI changes if any
                                         setState(() {
-                                          ShowCaseHelper.instance.toggleIsActive();
+                                          ShowCaseHelper.instance
+                                              .toggleIsActive();
                                         });
                                         ShowCaseHelper.instance
                                             .startShowCaseBeginning(
@@ -289,7 +312,8 @@ class _HomePageState extends State<HomePage> {
                                     itemBuilder: (BuildContext cnx) => [
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.creationNTL,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.creationNTL,
                                         child: Text(
                                           context.translate(Strings
@@ -301,7 +325,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.creationLTN,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.creationLTN,
                                         child: Text(
                                           context.translate(Strings
@@ -313,7 +338,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.deadlineLTN,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.deadlineLTN,
                                         child: Text(
                                           context.translate(
@@ -325,7 +351,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.deadlineNTL,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.deadlineNTL,
                                         child: Text(
                                           context.translate(
@@ -337,7 +364,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.progressBTS,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.progressBTS,
                                         child: Text(
                                           context.translate(
@@ -349,7 +377,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       CheckedPopupMenuItem<SortBy>(
                                         value: SortBy.progressSTB,
-                                        checked: _controller.currentSortBy == // From controller
+                                        checked: _controller
+                                                .currentSortBy == // From controller
                                             SortBy.progressSTB,
                                         child: Text(
                                           context.translate(
@@ -369,48 +398,66 @@ class _HomePageState extends State<HomePage> {
                   child: Skeletonizer(
                     enabled: _controller.isLoading,
                     child: _controller.isLoading
-                      ? ItemsScreen( // Show a dummy ItemsScreen for skeleton effect
-                          existingItems: List.generate(5, (index) => ToDoList.placeholder()), // Use placeholder
-                          deleteItem: (_) {},
-                          refresh: () {},
-                          title: _titles.isNotEmpty ? _titles[_controller.currentPageIndex] : "Loading...",
-                        )
-                      : _controller.searchMode
-                          ? ItemsScreen(
-                              existingItems: _controller.searchResults, // From controller
-                              deleteItem: _deleteList, // Use new method
-                              refresh: _controller.refreshAllLists, // Pass controller's refresh
-                              title: context.translate(Strings.searchResults),
-                            )
-                          : PageView(
-                              onPageChanged: (index) {
-                                // Note: This onPageChanged is from user swipe.
-                                // We need to inform the controller.
-                                _controller.onPageChanged(index);
-                              },
-                              controller: _pageController, // Use the local PageController
-                              children: [
-                                ItemsScreen(
-                                  existingItems: _controller.activeLists, // From controller
-                                  deleteItem: _deleteList,
-                                  refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex], // Use controller's index
-                                ),
-                                ItemsScreen(
-                                  existingItems: _controller.achievedLists, // From controller
-                                  deleteItem: _deleteList,
-                                  refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex],
-                                ),
-                                ItemsScreen(
-                                  existingItems: _controller.withoutDeadlineLists, // From controller
-                                  deleteItem: _deleteList,
-                                  refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex],
-                                ),
-                                Settings(refresh: _controller.refreshAllLists), // Pass controller's refresh
-                              ],
-                            ),
+                        ? ItemsScreen(
+                            // Show a dummy ItemsScreen for skeleton effect
+                            existingItems: List.generate(
+                                5,
+                                (index) =>
+                                    ToDoList.placeholder()), // Use placeholder
+                            deleteItem: (_) {},
+                            refresh: () {},
+                            title: _titles.isNotEmpty
+                                ? _titles[_controller.currentPageIndex]
+                                : "Loading...",
+                          )
+                        : _controller.searchMode
+                            ? ItemsScreen(
+                                existingItems: _controller
+                                    .searchResults, // From controller
+                                deleteItem: _deleteList, // Use new method
+                                refresh: _controller
+                                    .refreshAllLists, // Pass controller's refresh
+                                title: context.translate(Strings.searchResults),
+                              )
+                            : PageView(
+                                onPageChanged: (index) {
+                                  // Note: This onPageChanged is from user swipe.
+                                  // We need to inform the controller.
+                                  _controller.onPageChanged(index);
+                                },
+                                controller:
+                                    _pageController, // Use the local PageController
+                                children: [
+                                  ItemsScreen(
+                                    existingItems: _controller
+                                        .activeLists, // From controller
+                                    deleteItem: _deleteList,
+                                    refresh: _controller.refreshAllLists,
+                                    title: _titles[_controller
+                                        .currentPageIndex], // Use controller's index
+                                  ),
+                                  ItemsScreen(
+                                    existingItems: _controller
+                                        .achievedLists, // From controller
+                                    deleteItem: _deleteList,
+                                    refresh: _controller.refreshAllLists,
+                                    title:
+                                        _titles[_controller.currentPageIndex],
+                                  ),
+                                  ItemsScreen(
+                                    existingItems: _controller
+                                        .withoutDeadlineLists, // From controller
+                                    deleteItem: _deleteList,
+                                    refresh: _controller.refreshAllLists,
+                                    title:
+                                        _titles[_controller.currentPageIndex],
+                                  ),
+                                  Settings(
+                                      refresh: _controller
+                                          .refreshAllLists), // Pass controller's refresh
+                                ],
+                              ),
+                  ),
                 ),
               ],
             ),
