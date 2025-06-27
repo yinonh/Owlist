@@ -253,7 +253,7 @@ class _ToDoItemTileState extends State<ToDoItemTile> {
             .editTitle(list, newTitle);
       }
     });
-    widget.refresh(restartSearchMode: true);
+    widget.refresh(); // Removed restartSearchMode: true
   }
 
   @override

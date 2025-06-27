@@ -42,6 +42,19 @@ class ToDoList {
     );
   }
 
+  factory ToDoList.placeholder() {
+    return ToDoList(
+      id: 'placeholder_id',
+      userID: 'placeholder_user',
+      hasDeadline: true,
+      title: 'Loading List Title...',
+      creationDate: DateTime.now(),
+      deadline: DateTime.now().add(const Duration(days: 7)),
+      totalItems: 5,
+      accomplishedItems: 2,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       Keys.id: id,

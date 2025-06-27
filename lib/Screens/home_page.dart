@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart'; // Added skeletonizer
 
 import '../Controllers/home_page_controller.dart'; // Changed
 import '../Models/to_do_list.dart';
@@ -365,8 +366,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 16.0),
                 Expanded(
-                  child: _controller.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                  child: Skeletonizer(
+                    enabled: _controller.isLoading,
+                    child: _controller.isLoading
+                      ? ItemsScreen( // Show a dummy ItemsScreen for skeleton effect
+                          existingItems: List.generate(5, (index) => ToDoList.placeholder()), // Use placeholder
+                          deleteItem: (_) {},
+                          refresh: () {},
+                          title: _titles.isNotEmpty ? _titles[_controller.currentPageIndex] : "Loading...",
+                        )
                       : _controller.searchMode
                           ? ItemsScreen(
                               existingItems: _controller.searchResults, // From controller
