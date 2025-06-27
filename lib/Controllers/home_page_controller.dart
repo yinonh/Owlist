@@ -134,16 +134,10 @@ class HomePageController extends ChangeNotifier {
   }
 
   Future<void> changeSortBy(SortBy newSortBy) async {
-    _isLoading = true;
-    notifyListeners();
-    _listsProvider.selectedOptionVal = newSortBy; // This should trigger its own notifyListeners
+    // isLoading state and notifyListeners will be handled by the refreshAllLists flow,
+    // which is triggered by the _listsProvider.selectedOptionVal setter.
     await SharedPreferencesHelper.instance.setSortByIndex(SortBy.values.indexOf(newSortBy));
-    // _listsProvider.notifyListeners() will trigger _handleListsProviderChanges, which calls refreshAllLists.
-    // No need to call _fetchAllLists or notifyListeners here directly.
-    // If not, then:
-    // await refreshAllLists();
-    _isLoading = false;
-    // notifyListeners();
+    _listsProvider.selectedOptionVal = newSortBy;
   }
 
   void setSearchMode(bool enabled, {String initialSearchVal = ""}) async {

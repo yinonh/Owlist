@@ -67,11 +67,7 @@ class _HomePageState extends State<HomePage> {
     // If page index changed in controller, update PageView
     // Ensure PageController is attached to a PageView before accessing .page
     if (_pageController.hasClients && _pageController.page?.round() != _controller.currentPageIndex) {
-      _pageController.animateToPage(
-        _controller.currentPageIndex,
-        duration: const Duration(milliseconds: 300), // Shorter duration for programmatic changes
-        curve: Curves.easeInOut,
-      );
+      _pageController.jumpToPage(_controller.currentPageIndex); // Changed to jumpToPage
     }
     // HomePage might need to rebuild if other relevant states in controller change (e.g. isLoading)
     // This is implicitly handled if HomePage's build method consumes controller's properties.
@@ -394,19 +390,19 @@ class _HomePageState extends State<HomePage> {
                                   existingItems: _controller.activeLists, // From controller
                                   deleteItem: _deleteList,
                                   refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex], // Use controller's index
+                                  title: _titles.isNotEmpty ? _titles[0] : "Active", // Fixed title
                                 ),
                                 ItemsScreen(
                                   existingItems: _controller.achievedLists, // From controller
                                   deleteItem: _deleteList,
                                   refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex],
+                                  title: _titles.isNotEmpty ? _titles[1] : "Archived", // Fixed title
                                 ),
                                 ItemsScreen(
                                   existingItems: _controller.withoutDeadlineLists, // From controller
                                   deleteItem: _deleteList,
                                   refresh: _controller.refreshAllLists,
-                                  title: _titles[_controller.currentPageIndex],
+                                  title: _titles.isNotEmpty ? _titles[2] : "Other", // Fixed title
                                 ),
                                 Settings(refresh: _controller.refreshAllLists), // Pass controller's refresh
                               ],
