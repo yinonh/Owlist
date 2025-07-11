@@ -151,7 +151,9 @@ class NotificationProvider with ChangeNotifier {
   Future<bool> addNotificationDayBeforeDeadline(
       ToDoList list, String notificationText) async {
     if (!SharedPreferencesHelper.instance.notificationsActive ||
-        !autoNotification) return false;
+        !autoNotification) {
+      return false;
+    }
     final deadline = list.deadline.subtract(const Duration(days: 1));
     final tz.TZDateTime scheduledTime = tz.TZDateTime(
       tz.local,

@@ -112,13 +112,6 @@ final class Strings {
   static const String justOneDayLeftDeadlineTomorrow =
       "Just One Day Left: Deadline Tomorrow!";
 
-  // Notifications Bottom Sheet
-  static const String notifications = "Notifications";
-  static const String date = "Date";
-  static const String time = "Time";
-  static const String youCantAddNotificationsToThisList =
-      "You can't add notifications to this list";
-
   // ShowCase Helper
   static const String homePageShowCaseDescription =
       "Home page show case description";
@@ -132,4 +125,53 @@ final class Strings {
       "Notifications state show case description";
   static const String contentShowCaseDescription =
       "Content show case description";
+
+  // // Notifications
+  static const String notificationIndex = 'notificationIndex';
+  static const String notificationDateTime = 'notificationDateTime';
+  static const String disabled = 'disabled';
+  static const String notificationDateTimeFormat = 'yyyy-MM-dd HH:mm';
+  static const String notificationType = 'notificationType';
+  static const String periodicInterval = 'periodicInterval';
+
+  // Notifications Bottom Sheet
+  static const String notifications = "Notifications";
+  static const String date = "Date";
+  static const String time = "Time";
+  static const String youCantAddNotificationsToThisList =
+      "You can't add notifications to this list";
+  static const String nextNotification = "Next notification";
+
+// Notification types
+  static const String fixed = "fixed";
+  static const String periodic = "periodic";
+  static const String daily = "daily";
+  static const String weekly = "weekly";
+  static const String monthly = "monthly";
+
+// Next notification timing
+  static const String next = "Next";
+  static const String at = "at";
+  static const String repeatsDaily = "Repeats daily";
+  static const String repeatsWeekly = "Repeats weekly";
+
+// Additional notification bottom sheet strings
+  static const String interval = "Interval";
+  static const String setPeriodicReminder = "Set Periodic Reminder";
+  static const String updatePeriodicReminder = "Update Periodic Reminder";
+  static const String periodicReminder = "Periodic reminder";
+
+// Error messages
+  static const String deletePeriodicFirst =
+      "Please delete the periodic notification first before adding fixed notifications";
+  static const String fixedNotificationsLimit =
+      "You can only have up to 4 fixed notifications per list";
+  static const String failedToAddNotification =
+      "Failed to add notification. Please try again.";
+  static const String useButtonBelowForPeriodic =
+      "Use the button below to set periodic reminders";
+  static const String cannotAddNotificationNow =
+      "Cannot add notification at this time";
+  static const String fixedNotificationsDisabledWithPeriodic =
+      "Fixed notifications can't activate when periodic notification is active";
 }

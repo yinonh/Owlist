@@ -91,7 +91,8 @@ class ListsProvider extends ChangeNotifier {
         ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) { // This is the existing V1 to V2 migration
+        if (oldVersion < 2) {
+          // This is the existing V1 to V2 migration
           // ... (existing migration logic for V2 remains unchanged) ...
           await db.execute('''
       CREATE TABLE todo_lists_temp(
@@ -135,7 +136,7 @@ class ListsProvider extends ChangeNotifier {
             if (map[Keys.hasDeadline] == 0) continue;
             ToDoList list = ToDoList.fromMap(map);
             DateTime notificationDate =
-                list.deadline.subtract(Duration(days: 1));
+                list.deadline.subtract(const Duration(days: 1));
             String notificationDateTime =
                 DateFormat(Keys.notificationDateTimeFormat).format(
               DateTime(

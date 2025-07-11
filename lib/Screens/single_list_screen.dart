@@ -278,7 +278,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
       UnicornButton(
         currentButton: FloatingActionButton(
             heroTag: Keys.addNotificationsHeroTag,
-            backgroundColor: Color(0xFF634999),
+            backgroundColor: const Color(0xFF634999),
             mini: true,
             onPressed: () {
               _openBottomSheet(context);

@@ -113,6 +113,53 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
     }
   }
 
+  DateTime _calculateNextNotificationTime(Notifications notification) {
+    DateTime now = DateTime.now();
+    DateTime notificationTime = notification.notificationDateTime;
+
+    // Use the time components from the notification but start from today
+    DateTime todayWithNotificationTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      notificationTime.hour,
+      notificationTime.minute,
+    );
+
+    if (notification.periodicInterval == Keys.daily) {
+      // For daily notifications
+      if (todayWithNotificationTime.isAfter(now)) {
+        // If today's notification time hasn't passed yet
+        return todayWithNotificationTime;
+      } else {
+        // If today's notification time has passed, return tomorrow's time
+        return todayWithNotificationTime.add(const Duration(days: 1));
+      }
+    } else if (notification.periodicInterval == Keys.weekly) {
+      // For weekly notifications
+      // Find the next occurrence of this weekday and time
+      int currentWeekday = now.weekday; // Monday = 1, Sunday = 7
+      int notificationWeekday = notificationTime.weekday;
+
+      int daysUntilNext = (notificationWeekday - currentWeekday) % 7;
+
+      if (daysUntilNext == 0) {
+        // Same weekday - check if time has passed
+        if (todayWithNotificationTime.isAfter(now)) {
+          return todayWithNotificationTime;
+        } else {
+          // Time has passed, next week
+          daysUntilNext = 7;
+        }
+      }
+
+      return todayWithNotificationTime.add(Duration(days: daysUntilNext));
+    }
+
+    // Fallback - shouldn't happen with current supported intervals
+    return todayWithNotificationTime;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ShowCaseHelper.instance.customShowCase(
@@ -256,15 +303,15 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                     String errorMessage;
                     if (e.toString().contains("Periodic notification exists")) {
                       errorMessage =
-                          "Please delete the periodic notification first before adding fixed notifications";
+                          context.translate(Strings.deletePeriodicFirst);
                     } else if (e
                         .toString()
                         .contains("Fixed notifications limit reached")) {
                       errorMessage =
-                          "You can only have up to 4 fixed notifications per list";
+                          context.translate(Strings.fixedNotificationsLimit);
                     } else {
                       errorMessage =
-                          "Failed to add notification. Please try again.";
+                          context.translate(Strings.failedToAddNotification);
                     }
 
                     showTopSnackBar(
@@ -300,11 +347,13 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   } else if (_selectedNotificationType == Keys.fixed &&
                       _fixedNotifications.length >= 4) {
                     message =
-                        "You can only have up to 4 fixed notifications per list";
+                        context.translate(Strings.fixedNotificationsLimit);
                   } else if (_selectedNotificationType == Keys.periodic) {
-                    message = "Use the button below to set periodic reminders";
+                    message =
+                        context.translate(Strings.useButtonBelowForPeriodic);
                   } else {
-                    message = "Cannot add notification at this time";
+                    message =
+                        context.translate(Strings.cannotAddNotificationNow);
                   }
 
                   showPopup(message);
@@ -334,7 +383,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         children: [
           // Interval selection - more compact
           Text(
-            "interval" /*context.translate(Strings.interval)*/,
+            context.translate(Strings.interval),
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
@@ -342,7 +391,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             children: [
               Expanded(
                 child: _buildCompactIntervalChip(
-                  label: "daily" /*context.translate(Strings.daily)*/,
+                  label: context.translate(Strings.daily),
                   icon: Icons.today_rounded,
                   isSelected: _selectedPeriodicInterval == Keys.daily,
                   onSelected: () =>
@@ -353,7 +402,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildCompactIntervalChip(
-                  label: "weekly" /*context.translate(Strings.weekly)*/,
+                  label: context.translate(Strings.weekly),
                   icon: Icons.date_range_rounded,
                   isSelected: _selectedPeriodicInterval == Keys.weekly,
                   onSelected: () =>
@@ -386,8 +435,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
                 child: Text(
                   _currentPeriodicNotification == null
-                      ? "setPeriodicReminder" /*context.translate(Strings.setPeriodicReminder)*/
-                      : "updatePeriodicReminder" /*context.translate(Strings.updatePeriodicReminder)*/,
+                      ? context.translate(Strings.setPeriodicReminder)
+                      : context.translate(Strings.updatePeriodicReminder),
                   style: textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.onPrimary,
                     fontWeight: FontWeight.w600,
@@ -403,7 +452,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                           .addNotification(
                               list,
                               anchorDate,
-                              "periodicReminder" /*Strings.periodicReminder*/,
+                              context.translate(Strings.periodicReminder),
                               Keys.periodic,
                               _selectedPeriodicInterval);
                       _loadNotificationsData();
@@ -474,6 +523,14 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             : notification.periodicInterval) ??
         Keys.daily;
 
+    // Calculate next notification time
+    DateTime nextNotification = _calculateNextNotificationTime(notification);
+    String nextNotificationFormatted =
+        DateFormat(context.translate(Strings.dateFormat))
+            .format(nextNotification);
+    String nextNotificationTimeFormatted =
+        DateFormat(Keys.timeFormat).format(nextNotification);
+
     return ListTile(
       leading: Stack(
         children: [
@@ -502,14 +559,27 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("${context.translate(Strings.time)}: $timeFormatted"),
-          Text(
-            "Repeats: $intervalText",
-            style: TextStyle(
-              color: Theme.of(context).highlightColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+          if (!notification.disabled)
+            Text(
+              intervalText == Keys.daily
+                  ? context.translate(Strings.repeatsDaily)
+                  : context.translate(Strings.repeatsWeekly),
+              style: TextStyle(
+                color: Theme.of(context).highlightColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
+          if (!notification
+              .disabled) // Only show next notification if not disabled
+            Text(
+              "${context.translate(Strings.next)}: $nextNotificationFormatted ${context.translate(Strings.at)} $nextNotificationTimeFormatted",
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+                fontSize: 11,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
         ],
       ),
       trailing: IconButton(
@@ -554,7 +624,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                       const BorderRadius.horizontal(left: Radius.circular(8.0)),
                 ),
                 child: Text(
-                  "Fixed",
+                  context.translate(Strings.fixed),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _selectedNotificationType == Keys.fixed
@@ -586,7 +656,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                       right: Radius.circular(8.0)),
                 ),
                 child: Text(
-                  "Periodic",
+                  context.translate(Strings.periodic),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _selectedNotificationType == Keys.periodic
@@ -648,8 +718,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               }
             }
           : _currentPeriodicNotification != null
-              ? () => showPopup(
-                  "Fixed notifications can't activate when periodic notification is active")
+              ? () => showPopup(context
+                  .translate(Strings.fixedNotificationsDisabledWithPeriodic))
               : null,
       trailing: IconButton(
         icon: Icon(
