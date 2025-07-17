@@ -77,11 +77,11 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.warning_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 80,
@@ -257,7 +257,7 @@ class _SettingsState extends State<Settings> {
                       },
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 56),
+                      padding: const EdgeInsets.symmetric(horizontal: 56),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -391,6 +391,8 @@ class _SettingsState extends State<Settings> {
                                 ? () {
                                     Navigator.of(context).push(
                                       showPicker(
+                                          backgroundColor: Theme.of(context)
+                                              .primaryColorLight,
                                           height: 350,
                                           is24HrFormat: true,
                                           accentColor:

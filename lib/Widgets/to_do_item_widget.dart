@@ -43,7 +43,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.warning_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
@@ -52,7 +52,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
         widget.updateSingleListScreen();
         _itemVisible = true;
       },
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 80,
@@ -80,7 +80,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   color: Theme.of(context).cardColor,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey.withValues(alpha: 0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
                       // offset: Offset(0, 3),
@@ -92,7 +92,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   color: Theme.of(context).cardColor,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).hintColor.withOpacity(0.5),
+                      color: Theme.of(context).hintColor.withValues(alpha: 0.5),
                       spreadRadius: 0.5,
                       blurRadius: 1.5,
                       // offset: Offset(0, 3),

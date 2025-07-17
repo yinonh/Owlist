@@ -189,13 +189,11 @@ class _OwlistAppState extends State<OwlistApp> {
                           ShowCaseHelper.instance.listShowCaseSteps++;
                           ShowCaseHelper.instance.isShowCaseDone();
                         },
-                        builder: Builder(
-                          builder: (context) {
-                            return SingleListScreen(
-                              listId: settings.arguments as String,
-                            );
-                          },
-                        ),
+                        builder: (context) {
+                          return SingleListScreen(
+                            listId: settings.arguments as String,
+                          );
+                        },
                       );
                     },
                   );
@@ -219,11 +217,9 @@ class _OwlistAppState extends State<OwlistApp> {
                           ShowCaseHelper.instance.contentShowCaseSteps++;
                           ShowCaseHelper.instance.isShowCaseDone();
                         },
-                        builder: Builder(
-                          builder: (context) {
-                            return ContentScreen(id: args[Keys.id] as String);
-                          },
-                        ),
+                        builder: (context) {
+                          return ContentScreen(id: args[Keys.id] as String);
+                        },
                       );
                     },
                   );
@@ -243,13 +239,11 @@ class _OwlistAppState extends State<OwlistApp> {
                     ShowCaseHelper.instance.listShowCaseSteps++;
                     ShowCaseHelper.instance.isShowCaseDone();
                   },
-                  builder: Builder(
-                    builder: (context) {
-                      return SingleListScreen(
-                        listId: selectedNotificationPayload!,
-                      );
-                    },
-                  ),
+                  builder: (context) {
+                    return SingleListScreen(
+                      listId: selectedNotificationPayload!,
+                    );
+                  },
                 )
               : const HomePage(),
         ),

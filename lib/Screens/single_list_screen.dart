@@ -177,11 +177,11 @@ class _SingleListScreenState extends State<SingleListScreen> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.notifications_active_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 80,
@@ -243,20 +243,16 @@ class _SingleListScreenState extends State<SingleListScreen> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return ShowCaseWidget(
-          onComplete: (index, __) {
-            ShowCaseHelper.instance.notificationsShowCaseSteps++;
-          },
-          onFinish: () {
-            ShowCaseHelper.instance.notificationsShowCaseSteps++;
-            ShowCaseHelper.instance.isShowCaseDone();
-          },
-          builder: Builder(builder: (context) {
-            return NotificationBottomSheet(
-              listId: list!.id,
-            );
-          }),
-        );
+        return ShowCaseWidget(onComplete: (index, __) {
+          ShowCaseHelper.instance.notificationsShowCaseSteps++;
+        }, onFinish: () {
+          ShowCaseHelper.instance.notificationsShowCaseSteps++;
+          ShowCaseHelper.instance.isShowCaseDone();
+        }, builder: (context) {
+          return NotificationBottomSheet(
+            listId: list!.id,
+          );
+        });
       },
     );
   }
@@ -282,7 +278,7 @@ class _SingleListScreenState extends State<SingleListScreen> {
       UnicornButton(
         currentButton: FloatingActionButton(
             heroTag: Keys.addNotificationsHeroTag,
-            backgroundColor: Color(0xFF634999),
+            backgroundColor: const Color(0xFF634999),
             mini: true,
             onPressed: () {
               _openBottomSheet(context);

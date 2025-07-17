@@ -181,11 +181,11 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         backgroundColor: Theme.of(context).highlightColor,
         icon: Icon(
           Icons.notifications_off_rounded,
-          color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+          color: Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
           size: 120,
         ),
       ),
-      snackBarPosition: SnackBarPosition.bottom,
+      snackBarPosition: SnackBarPosition.top,
       displayDuration: const Duration(seconds: 1, milliseconds: 500),
     );
   }
@@ -231,7 +231,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                   showPopup(context
                       .translate(Strings.youCantAddNotificationsToThisList));
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.add_rounded,
                   color: Colors.grey,
                 ),
@@ -296,7 +296,8 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               backgroundColor: Theme.of(context).highlightColor,
               icon: Icon(
                 Icons.warning_rounded,
-                color: Theme.of(context).primaryColorDark.withOpacity(0.2),
+                color:
+                    Theme.of(context).primaryColorDark.withValues(alpha: 0.2),
                 size: 120,
               ),
             ),
@@ -304,7 +305,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
               notificationProvider.addNotification(
                   list, notification.notificationDateTime);
             },
-            snackBarPosition: SnackBarPosition.bottom,
+            snackBarPosition: SnackBarPosition.top,
             displayDuration: const Duration(seconds: 1, milliseconds: 500),
           );
         },
@@ -355,6 +356,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         showPicker(
           height: 350,
           is24HrFormat: true,
+          backgroundColor: Theme.of(context).primaryColorLight,
           accentColor: Theme.of(context).highlightColor,
           context: context,
           showSecondSelector: false,
