@@ -315,8 +315,6 @@ class NotificationProvider with ChangeNotifier {
         ),
         payload: list.id,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
       );
       notificationScheduled = true;
     }

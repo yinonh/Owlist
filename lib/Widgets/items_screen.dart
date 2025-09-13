@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../Models/to_do_list.dart';
 import './list_item_tile.dart';
+import 'custom_scaffold.dart';
 
 class ItemsScreen extends StatefulWidget {
   final List<ToDoList> existingItems;
@@ -127,49 +128,51 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            title: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+    return BottomPaddingWrapper(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              title: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+              backgroundColor: Colors.transparent,
             ),
-            backgroundColor: Colors.transparent,
-          ),
-          SliverList.separated(
-            itemCount: widget.existingItems.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ToDoItemTile(
-                  item: widget.existingItems[index],
-                  onDelete: (item) {
-                    widget.deleteItem(item);
-                  },
-                  refresh: widget.refresh,
-                ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              if (index == randomNumber) {
-                return _getAdWidget();
-              } else {
-                return const SizedBox(
-                  height: 0,
+            SliverList.separated(
+              itemCount: widget.existingItems.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ToDoItemTile(
+                    item: widget.existingItems[index],
+                    onDelete: (item) {
+                      widget.deleteItem(item);
+                    },
+                    refresh: widget.refresh,
+                  ),
                 );
-              }
-            },
-          ),
-        ],
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                if (index == randomNumber) {
+                  return _getAdWidget();
+                } else {
+                  return const SizedBox(
+                    height: 0,
+                  );
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

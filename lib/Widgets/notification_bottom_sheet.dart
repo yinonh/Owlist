@@ -17,6 +17,7 @@ import '../Utils/notification_time.dart';
 import '../Utils/shared_preferences_helper.dart';
 import '../Utils/show_case_helper.dart';
 import '../Utils/strings.dart';
+import 'custom_scaffold.dart';
 
 class NotificationBottomSheet extends StatefulWidget {
   final String listId;
@@ -49,125 +50,128 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return ShowCaseHelper.instance.customShowCase(
-      key: notificationsKey,
-      description: context
-          .translate(ShowCaseHelper.instance.notificationsShowCaseDescription),
-      context: context,
-      child: Container(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.4 + 20,
-        child: FutureBuilder(
-          future:
-              Provider.of<ListsProvider>(context).getListById(widget.listId),
-          builder: (context, futureList) {
-            if (futureList.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (futureList.hasError) {
-              return Text('Error: ${futureList.error}');
-            } else {
-              ToDoList list = futureList.data!;
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    height: 4,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).highlightColor,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
+    return BottomPaddingWrapper(
+      child: ShowCaseHelper.instance.customShowCase(
+        key: notificationsKey,
+        description: context.translate(
+            ShowCaseHelper.instance.notificationsShowCaseDescription),
+        context: context,
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.4 + 20,
+          child: FutureBuilder(
+            future:
+                Provider.of<ListsProvider>(context).getListById(widget.listId),
+            builder: (context, futureList) {
+              if (futureList.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (futureList.hasError) {
+                return Text('Error: ${futureList.error}');
+              } else {
+                ToDoList list = futureList.data!;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      height: 4,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).highlightColor,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    child: FutureBuilder<List<Notifications>>(
-                      future: Provider.of<NotificationProvider>(context)
-                          .getNotificationsByListId(list.id),
-                      builder: (context, futureNotificationList) {
-                        if (futureNotificationList.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (futureNotificationList.hasError) {
-                          return Text('Error: ${futureNotificationList.error}');
-                        } else if (futureNotificationList.hasData &&
-                            futureNotificationList.data!.isEmpty) {
-                          return Column(
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                      ),
+                      child: FutureBuilder<List<Notifications>>(
+                        future: Provider.of<NotificationProvider>(context)
+                            .getNotificationsByListId(list.id),
+                        builder: (context, futureNotificationList) {
+                          if (futureNotificationList.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (futureNotificationList.hasError) {
+                            return Text(
+                                'Error: ${futureNotificationList.error}');
+                          } else if (futureNotificationList.hasData &&
+                              futureNotificationList.data!.isEmpty) {
+                            return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                    child: header(list),
+                                  ),
+                                  Expanded(
+                                    child: Center(
+                                      child: Lottie.asset(
+                                        Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Keys.emptyNotificationsDark
+                                            : Keys.emptyNotificationsLight,
+                                      ),
+                                    ),
+                                  ),
+                                ]);
+                          } else {
+                            List<Notifications> notificationsList =
+                                List.from(futureNotificationList.data!);
+                            notificationsList.sort((a, b) => a
+                                .notificationDateTime
+                                .compareTo(b.notificationDateTime));
+                            return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
-                                  child: header(list),
+                                  child: header(list,
+                                      notificationsList: notificationsList),
                                 ),
                                 Expanded(
-                                  child: Center(
-                                    child: Lottie.asset(
-                                      Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Keys.emptyNotificationsDark
-                                          : Keys.emptyNotificationsLight,
-                                    ),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: notificationsList.length,
+                                    itemBuilder: (context, index) {
+                                      final notification =
+                                          notificationsList[index];
+                                      if (index == 0) {
+                                        return ShowCaseHelper.instance
+                                            .customShowCase(
+                                          key: notificationsStatusKey,
+                                          description: context.translate(
+                                              ShowCaseHelper.instance
+                                                  .notificationsStateShowCaseDescription),
+                                          context: context,
+                                          child: _buildNotificationItem(
+                                              context, notification, list),
+                                        );
+                                      }
+                                      return _buildNotificationItem(
+                                          context, notification, list);
+                                    },
                                   ),
                                 ),
-                              ]);
-                        } else {
-                          List<Notifications> notificationsList =
-                              List.from(futureNotificationList.data!);
-                          notificationsList.sort((a, b) => a
-                              .notificationDateTime
-                              .compareTo(b.notificationDateTime));
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: header(list,
-                                    notificationsList: notificationsList),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: notificationsList.length,
-                                  itemBuilder: (context, index) {
-                                    final notification =
-                                        notificationsList[index];
-                                    if (index == 0) {
-                                      return ShowCaseHelper.instance
-                                          .customShowCase(
-                                        key: notificationsStatusKey,
-                                        description: context.translate(
-                                            ShowCaseHelper.instance
-                                                .notificationsStateShowCaseDescription),
-                                        context: context,
-                                        child: _buildNotificationItem(
-                                            context, notification, list),
-                                      );
-                                    }
-                                    return _buildNotificationItem(
-                                        context, notification, list);
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }
-          },
+                  ],
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -356,7 +360,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         showPicker(
           height: 350,
           is24HrFormat: true,
-          backgroundColor: Theme.of(context).primaryColorLight,
+          backgroundColor: Theme.of(context).primaryColor,
           accentColor: Theme.of(context).highlightColor,
           context: context,
           showSecondSelector: false,
