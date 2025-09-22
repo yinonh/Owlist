@@ -6,6 +6,7 @@ import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class _SettingsState extends State<Settings> {
   late NotificationTime _time;
   late bool _notificationsActive;
   late bool _autoNotificationsActive;
+  String _appVersion = "";
   Map<String, String> languages = {
     "en": Keys.english,
     "zh": Keys.mandarin,
@@ -53,6 +55,7 @@ class _SettingsState extends State<Settings> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadSharedPreferences();
+    _loadAppVersion();
     notificationProvider = Provider.of<NotificationProvider>(context);
     _time = notificationProvider.notificationTime;
     _notificationsActive = SharedPreferencesHelper.instance.notificationsActive;
@@ -66,6 +69,14 @@ class _SettingsState extends State<Settings> {
 
     setState(() {
       _selectedLanguages = selectedLanguage;
+    });
+  }
+
+  Future<void> _loadAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String cleanVersion = packageInfo.version.split('-').first;
+    setState(() {
+      _appVersion = "$cleanVersion+${packageInfo.buildNumber}";
     });
   }
 
@@ -498,6 +509,18 @@ class _SettingsState extends State<Settings> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "Version $_appVersion",
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
