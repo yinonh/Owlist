@@ -28,7 +28,7 @@ import 'custom_scaffold.dart';
 class Settings extends StatefulWidget {
   final Function refresh;
 
-  const Settings({required this.refresh, Key? key}) : super(key: key);
+  const Settings({required this.refresh, super.key});
 
   @override
   State<Settings> createState() => _SettingsState();
