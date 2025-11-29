@@ -358,7 +358,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
                   showPopup(message);
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.add_rounded,
                   color: (_selectedNotificationType == Keys.fixed &&
                           !list.isAchieved &&
