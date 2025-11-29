@@ -356,7 +356,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
         showPicker(
           height: 350,
           is24HrFormat: true,
-          backgroundColor: Theme.of(context).primaryColorLight,
+          backgroundColor: Theme.of(context).primaryColor,
           accentColor: Theme.of(context).highlightColor,
           context: context,
           showSecondSelector: false,

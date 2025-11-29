@@ -50,10 +50,23 @@ android {
     defaultConfig {
         applicationId "com.yinonhdev.owlist"
         minSdkVersion 25
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+    }
+
+    flavorDimensions "version"
+    productFlavors {
+        production {
+            dimension "version"
+            applicationId "com.yinonhdev.owlist"
+        }
+        qa {
+            dimension "version"
+            applicationId "com.yinonhdev.owlist.qa"
+            versionNameSuffix "-qa"
+        }
     }
 
     signingConfigs {

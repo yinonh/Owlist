@@ -158,94 +158,97 @@ class _OwlistAppState extends State<OwlistApp> {
           CustomFeedbackLocalizationsDelegate(),
         ],
         localeOverride: _locale,
-        child: MaterialApp(
-          navigatorKey: navigatorKey,
-          locale: _locale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: AppLocalizations.supportedLanguage.values,
-          themeMode: currentThemeMode,
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          routes: {
-            HomePage.routeName: (context) => const HomePage(),
-            StatisticsScreen.routeName: (context) => const StatisticsScreen(),
-          },
-          onGenerateRoute: (settings) {
-            switch (settings.name) {
-              case SingleListScreen.routeName:
-                {
-                  return MaterialPageRoute(
-                    builder: (context) {
-                      return ShowCaseWidget(
-                        onComplete: (index, __) {
-                          ShowCaseHelper.instance.listShowCaseSteps++;
-                        },
-                        onFinish: () {
-                          ShowCaseHelper.instance.listShowCaseSteps++;
-                          ShowCaseHelper.instance.isShowCaseDone();
-                        },
-                        builder: (context) {
-                          return SingleListScreen(
-                            listId: settings.arguments as String,
-                          );
-                        },
-                      );
-                    },
-                  );
-                }
-              case ContentScreen.routeName:
-                {
-                  // Extract the arguments map from settings
-                  final Map<String, dynamic> args =
-                      settings.arguments as Map<String, dynamic>;
-
-                  return MaterialPageRoute(
-                    builder: (context) {
-                      return ShowCaseWidget(
-                        onStart: (_, __) {
-                          ShowCaseHelper.instance.contentShowCaseSteps = 0;
-                        },
-                        onComplete: (index, __) {
-                          ShowCaseHelper.instance.contentShowCaseSteps++;
-                        },
-                        onFinish: () {
-                          ShowCaseHelper.instance.contentShowCaseSteps++;
-                          ShowCaseHelper.instance.isShowCaseDone();
-                        },
-                        builder: (context) {
-                          return ContentScreen(id: args[Keys.id] as String);
-                        },
-                      );
-                    },
-                  );
-                }
-              case _:
-                return MaterialPageRoute(builder: (context) {
-                  return const SizedBox();
-                });
-            }
-          },
-          home: selectedNotificationPayload != null
-              ? ShowCaseWidget(
-                  onComplete: (index, __) {
-                    ShowCaseHelper.instance.listShowCaseSteps++;
-                  },
-                  onFinish: () {
-                    ShowCaseHelper.instance.listShowCaseSteps++;
-                    ShowCaseHelper.instance.isShowCaseDone();
-                  },
-                  builder: (context) {
-                    return SingleListScreen(
-                      listId: selectedNotificationPayload!,
+        child: SafeArea(
+          top: false,
+          child: MaterialApp(
+            navigatorKey: navigatorKey,
+            locale: _locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLanguage.values,
+            themeMode: currentThemeMode,
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            routes: {
+              HomePage.routeName: (context) => const HomePage(),
+              StatisticsScreen.routeName: (context) => const StatisticsScreen(),
+            },
+            onGenerateRoute: (settings) {
+              switch (settings.name) {
+                case SingleListScreen.routeName:
+                  {
+                    return MaterialPageRoute(
+                      builder: (context) {
+                        return ShowCaseWidget(
+                          onComplete: (index, __) {
+                            ShowCaseHelper.instance.listShowCaseSteps++;
+                          },
+                          onFinish: () {
+                            ShowCaseHelper.instance.listShowCaseSteps++;
+                            ShowCaseHelper.instance.isShowCaseDone();
+                          },
+                          builder: (context) {
+                            return SingleListScreen(
+                              listId: settings.arguments as String,
+                            );
+                          },
+                        );
+                      },
                     );
-                  },
-                )
-              : const HomePage(),
+                  }
+                case ContentScreen.routeName:
+                  {
+                    // Extract the arguments map from settings
+                    final Map<String, dynamic> args =
+                        settings.arguments as Map<String, dynamic>;
+          
+                    return MaterialPageRoute(
+                      builder: (context) {
+                        return ShowCaseWidget(
+                          onStart: (_, __) {
+                            ShowCaseHelper.instance.contentShowCaseSteps = 0;
+                          },
+                          onComplete: (index, __) {
+                            ShowCaseHelper.instance.contentShowCaseSteps++;
+                          },
+                          onFinish: () {
+                            ShowCaseHelper.instance.contentShowCaseSteps++;
+                            ShowCaseHelper.instance.isShowCaseDone();
+                          },
+                          builder: (context) {
+                            return ContentScreen(id: args[Keys.id] as String);
+                          },
+                        );
+                      },
+                    );
+                  }
+                case _:
+                  return MaterialPageRoute(builder: (context) {
+                    return const SizedBox();
+                  });
+              }
+            },
+            home: selectedNotificationPayload != null
+                ? ShowCaseWidget(
+                    onComplete: (index, __) {
+                      ShowCaseHelper.instance.listShowCaseSteps++;
+                    },
+                    onFinish: () {
+                      ShowCaseHelper.instance.listShowCaseSteps++;
+                      ShowCaseHelper.instance.isShowCaseDone();
+                    },
+                    builder: (context) {
+                      return SingleListScreen(
+                        listId: selectedNotificationPayload!,
+                      );
+                    },
+                  )
+                : const HomePage(),
+          ),
         ),
       ),
     );
