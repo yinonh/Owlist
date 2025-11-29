@@ -80,6 +80,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                   color: Theme.of(context).cardColor,
                   boxShadow: [
                     BoxShadow(
+                      color: Colors.grey.withValues(alpha: 0.5),
                       color: Colors.grey..withValues(alpha: 0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
@@ -125,7 +126,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             ),
             child: widget.editMode
                 ? ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 6),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 6),
                     leading: Icon(
                       Icons.drag_handle_rounded,
                       color: Theme.of(context).hintColor,

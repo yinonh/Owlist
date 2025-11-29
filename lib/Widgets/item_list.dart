@@ -23,8 +23,7 @@ class ItemList extends StatefulWidget {
       required this.toggleEditMode,
       required this.controller,
       required this.updateSingleListScreen,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   State<ItemList> createState() => _ItemListState();

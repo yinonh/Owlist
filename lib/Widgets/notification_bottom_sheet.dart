@@ -274,7 +274,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             },
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: Theme.of(context).dialogBackgroundColor,
+              color: Theme.of(context).hoverColor,
               size: 32,
             )),
         FittedBox(
@@ -334,7 +334,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                 },
                 icon: Icon(
                   Icons.add_rounded,
-                  color: Theme.of(context).dialogBackgroundColor,
+                  color: Theme.of(context).hoverColor,
                 ),
               )
             : IconButton(
@@ -358,7 +358,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
 
                   showPopup(message);
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.add_rounded,
                   color: (_selectedNotificationType == Keys.fixed &&
                           !list.isAchieved &&
@@ -818,7 +818,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
       // Show the time picker and wait for result
       final result = await Navigator.of(context).push(
         showPicker(
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).hoverColor,
             borderRadius: 30.0,
             height: 350,
             is24HrFormat: true,

@@ -257,7 +257,7 @@ class _SettingsState extends State<Settings> {
                       },
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 56),
+                      padding: const EdgeInsets.symmetric(horizontal: 56),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
