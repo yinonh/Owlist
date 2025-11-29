@@ -200,7 +200,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
             },
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: Theme.of(context).dialogBackgroundColor,
+              color: Theme.of(context).hoverColor,
               size: 32,
             )),
         FittedBox(
@@ -223,7 +223,7 @@ class _NotificationBottomSheetState extends State<NotificationBottomSheet> {
                 },
                 icon: Icon(
                   Icons.add_rounded,
-                  color: Theme.of(context).dialogBackgroundColor,
+                  color: Theme.of(context).hoverColor,
                 ),
               )
             : IconButton(

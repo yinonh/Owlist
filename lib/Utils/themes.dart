@@ -16,7 +16,7 @@ final ThemeData lightTheme = ThemeData(
   ),
   dividerColor: const Color(0xFF9685D9),
   hintColor: Colors.grey,
-  dialogBackgroundColor: Colors.black,
+  hoverColor: const Color(0xFF18122B),
   canvasColor: Colors.transparent,
   primaryColorDark: const Color(0xFF18122B),
   primaryColorLight: const Color(0xFF635985),
@@ -57,8 +57,8 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
   checkboxTheme: CheckboxThemeData(
-    fillColor: MaterialStateProperty.all<Color>(const Color(0xFF635985)),
-    checkColor: MaterialStateProperty.all<Color>(Colors.white),
+    fillColor: WidgetStateProperty.all<Color>(const Color(0xFF635985)),
+    checkColor: WidgetStateProperty.all<Color>(Colors.white),
     side: BorderSide.none,
   ),
   progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -69,13 +69,13 @@ final ThemeData lightTheme = ThemeData(
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
         foregroundColor:
-            MaterialStateProperty.all<Color>(const Color(0xFF635985))),
+            WidgetStateProperty.all<Color>(const Color(0xFF635985))),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-        (Set<MaterialState> states) {
-          if (states.contains(MaterialState.disabled)) {
+      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
             return const Color(0xFF38363b);
           }
           return const Color(0xFF635985);
@@ -86,33 +86,33 @@ final ThemeData lightTheme = ThemeData(
   datePickerTheme: DatePickerThemeData(
     headerForegroundColor: Colors.white,
     surfaceTintColor: Colors.white,
-    yearBackgroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFF9685D9);
       }
-      if (states.contains(MaterialState.disabled)) {
+      if (states.contains(WidgetState.disabled)) {
         return Colors.grey.shade300;
       }
       return Colors.white;
     }),
-    yearForegroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return Colors.white;
       }
       return Colors.black;
     }),
-    todayForegroundColor: MaterialStateProperty.all<Color>(Colors.black),
-    todayBackgroundColor: MaterialStateProperty.all<Color>(
-        const Color(0xFF9685D9).withOpacity(0.5)),
+    todayForegroundColor: WidgetStateProperty.all<Color>(Colors.black),
+    todayBackgroundColor: WidgetStateProperty.all<Color>(
+        const Color(0xFF9685D9).withValues(alpha: 0.5)),
     headerBackgroundColor: const Color(0xFF635985),
-    dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFF9685D9);
       }
       return Colors.white;
     }),
-    dayForegroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.disabled)) {
+    dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
         return Colors.grey;
       }
       return Colors.black;
@@ -126,9 +126,9 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     cursorColor: Colors.purpleAccent,
     selectionHandleColor: Colors.purpleAccent,
   ),
+  hoverColor: Colors.white,
   dividerColor: const Color(0xFF42385E),
   hintColor: Colors.grey,
-  dialogBackgroundColor: Colors.white,
   canvasColor: Colors.transparent,
   primaryColorDark: Colors.black,
   primaryColorLight: const Color(0xFF42385E),
@@ -174,8 +174,8 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     ),
   ),
   checkboxTheme: CheckboxThemeData(
-    fillColor: MaterialStateProperty.all<Color>(const Color(0xFF9685D9)),
-    checkColor: MaterialStateProperty.all<Color>(Colors.black),
+    fillColor: WidgetStateProperty.all<Color>(const Color(0xFF9685D9)),
+    checkColor: WidgetStateProperty.all<Color>(Colors.black),
     side: BorderSide.none,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -186,13 +186,13 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
         foregroundColor:
-            MaterialStateProperty.all<Color>(const Color(0xFF9685D9))),
+            WidgetStateProperty.all<Color>(const Color(0xFF9685D9))),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-        (Set<MaterialState> states) {
-          if (states.contains(MaterialState.disabled)) {
+      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
             return const Color(0xFF38363b);
           }
           return const Color(0xFF635985);
@@ -204,34 +204,34 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   datePickerTheme: DatePickerThemeData(
     backgroundColor: const Color(0xFF18122B),
     weekdayStyle: const TextStyle(color: Colors.white),
-    yearBackgroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFF9685D9);
       }
-      if (states.contains(MaterialState.disabled)) {
+      if (states.contains(WidgetState.disabled)) {
         return Colors.grey.shade700;
       }
       return Colors.transparent;
     }),
-    yearForegroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return Colors.black;
       }
       return Colors.white;
     }),
-    todayForegroundColor: MaterialStateProperty.all<Color>(Colors.white),
-    todayBackgroundColor: MaterialStateProperty.all<Color>(
-        const Color(0xFF635985).withOpacity(0.5)),
+    todayForegroundColor: WidgetStateProperty.all<Color>(Colors.white),
+    todayBackgroundColor: WidgetStateProperty.all<Color>(
+        const Color(0xFF635985).withValues(alpha: 0.5)),
     headerBackgroundColor: const Color(0xFF635985),
-    dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFF635985);
       }
       return Colors.transparent;
     }),
-    yearOverlayColor: MaterialStateProperty.all<Color>(Colors.white),
-    dayForegroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.disabled)) {
+    yearOverlayColor: WidgetStateProperty.all<Color>(Colors.white),
+    dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
         return Colors.grey.shade700;
       }
       return Colors.white;

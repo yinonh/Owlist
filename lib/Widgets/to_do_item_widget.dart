@@ -124,7 +124,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             ),
             child: widget.editMode
                 ? ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 6),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 6),
                     leading: Icon(
                       Icons.drag_handle_rounded,
                       color: Theme.of(context).hintColor,
