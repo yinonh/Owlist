@@ -205,7 +205,7 @@ class _OwlistAppState extends State<OwlistApp> {
                     // Extract the arguments map from settings
                     final Map<String, dynamic> args =
                         settings.arguments as Map<String, dynamic>;
-          
+
                     return MaterialPageRoute(
                       builder: (context) {
                         return ShowCaseWidget(

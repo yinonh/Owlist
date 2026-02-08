@@ -300,25 +300,33 @@ class NotificationProvider with ChangeNotifier {
         notificationText = '';
       }
 
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        notification.notificationIndex,
-        list.title,
-        notificationText,
-        tz.TZDateTime.from(scheduledDateTime, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            Keys.mainChannelId,
-            Keys.mainChannelName,
-            channelDescription: Keys.mainChannelDescription,
-            channelShowBadge: false,
+      final tzDateTime = tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+      try {
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          notification.notificationIndex,
+          list.title,
+          notificationText,
+          tzDateTime,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              Keys.mainChannelId,
+              Keys.mainChannelName,
+              channelDescription: Keys.mainChannelDescription,
+              channelShowBadge: false,
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
           ),
-        ),
-        payload: list.id,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-      );
-      notificationScheduled = true;
+          payload: list.id,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+        );
+        notificationScheduled = true;
+      } catch (e) {
+        print('Error scheduling notification: $e');
+      }
     }
     notifyListeners();
     return notificationScheduled;
