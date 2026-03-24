@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do/Providers/item_provider.dart';
 import 'package:to_do/Models/to_do_item.dart';
+import 'package:to_do/Utils/shared_preferences_helper.dart';
 import '../../fixtures/mock_database.dart';
 import '../../fixtures/test_data.dart';
 
@@ -11,6 +13,10 @@ void main() {
   setUpAll(() async {
     // Load .env file once for all tests
     await dotenv.load(fileName: '.env');
+    
+    // Initialize SharedPreferences with mock data
+    SharedPreferences.setMockInitialValues({});
+    await SharedPreferencesHelper.instance.initialise();
   });
 
   setUp(() async {

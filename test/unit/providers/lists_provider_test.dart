@@ -1,24 +1,40 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do/Providers/lists_provider.dart';
+import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Models/to_do_list.dart';
 import 'package:to_do/Utils/sort_by.dart';
+import 'package:to_do/Utils/shared_preferences_helper.dart';
 import '../../fixtures/mock_database.dart';
+import '../../fixtures/mock_providers.dart';
 import '../../fixtures/test_data.dart';
 
 void main() {
   late ListsProvider provider;
+  late MockNotificationProvider mockNotificationProvider;
 
   setUpAll(() async {
     // Load .env file once for all tests
     await dotenv.load(fileName: '.env');
+    
+    // Initialize SharedPreferences with mock data
+    SharedPreferences.setMockInitialValues({});
+    await SharedPreferencesHelper.instance.initialise();
   });
 
   setUp(() async {
     // Initialize fresh test database with injected dependency
     final testDb = await TestDatabaseHelper.getTestDatabase();
     provider = ListsProvider(database: testDb);
+    
+    // Initialize mock notification provider
+    mockNotificationProvider = MockNotificationProvider();
+    
+    // Set up ListsProvider's required fields for testing
+    provider.notificationProvider = mockNotificationProvider;
+    provider.selectedOption = SortBy.creationNTL; // Default sort option
   });
 
   tearDown(() async {

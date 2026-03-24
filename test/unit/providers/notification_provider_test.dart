@@ -19,7 +19,7 @@ void main() {
   setUp(() async {
     // Initialize SharedPreferences with mock data
     SharedPreferences.setMockInitialValues({});
-    await SharedPreferencesHelper.instance.init();
+    await SharedPreferencesHelper.instance.initialise();
     
     // Initialize fresh test database with injected dependency
     final testDb = await TestDatabaseHelper.getTestDatabase();
