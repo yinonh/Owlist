@@ -19,15 +19,7 @@ import '../Utils/strings.dart';
 import '../Widgets/diamond_bottom_navigation_bar.dart';
 import '../Widgets/items_screen.dart';
 import '../Widgets/settigns_widget.dart';
-
-enum SortBy {
-  creationNTL,
-  creationLTN,
-  deadlineLTN,
-  deadlineNTL,
-  progressBTS,
-  progressSTB
-}
+import '../Utils/sort_by.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = Keys.homePageRouteName;

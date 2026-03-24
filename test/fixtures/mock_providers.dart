@@ -6,6 +6,7 @@ import 'package:to_do/Providers/item_provider.dart';
 import 'package:to_do/Models/to_do_list.dart';
 import 'package:to_do/Models/to_do_item.dart';
 import 'package:to_do/Models/notification.dart';
+import 'package:to_do/Utils/sort_by.dart';
 
 /// Mock ListsProvider for widget and integration tests
 class MockListsProvider extends Mock implements ListsProvider {

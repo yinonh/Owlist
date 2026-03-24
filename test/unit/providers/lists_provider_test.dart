@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:to_do/Providers/lists_provider.dart';
 import 'package:to_do/Models/to_do_list.dart';
+import 'package:to_do/Utils/sort_by.dart';
 import '../../fixtures/mock_database.dart';
 import '../../fixtures/test_data.dart';
 
