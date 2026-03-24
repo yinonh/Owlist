@@ -22,12 +22,16 @@ import '../Utils/strings.dart';
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
+  final Database? _injectedDatabase;
   List<ToDoList>? _activeItemsCache;
   List<ToDoList>? _achievedItemsCache;
   List<ToDoList>? _withoutDeadlineItemsCache;
   late NotificationProvider notificationProvider;
   late BuildContext context;
   late SortBy selectedOption;
+
+  // Constructor with optional database injection for testing
+  ListsProvider({Database? database}) : _injectedDatabase = database;
 
   SortBy get selectedOptionVal => selectedOption;
 
@@ -46,6 +50,7 @@ class ListsProvider extends ChangeNotifier {
   }
 
   Future<Database> get database async {
+    if (_injectedDatabase != null) return _injectedDatabase!;
     if (_database != null) return _database!;
     _database = await initDB();
     return _database!;

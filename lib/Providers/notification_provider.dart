@@ -24,10 +24,18 @@ class NotificationProvider with ChangeNotifier {
   late NotificationTime _notificationTime;
   late bool autoNotification;
   Database? _database;
+  final Database? _injectedDatabase;
 
   // late BuildContext context;
 
+  // Constructor with optional database injection for testing
+  NotificationProvider({Database? database}) : _injectedDatabase = database {
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    _initSharedPreferences();
+  }
+
   Future<Database> get database async {
+    if (_injectedDatabase != null) return _injectedDatabase!;
     if (_database != null) return _database!;
     _database = await initDB();
     return _database!;
@@ -46,11 +54,6 @@ class NotificationProvider with ChangeNotifier {
   bool get notificationsEnabled => _notificationsEnabled;
 
   NotificationTime get notificationTime => _notificationTime;
-
-  NotificationProvider() {
-    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    _initSharedPreferences();
-  }
 
   Future<void> _initSharedPreferences() async {
     int storedTime =
