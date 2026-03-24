@@ -90,10 +90,10 @@ void main() {
 
     test('should handle items with special characters in title', () {
       final item = TestDataFactory.createTestItem(
-        title: 'Buy @#$% special items!',
+        title: 'Buy @#\$% special items!',
       );
 
-      expect(item.title, 'Buy @#$% special items!');
+      expect(item.title, 'Buy @#\$% special items!');
     });
 
     test('should handle items with special characters in content', () {
