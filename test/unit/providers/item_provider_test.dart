@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:to_do/Providers/item_provider.dart';
 import 'package:to_do/Models/to_do_item.dart';
 import '../../fixtures/mock_database.dart';
@@ -7,10 +8,15 @@ import '../../fixtures/test_data.dart';
 void main() {
   late ItemProvider provider;
 
+  setUpAll(() async {
+    // Load .env file once for all tests
+    await dotenv.load(fileName: '.env');
+  });
+
   setUp(() async {
-    await TestDatabaseHelper.getTestDatabase();
-    provider = ItemProvider();
-    // NOTE: ItemProvider also needs database injection for proper testing
+    // Initialize fresh test database with injected dependency
+    final testDb = await TestDatabaseHelper.getTestDatabase();
+    provider = ItemProvider(database: testDb);
   });
 
   tearDown(() async {
