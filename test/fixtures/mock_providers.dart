@@ -1,5 +1,6 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/Providers/lists_provider.dart';
 import 'package:to_do/Providers/notification_provider.dart';
 import 'package:to_do/Providers/item_provider.dart';
@@ -67,10 +68,49 @@ class MockNotificationProvider extends Mock implements NotificationProvider {
     return _notifications[listId] ?? [];
   }
 
-  void addNotification(String listId, Notifications notification) {
+  void addTestNotification(String listId, Notifications notification) {
     _notifications.putIfAbsent(listId, () => []);
     _notifications[listId]!.add(notification);
   }
+
+  @override
+  Future<bool> addNotification(ToDoList list, DateTime notificationDateTime,
+      [String? notificationText]) async {
+    return true;
+  }
+
+  @override
+  Future<List<Notifications>> getNotificationsByListId(String listId) async {
+    return _notifications[listId] ?? [];
+  }
+
+  @override
+  Future<bool> cancelNotification(int notificationID) async {
+    return true;
+  }
+
+  @override
+  Future<void> requestPermissions([bool? toActive]) async {}
+
+  @override
+  Future<bool> isAndroidPermissionGranted() async {
+    return false; // return false so createNewList skips scheduling
+  }
+
+  @override
+  Future<bool> scheduleNotification(ToDoList list,
+      [String? notificationText]) async {
+    return true;
+  }
+
+  @override
+  Future<bool> deleteNotification(
+      Notifications notification, ToDoList list) async {
+    return true;
+  }
+
+  @override
+  Future<void> setUpNotifications() async {}
 
   void clear() => _notifications.clear();
 }
