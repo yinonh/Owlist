@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do/Providers/item_provider.dart';
-import 'package:to_do/Models/to_do_item.dart';
 import 'package:to_do/Utils/shared_preferences_helper.dart';
 import '../../fixtures/mock_database.dart';
 import '../../fixtures/test_data.dart';
@@ -11,16 +10,12 @@ void main() {
   late ItemProvider provider;
 
   setUpAll(() async {
-    // Load .env file once for all tests
     await dotenv.load(fileName: '.env');
-    
-    // Initialize SharedPreferences with mock data
     SharedPreferences.setMockInitialValues({});
     await SharedPreferencesHelper.instance.initialise();
   });
 
   setUp(() async {
-    // Initialize fresh test database with injected dependency
     final testDb = await TestDatabaseHelper.getTestDatabase();
     provider = ItemProvider(database: testDb);
   });
@@ -32,307 +27,342 @@ void main() {
 
   group('ItemProvider - Item Retrieval', () {
     test('should retrieve empty list when no items exist', () async {
-      // final items = await provider.itemsByListId('list-1');
-      // expect(items, isEmpty);
+      final items = await provider.itemsByListId('list-1');
+      expect(items, isEmpty);
     });
 
     test('should retrieve items by list ID', () async {
-      // Create 3 items in list-1
-      // const item1 = TestDataFactory.createTestItem(listId: 'list-1');
-      // const item2 = TestDataFactory.createTestItem(listId: 'list-1');
-      // const item3 = TestDataFactory.createTestItem(listId: 'list-1');
-      
-      // final items = await provider.itemsByListId('list-1');
-      // expect(items.length, 3);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
+
+      final item1 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 0);
+      final item2 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 1);
+      final item3 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 2);
+      await provider.addExistingItem(item1);
+      await provider.addExistingItem(item2);
+      await provider.addExistingItem(item3);
+
+      final items = await provider.itemsByListId('list-1');
+      expect(items.length, 3);
     });
 
     test('should retrieve item by ID', () async {
-      // const item = TestDataFactory.createTestItem(id: 'item-1');
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // final retrieved = await provider.itemById('item-1');
-      // expect(retrieved.title, item.title);
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', title: 'Buy milk');
+      await provider.addExistingItem(item);
+
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.title, 'Buy milk');
+      expect(retrieved.id, 'item-1');
     });
 
     test('should return empty for non-existent list', () async {
-      // final items = await provider.itemsByListId('nonexistent');
-      // expect(items, isEmpty);
+      final items = await provider.itemsByListId('nonexistent');
+      expect(items, isEmpty);
     });
 
-    test('should throw/handle for non-existent item ID', () async {
-      // final item = await provider.itemById('nonexistent');
-      // expect(item, isNull); // Or throws, depending on implementation
+    test('should separate items by list ID', () async {
+      final db = await provider.database;
+      final list1 = TestDataFactory.createTestList(id: 'list-1');
+      final list2 = TestDataFactory.createTestList(id: 'list-2');
+      await db.insert('todo_lists', list1.toMap());
+      await db.insert('todo_lists', list2.toMap());
+
+      final item1 = TestDataFactory.createTestItem(listId: 'list-1');
+      final item2 = TestDataFactory.createTestItem(listId: 'list-2');
+      await provider.addExistingItem(item1);
+      await provider.addExistingItem(item2);
+
+      final items1 = await provider.itemsByListId('list-1');
+      final items2 = await provider.itemsByListId('list-2');
+
+      expect(items1.every((i) => i.listId == 'list-1'), true);
+      expect(items2.every((i) => i.listId == 'list-2'), true);
+      expect(items1.length, 1);
+      expect(items2.length, 1);
     });
   });
 
   group('ItemProvider - Item CRUD', () {
     test('should add new item to list', () async {
-      // const result = await provider.addNewItem('list-1', 'Buy milk');
-      // expect(result, isNotNull);
-      // expect(result.title, 'Buy milk');
-      // expect(result.listId, 'list-1');
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
+
+      final result = await provider.addNewItem('list-1', 'Buy milk');
+
+      expect(result, isNotNull);
+      expect(result!.title, 'Buy milk');
+      expect(result.listId, 'list-1');
+      expect(result.done, false);
+    });
+
+    test('should add new item and increment list totalItems', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      await provider.addNewItem('list-1', 'Item 1');
+
+      final listRows = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRows.first['totalItems'], 1);
+    });
+
+    test('should auto-increment itemIndex for new items', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
+
+      await provider.addNewItem('list-1', 'Item 1');
+      await provider.addNewItem('list-1', 'Item 2');
+      await provider.addNewItem('list-1', 'Item 3');
+
+      final items = await provider.itemsByListId('list-1');
+      final indices = items.map((i) => i.itemIndex).toList()..sort();
+      expect(indices[0], 0);
+      expect(indices[1], 1);
+      expect(indices[2], 2);
     });
 
     test('should add existing item', () async {
-      // const item = TestDataFactory.createTestItem(
-      //   listId: 'list-1',
-      //   title: 'Existing item',
-      // );
-      
-      // await provider.addExistingItem(item);
-      
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.id, item.id);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        title: 'Existing item',
+      );
+      await provider.addExistingItem(item);
+
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.id, 'item-1');
+      expect(retrieved.title, 'Existing item');
+    });
+
+    test('should add done existing item and increment accomplishedItems', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0, accomplishedItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(listId: 'list-1', done: true);
+      await provider.addExistingItem(item);
+
+      final listRows = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRows.first['totalItems'], 1);
+      expect(listRows.first['accomplishedItems'], 1);
     });
 
     test('should delete item by ID', () async {
-      // Create item
-      // const item = TestDataFactory.createTestItem();
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // Delete
-      // await provider.deleteItemById(item.id, false);
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1');
+      await provider.addExistingItem(item);
 
-      // Verify deleted
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved, isNull);
+      await provider.deleteItemById('item-1', false);
+
+      final items = await provider.itemsByListId('list-1');
+      expect(items.any((i) => i.id == 'item-1'), false);
+    });
+
+    test('should decrement totalItems when item deleted', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1');
+      await provider.addExistingItem(item);
+      await provider.deleteItemById('item-1', false);
+
+      final listRows = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRows.first['totalItems'], 0);
+    });
+
+    test('should decrement accomplishedItems when done item deleted', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0, accomplishedItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', done: true);
+      await provider.addExistingItem(item);
+      await provider.deleteItemById('item-1', true);
+
+      final listRows = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRows.first['accomplishedItems'], 0);
     });
 
     test('should update item content', () async {
-      // Create item
-      // const item = TestDataFactory.createTestItem(content: 'Old content');
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // Update
-      // await provider.updateItemContent(item.id, 'New content');
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', content: 'Old content');
+      await provider.addExistingItem(item);
 
-      // Verify
-      // final updated = await provider.itemById(item.id);
-      // expect(updated.content, 'New content');
-    });
+      await provider.updateItemContent('item-1', 'New content');
 
-    test('should toggle item done status', () async {
-      // Create item (not done)
-      // const item = TestDataFactory.createTestItem(done: false);
-      // await provider.addExistingItem(item);
-
-      // Toggle
-      // await provider.toggleItemDone(item, context); // Needs context
-
-      // Verify
-      // final updated = await provider.itemById(item.id);
-      // expect(updated.done, true);
+      final updated = await provider.itemById('item-1');
+      expect(updated.content, 'New content');
     });
   });
 
   group('ItemProvider - Item Ordering', () {
-    test('should maintain item order by index', () async {
-      // Create 3 items with indices 0, 1, 2
-      // const item1 = TestDataFactory.createTestItem(itemIndex: 0);
-      // const item2 = TestDataFactory.createTestItem(itemIndex: 1);
-      // const item3 = TestDataFactory.createTestItem(itemIndex: 2);
-
-      // final items = await provider.itemsByListId('list-1');
-      // expect(items[0].itemIndex, 0);
-      // expect(items[1].itemIndex, 1);
-      // expect(items[2].itemIndex, 2);
-    });
-
     test('should update item index', () async {
-      // Create item with index 0
-      // const item = TestDataFactory.createTestItem(itemIndex: 0);
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // Update index
-      // await provider.editIndex(item.id, 5);
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', itemIndex: 0);
+      await provider.addExistingItem(item);
 
-      // Verify
-      // final updated = await provider.itemById(item.id);
-      // expect(updated.itemIndex, 5);
+      await provider.editIndex('item-1', 5);
+
+      final updated = await provider.itemById('item-1');
+      expect(updated.itemIndex, 5);
     });
 
-    test('should reorder items when one is moved', () async {
-      // Create 5 items
-      // Move item at index 2 to index 4
-      // Verify ordering adjusted correctly
-    });
+    test('should maintain item order by index', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-    test('should handle reordering with gaps', () async {
-      // Items have indices: 0, 5, 10
-      // Reorder should handle non-contiguous indices
-    });
+      final item1 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 2);
+      final item2 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 0);
+      final item3 = TestDataFactory.createTestItem(listId: 'list-1', itemIndex: 1);
+      await provider.addExistingItem(item1);
+      await provider.addExistingItem(item2);
+      await provider.addExistingItem(item3);
 
-    test('should move done items to bottom automatically', () async {
-      // Create 3 items (all not done)
-      // Toggle middle item as done
-      // Done item should move to bottom
-      // Indices should be: 0, 1, 2 (or similar contiguous)
-    });
-  });
-
-  group('ItemProvider - Item Filtering', () {
-    test('should return only incomplete items', () async {
-      // Create mix: done, not done, done, not done
-      // Filter incomplete
-      // expect(incomplete.length, 2);
-      // expect(incomplete.every((i) => !i.done), true);
-    });
-
-    test('should return only complete items', () async {
-      // Create mix of done/not done
-      // Filter completed
-      // expect(completed.every((i) => i.done), true);
-    });
-
-    test('should return items in completion order', () async {
-      // Create items, toggle some done
-      // Incomplete items should come first
-      // Done items should come last
-    });
-
-    test('should handle all items incomplete', () async {
-      // Create 5 items, none done
-      // Filter incomplete
-      // expect(incomplete.length, 5);
-    });
-
-    test('should handle all items complete', () async {
-      // Create 5 items, all done
-      // Filter incomplete
-      // expect(incomplete.isEmpty, true);
+      final items = await provider.itemsByListId('list-1');
+      final sorted = items..sort((a, b) => a.itemIndex.compareTo(b.itemIndex));
+      expect(sorted[0].itemIndex, 0);
+      expect(sorted[1].itemIndex, 1);
+      expect(sorted[2].itemIndex, 2);
     });
   });
 
   group('ItemProvider - Item Content', () {
     test('should preserve URLs in content', () async {
-      // const content = 'Check https://flutter.dev';
-      // const item = TestDataFactory.createTestItem(content: content);
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.content.contains('https://'), true);
-    });
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        content: 'Check https://flutter.dev',
+      );
+      await provider.addExistingItem(item);
 
-    test('should preserve phone numbers in content', () async {
-      // const content = 'Call 123-456-7890';
-      // const item = TestDataFactory.createTestItem(content: content);
-      // await provider.addExistingItem(item);
-
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.content.contains('123-456'), true);
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.content.contains('https://flutter.dev'), true);
     });
 
     test('should preserve special characters in content', () async {
-      // const content = 'Buy @home #done $5 & more!';
-      // const item = TestDataFactory.createTestItem(content: content);
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.content, content);
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        content: 'Buy @home #done & more!',
+      );
+      await provider.addExistingItem(item);
+
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.content, 'Buy @home #done & more!');
     });
 
-    test('should handle empty content updates', () async {
-      // Create item with content
-      // Update to empty string
-      // expect(updated.content, '');
+    test('should handle empty content update', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        content: 'Some content',
+      );
+      await provider.addExistingItem(item);
+
+      await provider.updateItemContent('item-1', '');
+
+      final updated = await provider.itemById('item-1');
+      expect(updated.content, '');
     });
 
     test('should handle very long content', () async {
-      // const longContent = 'A' * 10000;
-      // const item = TestDataFactory.createTestItem(content: longContent);
-      // await provider.addExistingItem(item);
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.content.length, 10000);
-    });
-  });
+      final longContent = 'A' * 10000;
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        content: longContent,
+      );
+      await provider.addExistingItem(item);
 
-  group('ItemProvider - Multiple Lists', () {
-    test('should separate items by list ID', () async {
-      // Create items in list-1 and list-2
-      // final items1 = await provider.itemsByListId('list-1');
-      // final items2 = await provider.itemsByListId('list-2');
-
-      // Items should not be mixed
-      // expect(items1.every((i) => i.listId == 'list-1'), true);
-      // expect(items2.every((i) => i.listId == 'list-2'), true);
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.content.length, 10000);
     });
 
-    test('should handle items in different lists with same index', () async {
-      // list-1: item with index 0
-      // list-2: item with index 0
-      // Should not conflict
-    });
+    test('should handle unicode and emoji in title', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1');
+      await db.insert('todo_lists', list.toMap());
 
-    test('should delete items from only one list', () async {
-      // Create items in list-1 and list-2
-      // Delete all from list-1
-      // list-2 items should remain
-    });
-  });
+      final item = TestDataFactory.createTestItem(
+        id: 'item-1',
+        listId: 'list-1',
+        title: '🎉 עברית 中文',
+      );
+      await provider.addExistingItem(item);
 
-  group('ItemProvider - Statistics', () {
-    test('should count total items in list', () async {
-      // Create 5 items
-      // const items = await provider.itemsByListId('list-1');
-      // expect(items.length, 5);
-    });
-
-    test('should count incomplete items', () async {
-      // Create 5 items: 3 done, 2 not done
-      // const incomplete = items.where((i) => !i.done).length;
-      // expect(incomplete, 2);
-    });
-
-    test('should calculate completion percentage', () async {
-      // Create 4 items, 1 done
-      // percentage = 25%
-    });
-
-    test('should handle zero items', () async {
-      // No items
-      // Statistics should reflect 0/0
+      final retrieved = await provider.itemById('item-1');
+      expect(retrieved.title, '🎉 עברית 中文');
     });
   });
 
   group('ItemProvider - Edge Cases', () {
-    test('should handle items with very long titles', () async {
-      // Create item with 500+ character title
-      // Should preserve exactly
+    test('should handle deleting non-existent item gracefully', () async {
+      // Should not throw
+      await provider.deleteItemById('nonexistent-id', false);
     });
 
-    test('should handle special unicode characters', () async {
-      // Create item with emoji, hebrew, chinese, etc.
-      // const item = TestDataFactory.createTestItem(
-      //   title: '🎉 עברית 中文 Ñoño',
-      // );
-      // await provider.addExistingItem(item);
+    test('should handle rapid add and delete operations', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
+      await db.insert('todo_lists', list.toMap());
 
-      // final retrieved = await provider.itemById(item.id);
-      // expect(retrieved.title, item.title);
-    });
-
-    test('should handle rapid add/delete operations', () async {
       // Add 10 items
+      final items = List.generate(10, (i) =>
+        TestDataFactory.createTestItem(id: 'item-$i', listId: 'list-1', itemIndex: i));
+      for (final item in items) {
+        await provider.addExistingItem(item);
+      }
+
       // Delete 5
-      // Add 5 more
-      // All operations should succeed
+      for (int i = 0; i < 5; i++) {
+        await provider.deleteItemById('item-$i', false);
+      }
+
+      final remaining = await provider.itemsByListId('list-1');
+      expect(remaining.length, 5);
     });
 
-    test('should handle toggle on already-done item', () async {
-      // Create item (done: true)
-      // Toggle (should become not done)
-      // Toggle again (should become done)
-    });
-
-    test('should handle creating item with no list ID', () async {
-      // const item = TestDataFactory.createTestItem(listId: '');
-      // Should either throw or use default
-    });
-
-    test('should handle item index boundary values', () async {
-      // Create items with: -999, 0, 999, 999999
-      // Should all be valid
+    test('should handle updating content of non-existent item gracefully', () async {
+      // Should not throw
+      await provider.updateItemContent('nonexistent-id', 'content');
     });
   });
 }
