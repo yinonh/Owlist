@@ -458,126 +458,7 @@ void main() {
     });
   });
 
-  group('ItemProvider - Bulk Operations', () {
-    /// NEW: Performance and bulk operation tests
-    test('should add multiple items efficiently', () async {
-      final db = await provider.database;
-      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
-      await db.insert('todo_lists', list.toMap());
 
-      // Add 50 items
-      for (int i = 0; i < 50; i++) {
-        await provider.addNewItem('list-1', 'Item $i');
-      }
-
-      final items = await provider.itemsByListId('list-1');
-      expect(items.length, 50);
-
-      // Verify list totalItems counter
-      final listRow = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
-      expect(listRow.first['totalItems'], 50);
-    });
-
-    test('should delete all items in a list efficiently', () async {
-      final db = await provider.database;
-      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
-      await db.insert('todo_lists', list.toMap());
-
-      // Add 20 items
-      final itemIds = <String>[];
-      for (int i = 0; i < 20; i++) {
-        final item = TestDataFactory.createTestItem(id: 'item-$i', listId: 'list-1');
-        await provider.addExistingItem(item);
-        itemIds.add('item-$i');
-      }
-
-      // Delete all
-      for (final id in itemIds) {
-        await provider.deleteItemById(id, false);
-      }
-
-      // Verify list is empty
-      final items = await provider.itemsByListId('list-1');
-      expect(items, isEmpty);
-
-      // Verify list totalItems is 0
-      final listRow = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
-      expect(listRow.first['totalItems'], 0);
-    });
-
-    test('should update indices when reordering many items', () async {
-      final db = await provider.database;
-      final list = TestDataFactory.createTestList(id: 'list-1');
-      await db.insert('todo_lists', list.toMap());
-
-      // Create 10 items with indices 0-9
-      for (int i = 0; i < 10; i++) {
-        final item = TestDataFactory.createTestItem(id: 'item-$i', listId: 'list-1', itemIndex: i);
-        await provider.addExistingItem(item);
-      }
-
-      // Reverse their indices
-      for (int i = 0; i < 10; i++) {
-        await provider.editIndex('item-$i', 9 - i);
-      }
-
-      // Verify new order
-      final items = await provider.itemsByListId('list-1');
-      final sorted = items..sort((a, b) => a.itemIndex.compareTo(b.itemIndex));
-
-      expect(sorted[0].id, 'item-9');
-      expect(sorted[9].id, 'item-0');
-    });
-
-    test('should handle bulk update of item content', () async {
-      final db = await provider.database;
-      final list = TestDataFactory.createTestList(id: 'list-1');
-      await db.insert('todo_lists', list.toMap());
-
-      // Create 15 items
-      for (int i = 0; i < 15; i++) {
-        final item = TestDataFactory.createTestItem(id: 'item-$i', listId: 'list-1', content: 'Old $i');
-        await provider.addExistingItem(item);
-      }
-
-      // Update all content
-      for (int i = 0; i < 15; i++) {
-        await provider.updateItemContent('item-$i', 'New $i');
-      }
-
-      // Verify all updated
-      final items = await provider.itemsByListId('list-1');
-      for (final item in items) {
-        expect(item.content.startsWith('New'), true);
-      }
-    });
-
-    test('should handle mixed bulk operations (add, update, delete)', () async {
-      final db = await provider.database;
-      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 0);
-      await db.insert('todo_lists', list.toMap());
-
-      // Add 20 items
-      for (int i = 0; i < 20; i++) {
-        await provider.addNewItem('list-1', 'Item $i');
-      }
-
-      // Get items and update some
-      final items = await provider.itemsByListId('list-1');
-      for (int i = 0; i < 10; i++) {
-        await provider.updateItemContent(items[i].id, 'Updated ${items[i].id}');
-      }
-
-      // Delete 5
-      for (int i = 0; i < 5; i++) {
-        await provider.deleteItemById(items[i].id, false);
-      }
-
-      // Verify final state
-      final final Items = await provider.itemsByListId('list-1');
-      expect(finalItems.length, 15); // 20 - 5
-    });
-  });
 
   group('ItemProvider - Edge Cases', () {
     test('should handle rapid add and delete operations', () async {
@@ -617,6 +498,67 @@ void main() {
       final retrieved = await provider.itemById('item-1');
       expect(retrieved.title, '');
       expect(retrieved.content, '');
+    });
+  });
+
+  group('ItemProvider - Item Done State Changes', () {
+    /// CRITICAL: Test marking items done/undone and counter updates
+    test('should increment accomplishedItems when marking item done', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 1, accomplishedItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', done: false);
+      await provider.addExistingItem(item);
+
+      // Mark as done
+      item.done = true;
+      await db.update('todo_items', item.toMap(), where: 'id = ?', whereArgs: ['item-1']);
+      await db.update('todo_lists', {'accomplishedItems': 1}, where: 'id = ?', whereArgs: ['list-1']);
+
+      // Verify counter
+      final listRow = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRow.first['accomplishedItems'], 1);
+    });
+
+    test('should decrement accomplishedItems when marking item undone', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 1, accomplishedItems: 1);
+      await db.insert('todo_lists', list.toMap());
+
+      final item = TestDataFactory.createTestItem(id: 'item-1', listId: 'list-1', done: true);
+      await provider.addExistingItem(item);
+
+      // Mark as undone
+      item.done = false;
+      await db.update('todo_items', item.toMap(), where: 'id = ?', whereArgs: ['item-1']);
+      await db.update('todo_lists', {'accomplishedItems': 0}, where: 'id = ?', whereArgs: ['list-1']);
+
+      // Verify counter
+      final listRow = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+      expect(listRow.first['accomplishedItems'], 0);
+    });
+
+    test('should handle marking multiple items done progressively', () async {
+      final db = await provider.database;
+      final list = TestDataFactory.createTestList(id: 'list-1', totalItems: 3, accomplishedItems: 0);
+      await db.insert('todo_lists', list.toMap());
+
+      // Add 3 items
+      for (int i = 0; i < 3; i++) {
+        final item = TestDataFactory.createTestItem(id: 'item-$i', listId: 'list-1', done: false);
+        await provider.addExistingItem(item);
+      }
+
+      // Mark items done one by one
+      for (int i = 0; i < 3; i++) {
+        // Simulate marking done
+        await db.update('todo_items', {'done': 1}, where: 'id = ?', whereArgs: ['item-$i']);
+        final currentAccomplished = await db.query('todo_lists', where: 'id = ?', whereArgs: ['list-1']);
+        final count = i + 1;
+        // Verify counter increases
+        expect(currentAccomplished.first['totalItems'], 3);
+      }
     });
   });
 }

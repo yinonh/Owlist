@@ -775,6 +775,118 @@ void main() {
     });
   });
 
+  group('ListsProvider - Cache Invalidation', () {
+    /// CRITICAL: Test that caches are properly invalidated when lists are created/modified
+    test('should populate cache on first getActiveItems call', () async {
+      final db = await provider.database;
+      
+      final list = TestDataFactory.createTestList(
+        id: 'list-1',
+        title: 'First List',
+        hasDeadline: true,
+        deadline: futureDate,
+        totalItems: 5,
+        accomplishedItems: 0,
+      );
+      await db.insert('todo_lists', list.toMap());
+
+      // First call - should populate cache
+      final items1 = await provider.getActiveItems();
+      expect(items1.length, 1);
+      expect(items1[0].title, 'First List');
+
+      // Second call - should use cache (fast, no DB query)
+      final items2 = await provider.getActiveItems();
+      expect(items2.length, 1);
+      expect(items2[0].title, 'First List');
+    });
+
+    test('should invalidate cache when new list is created', () async {
+      final db = await provider.database;
+      
+      // Create first list
+      final list1 = TestDataFactory.createTestList(
+        id: 'list-1',
+        title: 'List 1',
+        hasDeadline: true,
+        deadline: futureDate,
+        totalItems: 0,
+      );
+      await db.insert('todo_lists', list1.toMap());
+
+      // Get active items - should cache 1 list
+      var items = await provider.getActiveItems();
+      expect(items.length, 1);
+
+      // Create another list
+      final list2 = TestDataFactory.createTestList(
+        id: 'list-2',
+        title: 'List 2',
+        hasDeadline: true,
+        deadline: futureDate,
+        totalItems: 0,
+      );
+      await provider.addNewList(list2);
+
+      // Cache should be invalidated, now should have 2 lists
+      // (In real app, createNewList() calls invalidateCache())
+      // For this test, we manually verify cache behavior
+      items = await provider.getActiveItems();
+      
+      // After addNewList, cache may or may not be invalidated depending on implementation
+      // This test documents the expected behavior
+      expect(items.length, 2); // Should reflect both lists
+    });
+
+    test('should maintain separate caches for different views', () async {
+      final db = await provider.database;
+      
+      // Create active list
+      final activeList = TestDataFactory.createTestList(
+        id: 'active',
+        title: 'Active',
+        hasDeadline: true,
+        deadline: futureDate,
+        totalItems: 5,
+        accomplishedItems: 0,
+      );
+
+      // Create completed list
+      final completedList = TestDataFactory.createTestList(
+        id: 'completed',
+        title: 'Completed',
+        totalItems: 5,
+        accomplishedItems: 5,
+      );
+
+      // Create list without deadline
+      final noDeadlineList = TestDataFactory.createTestList(
+        id: 'no-deadline',
+        title: 'No Deadline',
+        hasDeadline: false,
+        totalItems: 0,
+      );
+
+      await db.insert('todo_lists', activeList.toMap());
+      await db.insert('todo_lists', completedList.toMap());
+      await db.insert('todo_lists', noDeadlineList.toMap());
+
+      // Each view should have its own cache
+      final activeItems = await provider.getActiveItems();
+      final achievedItems = await provider.getAchievedItems();
+      final noDeadlineItems = await provider.getWithoutDeadlineItems();
+
+      expect(activeItems.length, 1);
+      expect(activeItems[0].id, 'active');
+      
+      expect(achievedItems.length, 1);
+      expect(achievedItems[0].id, 'completed');
+      
+      expect(noDeadlineItems.length, 1);
+      expect(noDeadlineItems[0].id, 'no-deadline');
+    });
+  });
+
   group('ListsProvider - Edge Cases', () {
     test('should handle extremely long list titles', () async {
       final longTitle = 'Test ' * 100; // 500+ characters
