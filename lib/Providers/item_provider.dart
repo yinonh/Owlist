@@ -14,8 +14,13 @@ import '../Utils/keys.dart';
 
 class ItemProvider extends ChangeNotifier {
   Database? _database;
+  final Database? _injectedDatabase;
+
+  // Constructor with optional database injection for testing
+  ItemProvider({Database? database}) : _injectedDatabase = database;
 
   Future<Database> get database async {
+    if (_injectedDatabase != null) return _injectedDatabase!;
     if (_database != null) return _database!;
     _database = await initDB();
     return _database!;

@@ -1,8 +1,8 @@
 class ToDoItem {
   final String id;
   final String listId;
-  final String title;
-  final String content;
+  String title;
+  String content;
   bool done;
   int itemIndex;
 

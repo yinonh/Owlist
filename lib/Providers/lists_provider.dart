@@ -15,6 +15,7 @@ import '../Providers/notification_provider.dart';
 import '../Screens/home_page.dart';
 import '../Utils/context_extensions.dart';
 import '../Utils/keys.dart';
+import '../Utils/sort_by.dart';
 import '../Utils/notification_time.dart';
 import '../Utils/pair_result.dart';
 import '../Utils/shared_preferences_helper.dart';
@@ -22,12 +23,16 @@ import '../Utils/strings.dart';
 
 class ListsProvider extends ChangeNotifier {
   Database? _database;
+  final Database? _injectedDatabase;
   List<ToDoList>? _activeItemsCache;
   List<ToDoList>? _achievedItemsCache;
   List<ToDoList>? _withoutDeadlineItemsCache;
   late NotificationProvider notificationProvider;
   late BuildContext context;
   late SortBy selectedOption;
+
+  // Constructor with optional database injection for testing
+  ListsProvider({Database? database}) : _injectedDatabase = database;
 
   SortBy get selectedOptionVal => selectedOption;
 
@@ -46,6 +51,7 @@ class ListsProvider extends ChangeNotifier {
   }
 
   Future<Database> get database async {
+    if (_injectedDatabase != null) return _injectedDatabase!;
     if (_database != null) return _database!;
     _database = await initDB();
     return _database!;
