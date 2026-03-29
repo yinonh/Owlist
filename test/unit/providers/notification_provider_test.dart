@@ -329,8 +329,6 @@ void main() {
     });
   });
 
-;
-
   group('NotificationProvider - Edge Cases', () {
     test('should retrieve notifications in stable order', () async {
       // Create notifications in random order
@@ -378,7 +376,7 @@ void main() {
       await provider.editNotification(notifications[0], list);
 
       notifications = await provider.getNotificationsByListId('list-1');
-      final final Notif = notifications[0];
+      final finalNotif = notifications[0];
 
       expect(finalNotif.id, 'notif-1');
       expect(finalNotif.listId, 'list-1');
